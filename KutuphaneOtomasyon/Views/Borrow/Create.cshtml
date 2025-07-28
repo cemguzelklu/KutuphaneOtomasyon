@@ -1,0 +1,39 @@
+﻿@model KutuphaneOtomasyon.Models.Borrow
+@{
+    ViewData["Title"] = "Yeni Ödünç Ver";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3>Yeni Ödünç Ver</h3>
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label asp-for="MemberId"></label>
+                <select asp-for="MemberId" class="form-control" asp-items="ViewBag.Members">
+                    <option value="">Üye seçiniz</option>
+                </select>
+                <span asp-validation-for="MemberId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="BookId"></label>
+                <select asp-for="BookId" class="form-control" asp-items="ViewBag.Books">
+                    <option value="">Kitap seçiniz</option>
+                </select>
+                <span asp-validation-for="BookId" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

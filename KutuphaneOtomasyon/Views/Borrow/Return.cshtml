@@ -1,0 +1,31 @@
+﻿@model KutuphaneOtomasyon.Models.Borrow
+@{
+    ViewData["Title"] = "Kitap İade Et";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3>Kitap İade Formu</h3>
+
+<form asp-action="Return" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.BorrowId" />
+
+    <div class="form-group">
+        <label>Kitap</label>
+        <input class="form-control text-white" style="background-color: #6c757d;" value="@Model.Book.Title" readonly />
+    </div>
+
+    <div class="form-group">
+        <label>Üye</label>
+        <input class="form-control text-white" style="background-color: #6c757d;" value="@Model.Member.Name" readonly />
+    </div>
+
+    <div class="form-group">
+        <label>İade Tarihi</label>
+        <input type="date" class="form-control" name="returnDate" required />
+        <span class="text-danger">@Html.ValidationMessage("returnDate")</span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">İade Et</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">İptal</a>
+</form>

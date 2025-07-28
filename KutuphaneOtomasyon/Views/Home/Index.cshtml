@@ -1,0 +1,143 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+
+    <!-- Toplam Kitap -->
+    <div class="card mb-3 shadow" data-bs-toggle="collapse" data-bs-target="#bookDetails" style="cursor:pointer;">
+        <div class="card-body bg-info text-white">
+            <h5 class="card-title mb-0">📚 Toplam Kitap: <strong>@ViewBag.TotalBooks</strong></h5>
+            <small class="text-white-50">Detaylar için tıklayın</small>
+        </div>
+    </div>
+    <div id="bookDetails" class="collapse mb-4">
+        <div class="card card-body">
+            <table class="table table-bordered">
+                <thead class="table-info">
+                    <tr>
+                        <th>Başlık</th>
+                        <th>Yazar</th>
+                        <th>Kategori</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var book in (List<KutuphaneOtomasyon.Models.Book>)ViewBag.BookList)
+                    {
+                        <tr>
+                            <td>@book.Title</td>
+                            <td>@book.Author</td>
+                            <td>@book.Category</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Toplam Üye -->
+    <div class="card mb-3 shadow" data-bs-toggle="collapse" data-bs-target="#memberDetails" style="cursor:pointer;">
+        <div class="card-body bg-success text-white">
+            <h5 class="card-title mb-0">👤 Toplam Üye: <strong>@ViewBag.TotalMembers</strong></h5>
+            <small class="text-white-50">Detaylar için tıklayın</small>
+        </div>
+    </div>
+    <div id="memberDetails" class="collapse mb-4">
+        <div class="card card-body">
+            <table class="table table-bordered">
+                <thead class="table-success">
+                    <tr>
+                        <th>İsim</th>
+                        <th>Email</th>
+                        <th>Üye Tipi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in (List<KutuphaneOtomasyon.Models.Member>)ViewBag.MemberList)
+                    {
+                        <tr>
+                            <td>@member.Name</td>
+                            <td>@member.Email</td>
+                            <td>@member.MemberType</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Ödünç Kitaplar -->
+    <div class="card mb-3 shadow" data-bs-toggle="collapse" data-bs-target="#borrowDetails" style="cursor:pointer;">
+        <div class="card-body bg-warning text-dark">
+            <h5 class="card-title mb-0">📖 Ödünç Kitaplar: <strong>@ViewBag.BorrowedBooks</strong></h5>
+            <small class="text-dark-50">Detaylar için tıklayın</small>
+        </div>
+    </div>
+    <div id="borrowDetails" class="collapse mb-4">
+        <div class="card card-body">
+            <table class="table table-bordered">
+                <thead class="table-warning">
+                    <tr>
+                        <th>Üye</th>
+                        <th>Kitap</th>
+                        <th>Alış Tarihi</th>
+                        <th>İade Durumu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var borrow in (List<KutuphaneOtomasyon.Models.Borrow>)ViewBag.BorrowList)
+                    {
+                        <tr>
+                            <td>@borrow.Member.Name</td>
+                            <td>@borrow.Book.Title</td>
+                            <td>@borrow.BorrowDate.ToShortDateString()</td>
+                            <td>
+                                @(borrow.ReturnDate == null ? "İade Edilmedi" : borrow.ReturnDate?.ToShortDateString())
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Toplam Ödünç İşlemi -->
+    <div class="card mb-3 shadow">
+        <div class="card-body bg-danger text-white">
+            <h5 class="card-title mb-0">📦 Toplam Ödünç İşlemi</h5>
+            <h3 class="mt-2">@ViewBag.TotalBorrows</h3>
+        </div>
+    </div>
+
+    <!-- Bugün Yapılan Ödünç İşlemleri -->
+    <div class="card mb-3 shadow">
+        <div class="card-body bg-primary text-white">
+            <h5 class="card-title mb-0">📅 Bugün Ödünç Alınan Kitap Sayısı</h5>
+            <h3 class="mt-2">@ViewBag.TodayBorrows</h3>
+        </div>
+    </div>
+
+    <!-- Bugün Yapılan İade İşlemleri -->
+    <div class="card mb-3 shadow">
+        <div class="card-body bg-secondary text-white">
+            <h5 class="card-title mb-0">✅ Bugün İade Edilen Kitap Sayısı</h5>
+            <h3 class="mt-2">@ViewBag.TodayReturns</h3>
+        </div>
+    </div>
+
+    <!-- En Çok Kitap Alan Üye -->
+    <div class="card mb-5 shadow">
+        <div class="card-body bg-dark text-white">
+            <h5 class="card-title mb-0">🏆 En Çok Kitap Ödünç Alan Üye</h5>
+            @if (ViewBag.TopMember != null)
+            {
+                <p class="mt-2"><strong>@ViewBag.TopMember.Name</strong> - @ViewBag.TopMember.Count kitap</p>
+            }
+            else
+            {
+                <p class="mt-2">Veri bulunamadı</p>
+            }
+        </div>
+    </div>
+
+</div>

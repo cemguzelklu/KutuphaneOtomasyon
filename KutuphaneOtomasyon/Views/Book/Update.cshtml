@@ -1,0 +1,40 @@
+﻿@model KutuphaneOtomasyon.Models.Book
+@{
+    ViewData["Title"] = "Kitap Güncelle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<form asp-action="Update" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="BookId" />
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Author"></label>
+        <input asp-for="Author" class="form-control" />
+        <span asp-validation-for="Author" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Category"></label>
+        <input asp-for="Category" class="form-control" />
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="TotalCopies"></label>
+        <input asp-for="TotalCopies" class="form-control" />
+        <span asp-validation-for="TotalCopies" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="AvailableCopies"></label>
+        <input asp-for="AvailableCopies" class="form-control" />
+        <span asp-validation-for="AvailableCopies" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Güncelle</button>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

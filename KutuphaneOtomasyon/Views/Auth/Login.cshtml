@@ -1,0 +1,97 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Admin Giriş</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Matrix Admin CSS -->
+    <link rel="icon" type="image/png" sizes="16x16" href="~/matrix-admin/assets/images/favicon.png">
+    <link href="~/matrix-admin/dist/css/style.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <!-- Preloader -->
+        <div class="preloader">
+            <div class="lds-ripple">
+                <div class="lds-pos"></div>
+                <div class="lds-pos"></div>
+            </div>
+        </div>
+
+        <!-- Login Box -->
+        <div class="auth-wrapper d-flex no-block justify-content-center align-items-center bg-dark">
+            <div class="auth-box bg-dark border-top border-secondary">
+                <div id="loginform">
+                    <div class="text-center p-t-20 p-b-20">
+                        <span class="db"><img src="~/matrix-admin/assets/images/logo.png" alt="logo" /></span>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger mx-3">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <!-- Giriş Formu -->
+                    <form asp-action="Login" asp-controller="Auth" method="post" class="form-horizontal m-t-20">
+                        <div class="row p-b-30">
+                            <div class="col-12">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-success text-white"><i class="ti-user"></i></span>
+                                    </div>
+                                    <input type="text" name="username" class="form-control form-control-lg" placeholder="Kullanıcı Adı" required />
+                                </div>
+
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-warning text-white"><i class="ti-pencil"></i></span>
+                                    </div>
+                                    <input type="password" name="password" class="form-control form-control-lg" placeholder="Şifre" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row border-top border-secondary">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <div class="p-t-20">
+                                        <button class="btn btn-success float-end" type="submit">Giriş Yap</button>
+                                        <button type="button" class="btn btn-info"><i class="fa fa-lock m-r-5"></i> Şifremi Unuttum</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="~/matrix-admin/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="~/matrix-admin/assets/libs/popper.js/dist/umd/popper.min.js"></script>
+    <script src="~/matrix-admin/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+        $(".preloader").fadeOut();
+        $('#to-recover').on("click", function () {
+            $("#loginform").slideUp();
+            $("#recoverform").fadeIn();
+        });
+        $('#to-login').click(function () {
+            $("#recoverform").hide();
+            $("#loginform").fadeIn();
+        });
+    </script>
+</body>
+
+</html>

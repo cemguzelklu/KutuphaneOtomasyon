@@ -1,0 +1,55 @@
+﻿@model KutuphaneOtomasyon.Models.Book
+
+@{
+    ViewData["Title"] = "Yeni Kitap Ekle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Hataları topluca göster *@
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Yeni Kitap Ekle</h3>
+    </div>
+    <div class="card-body">
+        <form asp-controller="Book" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label asp-for="Title"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Author"></label>
+                <input asp-for="Author" class="form-control" />
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Category"></label>
+                <input asp-for="Category" class="form-control" />
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalCopies"></label>
+                <input asp-for="TotalCopies" class="form-control" />
+                <span asp-validation-for="TotalCopies" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AvailableCopies"></label>
+                <input asp-for="AvailableCopies" class="form-control" />
+                <span asp-validation-for="AvailableCopies" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Kaydet</button>
+        </form>
+    </div>
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+        alert("Form gönderiliyor!");
+    });
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

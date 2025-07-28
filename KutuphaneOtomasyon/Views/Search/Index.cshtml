@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Arama Sonuçları";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h4 class="mb-4">🔎 "@ViewBag.Query" için Arama Sonuçları</h4>
+
+@if (((List<KutuphaneOtomasyon.Models.Book>)ViewBag.Books).Any())
+{
+    <h5>📚 Kitaplar</h5>
+    <table class="table table-bordered table-striped">
+        <thead class="bg-info text-white">
+            <tr>
+                <th>Başlık</th>
+                <th>Yazar</th>
+                <th>Kategori</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in (List<KutuphaneOtomasyon.Models.Book>)ViewBag.Books)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.Author</td>
+                    <td>@book.Category</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (((List<KutuphaneOtomasyon.Models.Member>)ViewBag.Members).Any())
+{
+    <h5>👤 Üyeler</h5>
+    <table class="table table-bordered table-striped">
+        <thead class="bg-secondary text-white">
+            <tr>
+                <th>İsim</th>
+                <th>Email</th>
+                <th>Üye Tipi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var member in (List<KutuphaneOtomasyon.Models.Member>)ViewBag.Members)
+            {
+                <tr>
+                    <td>@member.Name</td>
+                    <td>@member.Email</td>
+                    <td>@member.MemberType</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (((List<KutuphaneOtomasyon.Models.Borrow>)ViewBag.Borrows).Any())
+{
+    <h5>👤 Ödünç Listesi</h5>
+    <table class="table table-bordered table-striped">
+        <thead class="bg-secondary text-white">
+            <tr>
+                <th>Üye</th>
+                <th>Kitap</th>
+                <th>Alış Tarihi</th>
+                <th>İade Tarihi</th>
+                <th>İade Durumu</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var borrow in (List<KutuphaneOtomasyon.Models.Borrow>)ViewBag.Borrows)
+            {
+                <tr>
+                    <td>@borrow.Member.Name</td>
+                    <td>@borrow.Book.Title</td>
+                    <td>@borrow.BorrowDate.ToShortDateString()</td>
+                    <td>@(borrow.ReturnDate?.ToShortDateString() ?? "Henüz iade edilmedi")</td>
+                    <td class="text-center">
+                        @if (borrow.ReturnDate == null)
+                        {
+                            <span class="badge bg-secondary text-white">İade Edilmedi</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary text-white">İade Edildi</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+

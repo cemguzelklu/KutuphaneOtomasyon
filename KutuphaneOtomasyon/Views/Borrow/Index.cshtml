@@ -1,0 +1,1024 @@
+﻿@model List<KutuphaneOtomasyon.Models.Borrow>
+@{
+    ViewData["Title"] = "Ödünç Liste";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+
+    .customf-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        overflow: hidden;
+    }
+
+
+    .customf-modal-content {
+        background: #fff;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 480px;
+        margin: 5% auto;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .customf-modal-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .customf-modal-title i {
+            font-size: 20px;
+            color: #52616B;
+            background-color: #fafafa;
+            padding: 8px;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0,0,0,0.1);
+        }
+
+    .customf-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 32px 12px 32px;
+        border-bottom: 1px solid #eee;
+        background-color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+        .customf-modal-header h5 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+    /* Dropdown kutusunun bulunduğu alan */
+    .customf-modal-dropdown {
+        padding: 16px 32px 0 32px;
+        background: #fafafa;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 58px; /* header yüksekliği kadar */
+        z-index: 9;
+        padding-bottom: 30px;
+    }
+
+    .customf-modal-body {
+        padding: 24px 32px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .customf-modal-dropdown .customf-input-group {
+        margin-bottom: 0;
+    }
+
+    .customf-modal-footer {
+        padding: 16px 32px 24px 32px;
+        border-top: 1px solid #eee;
+        background: #fff;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .customf-close {
+        float: right;
+        font-size: 22px;
+        font-weight: 600;
+        color: #bbb;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+        background-color: #f2f2f2;
+        border-radius: 40%;
+        padding: 1px 9px;
+        transition: all 0.3s ease;
+    }
+
+        .customf-close:hover {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+        /* Çarpı simgesi ikonla beraber düzgün görünsün */
+        .customf-close i {
+            pointer-events: none;
+        }
+
+    .customf-modal-content h5 {
+        font-size: 22px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .customf-input-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+
+        .customf-input-group label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .customf-input-group input,
+        .customf-input-group select {
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fff;
+            transition: all 0.25s ease-in-out;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+            .customf-input-group input:focus,
+            .customf-input-group select:focus {
+                border-color: #C9D6DF;
+                background: #fefefe;
+                box-shadow: 0 0 0 3px rgba(201, 214, 223, 1);
+                outline: none;
+            }
+
+    .customf-button-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+        .customf-button-group .customf-btn {
+            flex: unset;
+            text-align: center;
+        }
+
+    .customf-btn {
+        color: #fff;
+        font-size: 16px;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.1s ease;
+    }
+
+    .customf-filter-btn {
+        width: 75%;
+        background: linear-gradient(135deg,#C9D6DF, #52616B);
+    }
+
+        .customf-filter-btn:hover {
+            background: linear-gradient(135deg, #52616B,#C9D6DF);
+        }
+
+    .customf-clear-btn {
+        color: #000;
+        width: 25%;
+        background: linear-gradient(135deg, #ffffff, #C9D6DF);
+    }
+
+        .customf-clear-btn:hover {
+            background: linear-gradient(135deg, #C9D6DF,#ffffff );
+        }
+
+        .customf-clear-btn:focus,
+        .customf-filter-btn:focus {
+            outline: none !important;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+            border: none !important;
+        }
+
+    /* Select2 Seçim Görünümü */
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #F0F5F9 !important;
+        color: #333;
+        border: none !important;
+        font-weight: 600;
+        padding: 10px 12px; /* Dikey ve yatay boşluğu artırarak etiketi büyüt */
+        font-size: 1.05em; /* Yazı boyutunu biraz daha büyüt */
+        margin-top: 4px; /* Üstten boşluğu biraz artır (birden fazla satırda daha iyi görünür) */
+        margin-right: 6px; /* Sağdan boşluğu koru */
+        /* Seçili öğe içindeki "x" butonunun dikey hizalanması için */
+        display: flex;
+        align-items: center;
+        gap: 5px; /* Metin ile "x" arasında boşluk */
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #666;
+        font-size: 1.1em;
+    }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #000;
+        }
+
+    .select2-container--default .select2-selection--multiple {
+        min-height: 42px !important;
+        height: auto !important;
+        overflow-y: auto;
+        max-height: 120px;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        background-color: #fff !important;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 6px;
+        line-height: normal;
+    }
+
+        .select2-container--default .select2-selection--multiple::-webkit-scrollbar {
+            display: none;
+        }
+
+    /* Dropdown Açılır Liste Seçenekleri */
+    .select2-container--default .select2-results__option {
+        padding: 10px 14px;
+        font-size: 15px;
+        color: #333;
+        background-color: #fff;
+        transition: background 0.2s ease-in-out;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* Hover efekti: Mor tema */
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg, #ffffff, #F0F5F9) !important;
+        color: #fff !important;
+        font-weight: 600;
+        border-radius: 6px;
+        outline: none !important;
+    }
+
+    /* Seçili olan öğe */
+    .select2-container--default .select2-results__option[aria-selected="true"] {
+        background-color: #F0F5F9 !important;
+        color: #222 !important;
+        font-weight: 500;
+        outline: none !important;
+    }
+
+    /* Dropdown kutusu */
+    .select2-container--default .select2-dropdown {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Dropdown arama kutusu */
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    /* Mavi odak çizgilerini kaldır */
+    .select2-container--default .select2-selection--multiple:focus,
+    .select2-container--default .select2-selection--single:focus,
+    .select2-container--default .select2-dropdown:focus,
+    .select2-container--default .select2-selection:focus-visible {
+        outline: none !important;
+        border-color: #F0F5F9 !important;
+        box-shadow: none !important;
+    }
+
+    .empty-placeholder {
+        text-align: center;
+        padding: 30px 20px;
+        color: #666;
+        font-size: 16px;
+        background: #fafafa;
+        border-radius: 12px;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
+    }
+
+        .empty-placeholder i {
+            font-size: 32px;
+            color: #ccc;
+        }
+
+    .customf-inline-inputs {
+        display: flex;
+        justify-content: space-between;
+        gap: 0%;
+    }
+
+        .customf-inline-inputs input[type="number"],
+        .customf-inline-inputs input[type="datetime-local"] {
+            flex: 1;
+            width: 48%;
+            display: inline-block;
+            margin-right: 4%;
+        }
+
+    .customf-input-group input[type="datetime-local"]:last-child,
+    .customf-input-group input[type="number"]:last-child {
+        margin-right: 0;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12 d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">📦 Ödünç Alınan Kitaplar</h4>
+            <a class="btn btn-success btn-rounded waves-effect waves-light" asp-action="Create">
+                <i class="fa fa-plus mr-1"></i> Yeni Ödünç Ver
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="borrowTable" class="table table-bordered table-hover table-striped">
+                    <thead class="bg-info text-white">
+                        <tr>
+                            <th>Üye</th>
+                            <th>Kitap</th>
+                            <th>Alış Tarihi</th>
+                            <th>İade Tarihi</th>
+                            <th class="text-center">İşlemler</th>
+                        </tr>
+                    </thead>
+                    @*  <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Member.Name</td>
+                                <td>@item.Book.Title</td>
+                                <td>
+                                    @item.BorrowDate.ToString("dd.MM.yyyy HH:mm")
+                                </td>
+                                <td>@(item.ReturnDate?.ToShortDateString() ?? "Henüz iade edilmedi")</td>
+                                <td class="text-center">
+                                    @if (item.ReturnDate == null)
+                                    {
+                                        <a asp-action="Return" asp-route-id="@item.BorrowId" class="btn btn-success btn-sm btn-rounded waves-effect waves-light">
+                                            <i class="fa fa-undo"></i> İade Et
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary text-white">İade Edildi</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>*@
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🔍 Filtreleme Modalı -->
+<div id="customf-filter-modal" class="customf-modal">
+    <div class="customf-modal-content">
+        <div class="customf-modal-header">
+            <div class="customf-modal-title">
+                <i class="fas fa-filter"></i>
+                <h5>Filtreleme Seçenekleri</h5>
+            </div>
+            <span class="customf-close" title="Kapat">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+
+        <!-- Dropdown üstte ve sabit -->
+        <div class="customf-modal-dropdown">
+            <div class="customf-input-group">
+                <label for="columnSelector">Filtrelenecek Sütunlar</label>
+                <select id="columnSelector" class="select2-column-selector" style="width: 100%;" multiple></select>
+            </div>
+        </div>
+
+        <!-- Scroll edilebilir içerik -->
+        <div class="customf-modal-body">
+            <form id="customf-dynamic-filter-form"></form>
+        </div>
+
+        <div class="customf-modal-footer">
+            <div class="customf-button-group">
+                <button id="customf-clear-filter" class="customf-btn customf-clear-btn">Temizle</button>
+                <button id="customf-apply-filter" class="customf-btn customf-filter-btn">Filtrele</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        let previousFilterValues = {};
+        let selectedColumns = [];
+        let columnTypesCache = {}; // Her sütunun tipini (date, number, text) önbelleğe almak için
+        let parsedDatesCache = []; // Sadece tarih sütunlarındaki dönüştürülmüş Date objelerini tutmak için
+
+        $(document).ready(function () {
+            // Örnek veri seti oluşturucu
+            function generateMockData(rowCount = 5000) {
+                const firstNames = ["Ahmet", "Mehmet", "Ayşe", "Fatma", "Zeynep", "Mustafa", "Emre", "Elif", "Cem", "Yılmaz", "Hakan"];
+                const lastNames = ["Yılmaz", "Kaya", "Demir", "Çelik", "Şahin", "Arslan", "Güzel", "Sabun"];
+                const bookTitles = [
+                    "Suç ve Ceza", "Sefiller", "1984",
+                    "Hayvan Çiftliği", "Küçük Prens", "Dönüşüm",
+                    "Satranç", "Beyaz Diş", "İnce Memed", "Anna Karenina",
+                    "Anna Karenina2"
+                ];
+
+                const data = [];
+                const today = new Date();
+                for (let i = 0; i < rowCount; i++) {
+                    const randomDays = Math.floor(Math.random() * 365);
+                    const borrowDate = new Date();
+                    borrowDate.setDate(today.getDate() - randomDays);
+                    const returnDate = Math.random() > 0.3 ?
+                        new Date(borrowDate.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000) :
+                        null;
+                    data.push([
+                        `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
+                        bookTitles[Math.floor(Math.random() * bookTitles.length)],
+                        borrowDate.toLocaleString('tr-TR'),
+                        returnDate ? returnDate.toLocaleDateString('tr-TR') : "Henüz iade edilmedi",
+                        returnDate ?
+                            '<span class="badge bg-secondary text-white">İade Edildi</span>' :
+                            '<button class="btn btn-success btn-sm">İade Et</button>'
+                    ]);
+                }
+                return data;
+            }
+
+            // DataTable başlatma
+            const table = $('#borrowTable').DataTable({
+                responsive: true,
+                autoWidth: false,
+                lengthChange: true,
+                deferRender: true,
+                scrollY: '60vh',
+                scrollCollapse: true,
+                scroller: true,
+                order: [],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
+                },
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                pageLength: 10,
+                paging: true,
+                buttons: [
+                    {
+                        extend: "copy",
+                        text: '<i class="fas fa-copy"></i>',
+                        titleAttr: "Kopyala",
+                        className: "btn-copy"
+                    },
+                    {
+                        text: '<i class="fas fa-filter"></i> Filtrele',
+                        titleAttr: "Filtreleme seçeneklerini aç",
+                        className: "customf-filter-button",
+                        action: function () {
+                 
+                                populateColumnSelector("borrowTable");
+                                generateCustomfFilterForm("borrowTable");
+                                $('#customf-filter-modal').show();
+                                activateSelect2();
+                        }
+                    }
+                ],
+                dom: 'Bfrtip',
+                data: generateMockData(5000),
+                columns: [
+                    { data: 0, title: "Üye" },
+                    { data: 1, title: "Kitap" },
+                    { data: 2, title: "Alış Tarihi" },
+                    { data: 3, title: "İade Tarihi" },
+                    {
+                        data: 4,
+                        title: "İşlemler",
+                        orderable: false,
+                        render: function (data) {
+                            return data;
+                        }
+                    }
+                ]
+            });
+
+            // Tablo yüklendiğinde sütun tiplerini ve tarihleri önbelleğe al
+            cacheColumnDataAndTypes("borrowTable");
+        });
+
+
+        function activateSelect2() {
+            if ($('#columnSelector').data('select2')) {
+                $('#columnSelector').select2('destroy');
+            }
+            if ($('#columnSelector option[value="select-all-option"]').length === 0) {
+                $('#columnSelector').prepend('<option value="select-all-option">Tümünü Seç</option>');
+            }
+            $('#columnSelector').select2({
+                placeholder: "Filtrelenecek sütunları seçin...",
+                width: '100%',
+                multiple: true,
+                dropdownParent: $('#customf-filter-modal .customf-modal-content'),
+                templateResult: function (data) {
+                    if (data.id === 'select-all-option') {
+                        return $('<span><i class="fas fa-check-double"></i> Tümünü Seç</span>');
+                    }
+                    return data.text;
+                },
+                templateSelection: function (data) {
+                    if (data.id === 'select-all-option') {
+                        const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
+                        const currentSelectedCount = $('#columnSelector').val() ? $('#columnSelector').val().length : 0;
+                        if (currentSelectedCount === totalSelectableOptions) {
+                            return `Tümü Seçili (${totalSelectableOptions})`;
+                        }
+                        return `(${currentSelectedCount}/${totalSelectableOptions}) Sütun Seçili`;
+                    }
+                    return data.text;
+                }
+            });
+            $('#columnSelector').on('select2:select', function (e) {
+                const selectedId = e.params.data.id;
+                if (selectedId === 'select-all-option') {
+                    const $selector = $(this);
+                    const allOptions = $selector.find('option').not('[value="select-all-option"]').map(function () {
+                        return $(this).val();
+                    }).get();
+                    $selector.val(allOptions).trigger('change');
+                    $selector.select2('close');
+                }
+            });
+            $('#columnSelector').on('select2:unselect', function (e) {
+                const unselectedId = e.params.data.id;
+                if (unselectedId === 'select-all-option') {
+                    $(this).val(null).trigger('change');
+                }
+            });
+        }
+
+        function populateColumnSelector(tableId) {
+            const table = $(`#${tableId}`).DataTable();
+            const columns = table.columns().header().toArray();
+            const selector = $('#columnSelector');
+            selector.empty();
+            columns.forEach((col, index) => {
+                const colName = $(col).text().trim();
+                if (colName && colName !== "İşlemler") {
+                  
+                    const selectedAttr = previousFilterValues.hasOwnProperty(index) ? 'selected' : '';
+                    selector.append(`<option value="${index}" ${selectedAttr}>${colName}</option>`);
+                }
+            });
+            selector.trigger('change.select2');
+            const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
+            const currentSelectedCount = Object.keys(previousFilterValues).length;
+            if (currentSelectedCount > 0 && currentSelectedCount === totalSelectableOptions) {
+                selector.find('option[value="select-all-option"]').prop('selected', true);
+                selector.trigger('change.select2');
+            }
+        }
+
+         function generateCustomfFilterForm(tableId) {
+        try {
+            const table = $(`#${tableId}`).DataTable();
+            const columns = table.columns().header().toArray();
+            // selectedColumns artık `populateColumnSelector` tarafından güncelleniyor ve previousFilterValues'dan türetiliyor
+            const selectedIndexes = $('#columnSelector').val()?.map(Number) || [];
+            let formHtml = "";
+
+            selectedIndexes.forEach(index => {
+                try {
+                    const col = columns[index];
+                    const colName = $(col).text().trim();
+                    if (!colName || colName === "İşlemler") return;
+
+                    const columnType = columnTypesCache[index] || 'text';
+                    // previousFilterValues'daki o sütuna ait filtre değerlerini al
+                    const prev = previousFilterValues[index] || {};
+
+                    formHtml += `<div class="customf-input-group"><label>${colName}</label>`;
+                    if (columnType === 'date') {
+                        // Tarih filtreleri için:
+                        // 'prev' objesinden doğrudan string değeri alıyoruz, Date objesi değil.
+                        // Çünkü input[type="datetime-local"] bir ISO string bekler.
+                                const startVal = (prev['date'] && prev['date'].start) ? prev['date'].start : '';
+        const endVal = (prev['date'] && prev['date'].end) ? prev['date'].end : '';
+                        formHtml += `<div class="customf-inline-inputs">`;
+                        formHtml += `<input type="datetime-local" class="filter-input" data-type="date-start" data-index="${index}" value="${startVal}">`;
+                        formHtml += `<input type="datetime-local" class="filter-input" data-type="date-end" data-index="${index}" value="${endVal}">`;
+                        formHtml += `</div>`;
+                    } else if (columnType === 'number') {
+                        const min = (prev['range'] && !isNaN(prev['range'][0])) ? prev['range'][0] : '';
+                        const max = (prev['range'] && !isNaN(prev['range'][1])) ? prev['range'][1] : '';
+                        formHtml += `<div class="customf-inline-inputs">`;
+                        formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Min" value="${min}">`;
+                        formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Max" value="${max}">`;
+                        formHtml += `</div>`;
+                    } else { // Metin veya select tipleri için
+                        const allDataForColumn = table.column(index).data().toArray();
+                        const sampleForSelect = allDataForColumn.slice(0, Math.min(allDataForColumn.length, 500)).map(cell => {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = cell;
+                            return (tempDiv.textContent || tempDiv.innerText || "").trim();
+                        }).filter(v => v);
+                        const uniqueValues = [...new Set(sampleForSelect)];
+                        const useSelect = uniqueValues.length > 0 && uniqueValues.length <= 10;
+
+                        if (useSelect) {
+                            formHtml += `<select class="filter-input" data-type="select" data-index="${index}">`;
+                            formHtml += `<option value="">Tümü</option>`;
+                            uniqueValues.forEach(val => {
+                                // Selectbox'ta kaydedilmiş değeri hatırlama
+                                const selected = (prev['select'] === val) ? 'selected' : '';
+                                formHtml += `<option value="${val}" ${selected}>${val}</option>`;
+                            });
+                            formHtml += `</select>`;
+                        } else {
+                            // Text input'ta kaydedilmiş değeri hatırlama
+                            const val = prev['text'] || '';
+                            formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
+                        }
+                    }
+                    formHtml += `</div>`;
+                } catch (e) {
+                    console.error(`Sütun işleme hatası (index ${index}):`, e);
+                }
+            });
+            $('#customf-dynamic-filter-form').html(formHtml || getEmptyPlaceholder());
+        } catch (e) {
+            console.error("Filtre formu oluşturma hatası:", e);
+            $('#customf-dynamic-filter-form').html('<div class="alert alert-danger">Filtre oluşturulurken hata oluştu</div>');
+        }}
+
+
+         function getEmptyPlaceholder() {
+            return `
+                <div class="empty-placeholder">
+                    <i class="fas fa-sliders-h"></i><br>
+                    <b>Filtrelemek istediğiniz sütunları seçin.</b>
+                    <div style="font-size:13px; margin-top: 6px;">Yukarıdaki listeden bir veya daha fazla sütun seçin.</div>
+                </div>
+            `;
+        }
+          $('#customf-clear-filter').on('click', function () {
+            $('#columnSelector').val(null).trigger('change');
+            previousFilterValues = {}; // Filtreleri temizlerken kayıtlı değerleri de sıfırla
+            generateCustomfFilterForm("borrowTable"); // Formu boş olarak yeniden oluştur
+            $.fn.dataTable.ext.search = [];
+            $('#borrowTable').DataTable().draw();
+        });
+         $(document).on('change', '#columnSelector', function () {
+            setTimeout(() => {
+                generateCustomfFilterForm("borrowTable");
+            }, 100);
+        });
+         $('#customf-apply-filter').on('click', function () {
+            try {
+                const table = $('#borrowTable').DataTable();
+                // selectedColumns'ı tekrar güncelle, çünkü kullanıcı modal içinde sütun seçimini değiştirmiş olabilir
+                selectedColumns = $('#columnSelector').val()?.map(Number) || [];
+
+                // Yeni aktif filtreleri `previousFilterValues`'a kaydetmeden önce sıfırlamıyoruz!
+                // Sadece önceki değerleri üzerine yazacağız.
+                const currentActiveFilters = {}; // Geçerli uygulama için geçici bir değişken
+
+                $('.filter-input').each(function () {
+                    const type = $(this).data('type');
+                    const index = parseInt($(this).data('index'));
+                    const value = $(this).val().trim();
+
+                    if (value) {
+                        if (!currentActiveFilters[index]) currentActiveFilters[index] = {};
+                        if (type === 'range') {
+                            const inputs = $(`input[data-type="range"][data-index="${index}"]`);
+                            currentActiveFilters[index][type] = [
+                                parseFloat(inputs.eq(0).val().replace(',', '.')) || -Infinity,
+                                parseFloat(inputs.eq(1).val().replace(',', '.')) || Infinity
+                            ];
+                        } else if (type === 'date-start' || type === 'date-end') {
+                            if (!currentActiveFilters[index]['date']) currentActiveFilters[index]['date'] = { start: null, end: null };
+                            if (type === 'date-start') currentActiveFilters[index]['date'].start = value; // ISO string olarak kaydet
+                            if (type === 'date-end') currentActiveFilters[index]['date'].end = value; // ISO string olarak kaydet
+                        } else {
+                            currentActiveFilters[index][type] = value;
+                        }
+                    }
+                });
+
+                // Aktif filtreleri `previousFilterValues`'a atayalım.
+                // Sadece gerçekten filtrelenmiş sütunları kaydedelim.
+                previousFilterValues = {}; // Önceki tüm filtreleri temizle
+                for (const index in currentActiveFilters) {
+                    if (currentActiveFilters.hasOwnProperty(index)) {
+                        previousFilterValues[index] = currentActiveFilters[index];
+                    }
+                }
+
+
+                // 2. Önceki tüm özel filtreleri temizle
+                $.fn.dataTable.ext.search = [];
+
+                // 3. Yeni filtreleme fonksiyonunu ekle
+                $.fn.dataTable.ext.search.push(function (settings, rowData, dataIndex) {
+                    let pass = true;
+
+                    const cleanedRowData = {};
+                    selectedColumns.forEach(idx => {
+                        if (columnTypesCache[idx] !== 'ignored') {
+                            const cell = rowData[idx];
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = cell;
+                            cleanedRowData[idx] = (tempDiv.textContent || tempDiv.innerText || "").trim();
+                        }
+                    });
+
+                    for (const index in previousFilterValues) { // activeFilters yerine previousFilterValues kullan
+                        if (!previousFilterValues.hasOwnProperty(index)) continue;
+
+                        const filtersForColumn = previousFilterValues[index]; // currentActiveFilters yerine previousFilterValues kullan
+                        const colIndex = parseInt(index);
+                        const columnType = columnTypesCache[colIndex];
+
+                        switch (columnType) {
+                            case 'date':
+                                const dateFilters = filtersForColumn['date'];
+                                if (dateFilters) {
+                                    const cellDate = parsedDatesCache[dataIndex]?.[colIndex];
+                                    // Filtre değerlerini Date objesine dönüştürüyoruz
+                                    const filterStartDate = dateFilters.start ? new Date(dateFilters.start) : null;
+                                    const filterEndDate = dateFilters.end ? new Date(dateFilters.end) : null;
+
+                                    if (!cellDate) {
+                                        if (filterStartDate || filterEndDate) {
+                                            pass = false;
+                                        }
+                                        break;
+                                    }
+
+                                            // Daha sağlam hali:
+        if (filterStartDate && cellDate) {
+            const cellTime = cellDate.getTime();
+            const startTime = filterStartDate.getTime();
+            if (cellTime < startTime) pass = false;
+        }
+
+        if (filterEndDate && cellDate && pass) { // pass kontrolü önceki filtrenin geçilip geçilmediğini kontrol eder
+            const cellTime = cellDate.getTime();
+            const endTime = filterEndDate.getTime();
+            if (cellTime > endTime) pass = false;
+        }
+                                }
+                                break;
+                            case 'number':
+                                const rangeFilters = filtersForColumn['range'];
+                                if (rangeFilters) {
+                                    const [min, max] = rangeFilters;
+                                    const num = parseFloat(cleanedRowData[colIndex]?.replace(',', '.')) || 0;
+                                    if (num < min || num > max) {
+                                        pass = false;
+                                    }
+                                }
+                                break;
+                            case 'text':
+                                const textFilter = filtersForColumn['text'];
+                                if (textFilter && !cleanedRowData[colIndex]?.toLowerCase().includes(textFilter.toLowerCase())) {
+                                    pass = false;
+                                }
+                                break;
+                            case 'select':
+                                const selectFilter = filtersForColumn['select'];
+                                if (selectFilter && cleanedRowData[colIndex] !== selectFilter) {
+                                    pass = false;
+                                }
+                                break;
+                        }
+
+                        if (!pass) break;
+                    }
+                    return pass;
+                });
+
+                table.search('').columns().search('').draw();
+                table.draw();
+                $('#customf-filter-modal').hide();
+            } catch (e) {
+                console.error("Filtre uygulama hatası:", e);
+            }
+        });
+               
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('customf-filter-modal');
+            const closeBtn = document.querySelector('.customf-close');
+            window.onclick = function (event) {
+                if (event.target === modal) modal.style.display = 'none';
+            };
+            closeBtn.onclick = function () {
+                modal.style.display = 'none';
+            };
+        });
+
+          function isValidDate(dateStr) {
+            if (!dateStr || typeof dateStr !== 'string') return false;
+
+            // Şirketin kullandığı formatlar
+            const dateFormats = [
+                /^\d{1,2}\.\d{1,2}\.\d{4}$/,                          // dd.MM.yyyy
+                /^\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2}$/,          // dd.MM.yyyy HH:mm
+                /^\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2}:\d{2}$/     // dd.MM.yyyy HH:mm:ss
+            ];
+
+            // Format kontrolü
+                   const isFormatValid = dateFormats.some(format => {
+            const match = dateStr.match(format);
+            return match && match[0] === dateStr; // Tam eşleşme kontrolü
+        });
+            if (!isFormatValid) return false;
+
+            // Gerçek tarih kontrolü
+            const date = parseDate(dateStr);
+            if (!date || isNaN(date.getTime())) return false;
+
+            // Gün/Ay kontrolü (32.01 gibi geçersiz tarihleri yakala)
+            const parts = dateStr.split(/[\.\s:]/);
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]);
+            const year = parseInt(parts[2]);
+
+            return (
+                month >= 1 && month <= 12 &&
+                day >= 1 && day <= new Date(year, month, 0).getDate()
+            );
+        }
+          function parseDate(dateStr) {
+                                  dateStr = dateStr.replace(/\s+/g, ' ').replace(/[\u00A0]/g, ' ').trim();
+            // 1. Ön kontroller
+            if (dateStr instanceof Date) return dateStr;
+            if (!dateStr || typeof dateStr !== 'string') return null;
+
+            const trimmedStr = dateStr.trim();
+            if (trimmedStr === "" ) return null;
+
+            // 2. ISO format denemesi
+            const isoDate = new Date(trimmedStr);
+            if (!isNaN(isoDate.getTime())) return isoDate;
+        
+            // 3. Şirketin kullandığı formatlar
+            const formats = [
+                // Format 1: dd.MM.yyyy HH:mm:ss
+                {
+                    regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/,
+                    handler: (m) => new Date(m[3], m[2]-1, m[1], m[4], m[5], m[6])
+                },
+                // Format 2: dd.MM.yyyy HH:mm
+                {
+                    regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/,
+                    handler: (m) => new Date(m[3], m[2]-1, m[1], m[4], m[5])
+                },
+                // Format 3: dd.MM.yyyy
+                {
+                    regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,
+                    handler: (m) => new Date(m[3], m[2]-1, m[1])
+                }
+            ];
+
+            // Formatları deneyelim
+            for (const {regex, handler} of formats) {
+                const match = trimmedStr.match(regex);
+                if (match) {
+                    try {
+                        const date = handler(match.map(Number));
+                        if (!isNaN(date.getTime())) {
+                        return date;
+                        }
+                    } catch (e) {
+                        console.error("Tarih dönüşüm hatası:", e);
+                    }
+                }
+            }
+
+            return null;
+        }
+          function cacheColumnDataAndTypes(tableId) {
+            const table = $(`#${tableId}`).DataTable();
+            const allData = table.rows().data().toArray();
+            const columnsCount = table.columns().header().toArray().length;
+
+            columnTypesCache = {};
+            parsedDatesCache = [];
+
+            // 1. Sütun başlıklarına göre ön filtreleme (Opsiyonel)
+            table.columns().every(function(index) {
+                const colHeader = this.header();
+                const colName = $(colHeader).text().trim().toLowerCase();
+
+                // Eğer sütun adında 'tarih' geçiyorsa otomatik date olarak işaretle
+                if (colName.includes('tarih') || colName.includes('date')) {
+                    columnTypesCache[index] = 'date';
+                }
+            });
+
+            // 2. Veri analizi ile tip tespiti
+            const sampleSize = Math.min(300, allData.length); // Performans için örneklem
+            for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
+                // Önceden tanımlanmışsa atla
+                if (columnTypesCache[colIndex]) continue;
+
+                let dateCount = 0;
+                let numberCount = 0;
+                let totalChecked = 0;
+
+                // Sütundaki verileri analiz et
+                for (let rowIndex = 0; rowIndex < sampleSize; rowIndex++) {
+                    const cell = allData[rowIndex][colIndex];
+                    if (!cell) continue;
+
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = cell;
+                    const cellText = (tempDiv.textContent || tempDiv.innerText || "").trim();
+
+                    // Boş hücreleri atla
+                    if (!cellText) continue;
+                    totalChecked++;
+
+                    // Tarih kontrolü (Geliştirilmiş)
+                    if (isValidDate(cellText)) {
+                        dateCount++;
+                    }
+                    // Sayı kontrolü
+                    else if (!isNaN(parseFloat(cellText.replace(',', '.')))) {
+                        numberCount++;
+                    }
+                }
+
+                // Tip belirleme (Threshold: %60'dan fazla eşleşme)
+                if (totalChecked > 0) {
+                    if (dateCount / totalChecked > 0.6) {
+                        columnTypesCache[colIndex] = 'date';
+                    } else if (numberCount / totalChecked > 0.6) {
+                        columnTypesCache[colIndex] = 'number';
+                    } else {
+                        columnTypesCache[colIndex] = 'text';
+                    }
+                } else {
+                    columnTypesCache[colIndex] = 'text'; // Varsayılan
+                }
+            }
+
+            // 3. Tarih verilerini önbelleğe al
+                    allData.forEach((row, rowIndex) => {
+            if (!parsedDatesCache[rowIndex]) parsedDatesCache[rowIndex] = {};
+            for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
+                if (columnTypesCache[colIndex] === 'date' && !parsedDatesCache[rowIndex][colIndex]) {
+                    const cell = row[colIndex];
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = cell;
+                    const cellText = (tempDiv.textContent || tempDiv.innerText || "").trim();
+                    parsedDatesCache[rowIndex][colIndex] = parseDate(cellText);
+                }
+            }
+        });
+        }
+
+    </script>
+}
+
+                        

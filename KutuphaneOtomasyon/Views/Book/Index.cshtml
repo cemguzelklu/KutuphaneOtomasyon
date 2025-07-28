@@ -1,0 +1,835 @@
+﻿@model List<KutuphaneOtomasyon.Models.Book>
+@{
+    ViewData["Title"] = "Kitap Listesi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+
+    .customf-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        overflow: hidden;
+    }
+
+
+    .customf-modal-content {
+        background: #fff;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 480px;
+        margin: 5% auto;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .customf-modal-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .customf-modal-title i {
+            font-size: 20px;
+            color: #52616B;
+            background-color: #fafafa;
+            padding: 8px;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0,0,0,0.1);
+        }
+
+    .customf-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 32px 12px 32px;
+        border-bottom: 1px solid #eee;
+        background-color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+        .customf-modal-header h5 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+    /* Dropdown kutusunun bulunduğu alan */
+    .customf-modal-dropdown {
+        padding: 16px 32px 0 32px;
+        background: #fafafa;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 58px; /* header yüksekliği kadar */
+        z-index: 9;
+        padding-bottom: 30px;
+    }
+
+    .customf-modal-body {
+        padding: 24px 32px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .customf-modal-dropdown .customf-input-group {
+        margin-bottom: 0;
+    }
+
+    .customf-modal-footer {
+        padding: 16px 32px 24px 32px;
+        border-top: 1px solid #eee;
+        background: #fff;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .customf-close {
+        float: right;
+        font-size: 22px;
+        font-weight: 600;
+        color: #bbb;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+        background-color: #f2f2f2;
+        border-radius: 40%;
+        padding: 1px 9px;
+        transition: all 0.3s ease;
+    }
+
+        .customf-close:hover {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+        /* Çarpı simgesi ikonla beraber düzgün görünsün */
+        .customf-close i {
+            pointer-events: none;
+        }
+
+    .customf-modal-content h5 {
+        font-size: 22px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .customf-input-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+
+        .customf-input-group label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .customf-input-group input,
+        .customf-input-group select {
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fff;
+            transition: all 0.25s ease-in-out;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+            .customf-input-group input:focus,
+            .customf-input-group select:focus {
+                border-color: #C9D6DF;
+                background: #fefefe;
+                box-shadow: 0 0 0 3px rgba(201, 214, 223, 1);
+                outline: none;
+            }
+
+    .customf-button-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+        .customf-button-group .customf-btn {
+            flex: unset;
+            text-align: center;
+        }
+
+    .customf-btn {
+        color: #fff;
+        font-size: 16px;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.1s ease;
+    }
+
+    .customf-filter-btn {
+        width: 75%;
+        background: linear-gradient(135deg,#C9D6DF, #52616B);
+    }
+
+        .customf-filter-btn:hover {
+            background: linear-gradient(135deg, #52616B,#C9D6DF);
+        }
+
+    .customf-clear-btn {
+        color: #000;
+        width: 25%;
+        background: linear-gradient(135deg, #ffffff, #C9D6DF);
+    }
+
+        .customf-clear-btn:hover {
+            background: linear-gradient(135deg, #C9D6DF,#ffffff );
+        }
+
+        .customf-clear-btn:focus,
+        .customf-filter-btn:focus {
+            outline: none !important;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+            border: none !important;
+        }
+    /* Select2 Seçim Görünümü */
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #F0F5F9 !important;
+        color: #333 ;
+        border: none !important;
+        font-weight: 600 ;
+        padding: 10px 12px; /* Dikey ve yatay boşluğu artırarak etiketi büyüt */
+        font-size: 1.05em; /* Yazı boyutunu biraz daha büyüt */
+        margin-top: 4px; /* Üstten boşluğu biraz artır (birden fazla satırda daha iyi görünür) */
+        margin-right: 6px; /* Sağdan boşluğu koru */
+        /* Seçili öğe içindeki "x" butonunun dikey hizalanması için */
+        display: flex;
+        align-items: center;
+        gap: 5px; /* Metin ile "x" arasında boşluk */
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #666 ;
+        font-size: 1.1em;
+    }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #000 ;
+        }
+
+    .select2-container--default .select2-selection--multiple {
+        min-height: 42px !important;
+        height: auto !important;
+        overflow-y: auto;
+        max-height: 120px;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        background-color: #fff !important;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 6px;
+        line-height: normal;
+    }
+
+    .select2-container--default .select2-selection--multiple::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Dropdown Açılır Liste Seçenekleri */
+    .select2-container--default .select2-results__option {
+        padding: 10px 14px;
+        font-size: 15px;
+        color: #333;
+        background-color: #fff;
+        transition: background 0.2s ease-in-out;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* Hover efekti: Mor tema */
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg, #ffffff, #F0F5F9) !important;
+        color: #fff !important;
+        font-weight: 600;
+        border-radius: 6px;
+        outline: none !important;
+
+    }
+
+    /* Seçili olan öğe */
+    .select2-container--default .select2-results__option[aria-selected="true"] {
+        background-color: #F0F5F9 !important;
+        color: #222 !important;
+        font-weight: 500;
+        outline: none !important;
+    }
+
+    /* Dropdown kutusu */
+    .select2-container--default .select2-dropdown {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Dropdown arama kutusu */
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    /* Mavi odak çizgilerini kaldır */
+    .select2-container--default .select2-selection--multiple:focus,
+    .select2-container--default .select2-selection--single:focus,
+    .select2-container--default .select2-dropdown:focus,
+    .select2-container--default .select2-selection:focus-visible {
+        outline: none !important;
+        border-color: #F0F5F9 !important;
+        box-shadow: none !important;
+    }
+
+    .empty-placeholder {
+        text-align: center;
+        padding: 30px 20px;
+        color: #666;
+        font-size: 16px;
+        background: #fafafa;
+        border-radius: 12px;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
+    }
+
+        .empty-placeholder i {
+            font-size: 32px;
+            color: #ccc;
+        }
+
+    .customf-inline-inputs {
+        display: flex;
+        justify-content: space-between;
+        gap: 0%;
+    }
+
+        .customf-inline-inputs input[type="number"],
+        .customf-inline-inputs input[type="datetime-local"] {
+            flex: 1;
+            width: 48%;
+            display: inline-block;
+            margin-right: 4%;
+        }
+
+    .customf-input-group input[type="datetime-local"]:last-child,
+    .customf-input-group input[type="number"]:last-child {
+        margin-right: 0;
+    }
+</style>
+
+
+
+
+<div class="container-fluid">
+    <!-- Sayfa Başlığı ve Yeni Kitap Butonu -->
+    <div class="row mb-4">
+        <div class="col-md-12 d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">📚 Kitap Listesi</h4>
+            <a class="btn btn-success btn-rounded waves-effect waves-light" asp-action="Create">
+                <i class="fa fa-plus mr-1"></i> Yeni Kitap Ekle
+            </a>
+        </div>
+    </div>
+
+
+
+    <!-- Kitap Tablosu -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="bookTable" class="table table-bordered table-hover table-striped">
+                    <thead class="bg-info text-white">
+                        <tr>
+                            <th>Durum</th>
+                            <th>ID</th>
+                            <th>Başlık</th>
+                            <th>Yazar</th>
+                            <th>Kategori</th>
+                            <th>Toplam</th>
+                            <th>Mevcut</th>
+                            <th class="text-center">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var book in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @if (book.AvailableCopies > 1)
+                                    {
+                                        <span class="badge bg-success text-white">Müsait</span>
+                                    }
+                                    else if (book.AvailableCopies == 1)
+                                    {
+                                        <span class="badge bg-warning text-white">Tükenmek Üzere</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger text-white">Tükenmiş</span>
+                                    }
+                                </td>
+                                <td>@book.BookId</td>
+                                <td>@book.Title</td>
+                                <td>@book.Author</td>
+                                <td>@book.Category</td>
+                                <td>@book.TotalCopies</td>
+                                <td>@book.AvailableCopies</td>
+                                <td class="text-center">
+                                    <a asp-action="Update" asp-route-id="@book.BookId" class="btn btn-warning btn-sm btn-rounded waves-effect waves-light mr-1">
+                                        <i class="fa fa-edit"></i> Güncelle
+                                    </a>
+                                    <button onclick="deleteBook(@book.BookId)" class="btn btn-danger btn-sm btn-rounded waves-effect waves-light">
+                                        <i class="fa fa-trash"></i> Sil
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 🔍 Filtreleme Modalı -->
+<div id="customf-filter-modal" class="customf-modal">
+    <div class="customf-modal-content">
+        <div class="customf-modal-header">
+            <div class="customf-modal-title">
+                <i class="fas fa-filter"></i>
+                <h5>Filtreleme Seçenekleri</h5>
+            </div>
+            <span class="customf-close" title="Kapat">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+
+        <!-- Dropdown üstte ve sabit -->
+        <div class="customf-modal-dropdown">
+            <div class="customf-input-group">
+                <label for="columnSelector">Filtrelenecek Sütunlar</label>
+                <select id="columnSelector" class="select2-column-selector" style="width: 100%;" multiple></select>
+            </div>
+        </div>
+
+        <!-- Scroll edilebilir içerik -->
+        <div class="customf-modal-body">
+            <form id="customf-dynamic-filter-form"></form>
+        </div>
+
+        <div class="customf-modal-footer">
+            <div class="customf-button-group">
+                <button id="customf-clear-filter" class="customf-btn customf-clear-btn">Temizle</button>
+                <button id="customf-apply-filter" class="customf-btn customf-filter-btn">Filtrele</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<form id="tokenForm">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    <script>
+        let previousFilterValues = {};
+        let selectedColumns = [];
+        $(document).ready(function () {
+            const table = $('#bookTable').DataTable({
+                responsive: true,
+                autoWidth: false,
+                lengthChange: true,
+                order: [],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
+                },
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                pageLength: 10,
+                paging: true,
+                buttons: [
+                    {
+                        extend: "copy",
+                        text: '<i class="fas fa-copy"></i>',
+                        titleAttr: "Kopyala",
+                        className: "btn-copy"
+                    },
+                    {
+                        text: '<i class="fas fa-filter"></i> Filtrele',
+                        titleAttr: "Filtreleme seçeneklerini aç",
+                        className: "customf-filter-button",
+                        action: function () {
+                            populateColumnSelector("bookTable");
+                            generateCustomfFilterForm("bookTable");
+                            $('#customf-filter-modal').show();
+                            activateSelect2();
+                        }
+                    }
+                ],
+                dom: 'Bfrtip'
+            });
+        });
+
+        function activateSelect2() {
+            // Select2'yi başlatmadan önce, eğer zaten başlatıldıysa yok etmeliyiz.
+            // Bu, modal her açıldığında Select2'nin tekrar tekrar başlatılmasını engeller.
+            if ($('#columnSelector').data('select2')) {
+                $('#columnSelector').select2('destroy');
+            }
+
+            // "Tümünü Seç" seçeneği, Select2 başlatılmadan önce DOM'a eklenmeli.
+            // Bu kontrol, seçeneğin zaten var olup olmadığını kontrol eder.
+            if ($('#columnSelector option[value="select-all-option"]').length === 0) {
+                // En başa "Tümünü Seç" seçeneğini ekle
+                $('#columnSelector').prepend('<option value="select-all-option">Tümünü Seç</option>');
+            }
+
+            $('#columnSelector').select2({
+                placeholder: "Filtrelenecek sütunları seçin...",
+                width: '100%',
+                multiple: true, // Birden fazla seçim yapılmasına izin ver
+                dropdownParent: $('#customf-filter-modal .customf-modal-content'),
+
+                // Dropdown listesindeki her öğenin nasıl render edileceğini özelleştirir
+                templateResult: function (data) {
+                    // Eğer bu öğe bizim özel "Tümünü Seç" öğemizse
+                    if (data.id === 'select-all-option') {
+                        return $('<span><i class="fas fa-check-double"></i> Tümünü Seç</span>');
+                    }
+                    // Diğer seçenekleri varsayılan olarak render et
+                    return data.text;
+                },
+
+                // Seçilen öğelerin Select2 kutusunda nasıl görüneceğini özelleştirir
+                templateSelection: function (data) {
+                    // Eğer "Tümünü Seç" seçeneği seçilirse, kutucukta gösterilecek metni değiştir
+                    if (data.id === 'select-all-option') {
+                        // "Tümünü Seç" hariç diğer tüm seçenekleri al
+                        const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
+                        // Şu anda seçili olan seçeneklerin sayısını al (null kontrolü ile)
+                        const currentSelectedCount = $('#columnSelector').val() ? $('#columnSelector').val().length : 0;
+
+                        // Eğer tüm seçenekler seçiliyse, özel bir mesaj göster
+                        if (currentSelectedCount === totalSelectableOptions) {
+                             return `Tümü Seçili (${totalSelectableOptions})`;
+                        }
+                        // Aksi takdirde, seçilenlerin sayısını göster
+                        return `(${currentSelectedCount}/${totalSelectableOptions}) Sütun Seçili`;
+                    }
+                    // Diğer seçenekleri varsayılan olarak render et
+                    return data.text;
+                }
+            });
+
+            // Select2 dropdown içindeki "Tümünü Seç" seçeneği tıklandığında
+            $('#columnSelector').on('select2:select', function (e) {
+                const selectedId = e.params.data.id;
+                if (selectedId === 'select-all-option') {
+                    const $selector = $(this);
+                    // "Tümünü Seç" hariç tüm seçeneklerin değerlerini al
+                    const allOptions = $selector.find('option').not('[value="select-all-option"]').map(function () {
+                        return $(this).val();
+                    }).get();
+
+                    // Tüm sütunları seçili hale getir
+                    $selector.val(allOptions).trigger('change');
+                    // Select2 dropdown'ını kapat
+                    $selector.select2('close');
+                }
+            });
+
+            // Select2 dropdown içindeki bir seçeneğin seçimi kaldırıldığında (unselect)
+            $('#columnSelector').on('select2:unselect', function (e) {
+                const unselectedId = e.params.data.id;
+                if (unselectedId === 'select-all-option') {
+                    // Eğer "Tümünü Seç" seçimi kaldırılırsa, tüm seçimleri kaldır
+                    // Bu durumda, sadece "Tümünü Seç" seçeneğini değil, tüm sütunların seçimini de kaldırmak isteyebiliriz.
+                    // Eğer sadece "Tümünü Seç"in kaldırılmasını istiyorsanız, bu kısmı değiştirebilirsiniz.
+                    $(this).val(null).trigger('change'); // Tüm seçimleri kaldırır
+                }
+            });
+        }
+
+        function populateColumnSelector(tableId) {
+            const table = $(`#${tableId}`).DataTable();
+            const columns = table.columns().header().toArray();
+            const selector = $('#columnSelector');
+            selector.empty();
+
+            columns.forEach((col, index) => {
+                const colName = $(col).text().trim();
+                if (colName && colName !== "İşlemler") {
+                    const selectedAttr = selectedColumns.includes(index) ? 'selected' : '';
+                    selector.append(`<option value="${index}" ${selectedAttr}>${colName}</option>`);
+                }
+            });
+
+            selector.trigger('change.select2');
+        }
+
+        function generateCustomfFilterForm(tableId) {
+            const table = $(`#${tableId}`).DataTable();
+            const columns = table.columns().header().toArray();
+            const allData = table.rows().data().toArray();
+
+            const previousValues = previousFilterValues;
+            const selectedIndexes = $('#columnSelector').val()?.map(Number) || [];
+            let formHtml = "";
+
+            selectedIndexes.forEach(index => {
+                const col = columns[index];
+                const colName = $(col).text().trim();
+                if (!colName || colName === "İşlemler") return;
+
+                const values = allData.map(row => row[index]);
+                const isDate = values.every(v => isValidDate(v));
+                const isNumber = values.every(v => !isNaN(parseFloat(v.toString().replace(',', '.'))));
+                const prev = previousValues[index] || {};
+
+                formHtml += `<div class="customf-input-group"><label>${colName}</label>`;
+
+                const cleanedTexts = values
+                    .filter(v => v && v.toString().trim() !== "")
+                    .map(v => {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = v;
+                        return tempDiv.textContent || tempDiv.innerText || "";
+                    });
+
+                const uniqueValues = [...new Set(cleanedTexts)];
+
+                if (uniqueValues.length > 0 && uniqueValues.length <= 10) {
+                    formHtml += `<select class="filter-input" data-type="select" data-index="${index}">`;
+                    formHtml += `<option value="">Tümü</option>`;
+                    uniqueValues.forEach(val => {
+                        const selected = prev['select'] === val ? 'selected' : '';
+                        formHtml += `<option value="${val}" ${selected}>${val}</option>`;
+                    });
+                    formHtml += `</select>`;
+                }
+                else if (isDate) {
+                    const startVal = (prev['date-start'] && prev['date-start'][0]) || '';
+                    const endVal = (prev['date-end'] && prev['date-end'][0]) || '';
+                    formHtml += `<div class="customf-inline-inputs">`;
+                    formHtml += `<input type="datetime-local" class="filter-input" data-type="date-start" data-index="${index}" value="${startVal}">`;
+                    formHtml += `<input type="datetime-local" class="filter-input" data-type="date-end" data-index="${index}" value="${endVal}">`;
+                    formHtml += `</div>`;
+                }
+                else if (isNumber) {
+                    const min = (prev['range'] && prev['range'][0]) || '';
+                    const max = (prev['range'] && prev['range'][1]) || '';
+                    formHtml += `<div class="customf-inline-inputs">`;
+                    formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Min" value="${min}">`;
+                    formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Max" value="${max}">`;
+                    formHtml += `</div>`;
+                }
+                else {
+                    const val = prev['text'] || '';
+                    formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
+                }
+
+                formHtml += `</div>`;
+            });
+
+            if (selectedIndexes.length === 0) {
+                formHtml = `
+                    <div class="empty-placeholder">
+                        <i class="fas fa-sliders-h"></i><br>
+                        <b>Filtrelemek istediğiniz sütunları seçin.</b>
+                        <div style="font-size:13px; margin-top: 6px;">Yukarıdaki listeden bir veya daha fazla sütun seçin.</div>
+                    </div>
+                `;
+            }
+
+            $('#customf-dynamic-filter-form').html(formHtml);
+        }
+
+        $('#customf-clear-filter').on('click', function () {
+            $('#columnSelector').val(null).trigger('change');
+            previousFilterValues = {};
+            generateCustomfFilterForm("bookTable");
+            $.fn.dataTable.ext.search = [];
+            $('#bookTable').DataTable().draw();
+        });
+
+        $(document).on('change', '#columnSelector', function () {
+            selectedColumns = $(this).val()?.map(Number) || [];
+            generateCustomfFilterForm("bookTable");
+        });
+
+        $('#customf-apply-filter').on('click', function () {
+            const table = $('#bookTable').DataTable();
+            selectedColumns = $('#columnSelector').val()?.map(Number) || [];
+            previousFilterValues = {};
+
+            $('.filter-input').each(function () {
+                const type = $(this).data('type');
+                const index = $(this).data('index');
+                if (!previousFilterValues[index]) previousFilterValues[index] = {};
+                if (type === 'range' || type === 'date-start' || type === 'date-end') {
+                    if (!previousFilterValues[index][type]) previousFilterValues[index][type] = [];
+                    previousFilterValues[index][type].push($(this).val());
+                } else {
+                    previousFilterValues[index][type] = $(this).val();
+                }
+            });
+
+            $.fn.dataTable.ext.search = [];
+
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                let pass = true;
+
+                $('.filter-input').each(function () {
+                    const type = $(this).data('type');
+                    const index = parseInt($(this).data('index'));
+                    const value = $(this).val().trim();
+                    const cell = data[index];
+
+                    if (!value) return;
+
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = cell;
+                    const cellText = tempDiv.textContent || tempDiv.innerText || "";
+
+                    if (type === 'select') {
+                        if (cellText.trim() !== value) pass = false;
+                    }
+                    else if (type === 'text') {
+                        if (!cellText.toLowerCase().includes(value.toLowerCase())) pass = false;
+                    }
+                    else if (type === 'range') {
+                        const inputs = $(`input[data-type="range"][data-index="${index}"]`);
+                        const min = parseFloat(inputs.eq(0).val().replace(',', '.')) || -Infinity;
+                        const max = parseFloat(inputs.eq(1).val().replace(',', '.')) || Infinity;
+                        const num = parseFloat(cellText.replace(',', '.')) || 0;
+                        if (num < min || num > max) pass = false;
+                    }
+                    else if (type === 'date-start' || type === 'date-end') {
+                        const startVal = $(`input[data-type="date-start"][data-index="${index}"]`).val();
+                        const endVal = $(`input[data-type="date-end"][data-index="${index}"]`).val();
+                        const date = parseDate(cellText);
+                        const startDate = startVal ? new Date(startVal) : null;
+                        const endDate = endVal ? new Date(endVal) : null;
+
+                        if (!date || (startDate && date < startDate) || (endDate && date > endDate)) {
+                            pass = false;
+                        }
+                    }
+                });
+
+                return pass;
+            });
+
+            table.draw();
+            $('#customf-filter-modal').hide();
+        });
+
+        function isValidDate(dateStr) {
+            const parsed = parseDate(dateStr);
+            return parsed instanceof Date && !isNaN(parsed.getTime());
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr || typeof dateStr !== 'string') return null;
+
+            const turkishDateRegex = /^\d{1,2}\.\d{1,2}\.\d{4}$/;
+            const turkishDateTimeRegex = /^\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2}(:\d{2})?$/;
+
+            if (turkishDateRegex.test(dateStr)) {
+                const [day, month, year] = dateStr.split('.').map(Number);
+                return new Date(year, month - 1, day);
+            }
+
+            if (turkishDateTimeRegex.test(dateStr)) {
+                const [datePart, timePart] = dateStr.split(' ');
+                const [day, month, year] = datePart.split('.').map(Number);
+                const [hour, minute, second = 0] = timePart.split(':').map(Number);
+                return new Date(year, month - 1, day, hour, minute, second);
+            }
+
+            const iso = new Date(dateStr);
+            return isNaN(iso.getTime()) ? null : iso;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('customf-filter-modal');
+            const closeBtn = document.querySelector('.customf-close');
+
+            window.onclick = function (event) {
+                if (event.target === modal) modal.style.display = 'none';
+            };
+
+            closeBtn.onclick = function () {
+                modal.style.display = 'none';
+            };
+        });
+        function deleteBook(id) {
+            Swal.fire({
+                title: "Silmek istediğinize emin misiniz?",
+                text: "Bu işlemi geri alamazsınız!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Evet, Sil!",
+                cancelButtonText: "İptal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/Book/DeleteConfirmed/' + id;
+
+                    const tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '__RequestVerificationToken';
+                    tokenInput.value = token;
+
+                    form.appendChild(tokenInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    </script>
+}
