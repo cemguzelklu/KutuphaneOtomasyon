@@ -1,0 +1,59 @@
+﻿@model List<KutuphaneOtomasyon.Controllers.BookController.BookApiViewModel>
+
+<h2>Google Books'ta Arama</h2>
+
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="query" class="form-control" placeholder="Kitap adı, yazar veya ISBN..." value="@Context.Request.Query["query"]" />
+        <button type="submit" class="btn btn-primary">Ara</button>
+    </div>
+</form>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="row">
+        @foreach (var book in Model)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="@book.ThumbnailUrl" class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="Kitap kapağı">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">@book.Title</h5>
+                                <p class="card-text"><strong>Yazar:</strong> @book.Author</p>
+                                <p class="card-text"><strong>Yayınevi:</strong> @book.Publisher</p>
+                                <p class="card-text"><strong>ISBN:</strong> @book.ISBN</p>
+                                <p class="card-text"><small class="text-muted">Yayın Tarihi: @book.PublishedDate</small></p>
+
+                                <form asp-controller="Book" asp-action="AddFromApi" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="bookId" value="@book.Id" />
+                                    <input type="hidden" name="isbn" value="@book.ISBN" />
+                                    <input type="hidden" name="title" value="@book.Title" />
+                                    <input type="hidden" name="author" value="@book.Author" />
+                                    <input type="hidden" name="publisher" value="@book.Publisher" />
+                                    <input type="hidden" name="thumbnailUrl" value="@book.ThumbnailUrl" />
+                                    <input type="hidden" name="category" value="@book.Category" />
+                                    <input type="hidden" name="description" value="@book.Descripton" />
+                                    <button type="submit" class="btn btn-success">Kütüphaneye Ekle</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else if (!string.IsNullOrEmpty(Context.Request.Query["query"]))
+{
+    <div class="alert alert-info">Sonuç bulunamadı veya kitaplar eksik bilgi içeriyor.</div>
+}

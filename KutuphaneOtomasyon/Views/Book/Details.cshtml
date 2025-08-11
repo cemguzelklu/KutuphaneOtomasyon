@@ -1,0 +1,120 @@
+﻿
+@model KutuphaneOtomasyon.Models.Book
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+<div class="book-detail-container">
+    <div class="row">
+        <!-- Kitap Kapak -->
+        <div class="col-md-4 book-cover-container">
+            @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+            {
+                <img src="@Model.ThumbnailUrl.Replace("http://", "https://")"
+                     class="img-fluid rounded shadow"
+                     alt="@Model.Title kitap kapağı">
+            }
+            else
+            {
+                <div class="no-cover">
+                    <i class="fas fa-book-open fa-5x text-muted"></i>
+                </div>
+            }
+        </div>
+
+        <!-- Kitap Bilgileri -->
+        <div class="col-md-8">
+            <h1>@Model.Title</h1>
+            <h4 class="text-muted">@Model.Author</h4>
+
+            <hr />
+
+            <dl class="row">
+                <dt class="col-sm-3">ISBN</dt>
+                <dd class="col-sm-9">@(Model.ISBN ?? "Bilinmiyor")</dd>
+
+                <dt class="col-sm-3">Yayınevi</dt>
+                <dd class="col-sm-9">@(Model.Publisher ?? "Bilinmiyor")</dd>
+
+                <dt class="col-sm-3">Kategori</dt>
+                <dd class="col-sm-9">@Model.Category</dd>
+
+                <dt class="col-sm-3">Stok Durumu</dt>
+                <dd class="col-sm-9">
+                    <span class="badge @(Model.AvailableCopies > 0 ? "bg-success" : "bg-danger")">
+                        @Model.AvailableCopies / @Model.TotalCopies
+                    </span>
+                </dd>
+            </dl>
+
+            <!-- API'den gelen ekstra bilgiler -->
+            @if (ViewBag.Description != null)
+            {
+                <div class="mt-3 p-3 bg-light">
+                    <h5>Kitap Açıklaması</h5>
+                    <p>@Html.Raw(ViewBag.Description)</p>  <!-- Null kontrolü zaten yapıldı -->
+                    <!-- Diğer bilgiler -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small><strong>Sayfa Sayısı:</strong> @(ViewBag.PageCount ?? "Bilinmiyor")</small>
+                        </div>
+                        <div class="col-md-6">
+                            <small><strong>Dil:</strong> @ViewBag.Language</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Action Butonları -->
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Kitaplığa Dön
+        </a>
+
+        @if (Model.AvailableCopies > 0)
+        {
+            <a asp-controller="Borrow" asp-action="Create" asp-route-bookId="@Model.BookId"
+               class="btn btn-primary ms-2">
+                <i class="fas fa-bookmark"></i> Ödünç Al
+            </a>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .no-cover {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .book-detail-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+            .book-detail-container .row {
+                align-items: flex-start; /* Üst hizala */
+            }
+
+        .book-cover-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .book-cover-container img {
+                max-height: 300px;
+                object-fit: contain;
+                margin-bottom: 20px;
+            }
+    </style>
+}

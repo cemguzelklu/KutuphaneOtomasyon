@@ -350,7 +350,12 @@
 </style>
 
 
-
+<!-- Yeni eklenen buton -->
+<div class="mb-4">
+    <a asp-action="SearchInApi" class="btn btn-primary">
+        <i class="bi bi-search"></i> Google Books'ta Ara
+    </a>
+</div>
 
 <div class="container-fluid">
     <!-- Sayfa Başlığı ve Yeni Kitap Butonu -->
@@ -379,6 +384,7 @@
                             <th>Kategori</th>
                             <th>Toplam</th>
                             <th>Mevcut</th>
+                            <th>Detay</th>
                             <th class="text-center">İşlemler</th>
                         </tr>
                     </thead>
@@ -406,6 +412,12 @@
                                 <td>@book.Category</td>
                                 <td>@book.TotalCopies</td>
                                 <td>@book.AvailableCopies</td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@book.BookId"
+                                       class="btn btn-sm btn-info">
+                                        <i class="fas fa-info-circle"></i> Detay
+                                    </a>
+                                </td>
                                 <td class="text-center">
                                     <a asp-action="Update" asp-route-id="@book.BookId" class="btn btn-warning btn-sm btn-rounded waves-effect waves-light mr-1">
                                         <i class="fa fa-edit"></i> Güncelle
