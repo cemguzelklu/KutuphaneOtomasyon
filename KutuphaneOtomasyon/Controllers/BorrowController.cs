@@ -35,38 +35,72 @@ namespace KutuphaneOtomasyon.Controllers
 
         public IActionResult Create()
         {
-            ViewBag.Members = new SelectList(_context.Members.ToList(), "MemberId", "Name");
-            ViewBag.Books = new SelectList(_context.Books.ToList(), "BookId", "Title");
-            return View();
+            ViewBag.Members = new SelectList(_context.Members, "MemberId", "Name");
+            ViewBag.Books = new SelectList(_context.Books, "BookId", "Title");
+
+            var vm = new Borrow
+            {
+                DueDate = DateTime.Now.AddDays(14) // ✅ varsayılan
+            };
+            return View(vm);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Borrow borrow)
-        {
-           
+       [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Create(Borrow borrow)
+{
+    if (ModelState.IsValid)
+    {
+        borrow.BorrowDate = DateTime.Now;
+        borrow.ReturnDate = null; // yeni kayıt iade edilmemiş olarak başlar
 
-            if (ModelState.IsValid)
-            {
-                borrow.BorrowDate = DateTime.Now;
-                var book = await _context.Books.FindAsync(borrow.BookId);
-                if (book == null || book.AvailableCopies <= 0)
+        // Kitap uygun mu?
+        var book = await _context.Books.FindAsync(borrow.BookId);
+        if (book == null || book.AvailableCopies <= 0)
+        {
+            ModelState.AddModelError("BookId", "Seçilen kitap mevcut değil veya tüm kopyaları ödünç verilmiş.");
+        }
+
+                // ✅ KULLANICI DueDate GİRİYOR — EZME!
+                // Basit doğrulamalar:
+                if (!borrow.DueDate.HasValue)
                 {
-                    ModelState.AddModelError("BookId", "Seçilen kitap mevcut değil veya tüm kopyaları ödünç verilmiş.");
-                    ViewBag.Members = new SelectList(_context.Members.ToList(), "MemberId", "Name");
-                    ViewBag.Books = new SelectList(_context.Books.ToList(), "BookId", "Title");
+                    ModelState.AddModelError("DueDate", "İade tarihi zorunludur.");
+                }
+
+                // DueDate varsa kontrolleri yap
+                if (borrow.DueDate.HasValue)
+                {
+                    // Sadece günü baz al (saat etkilenmesin)
+                    var span = borrow.DueDate.Value.Date - borrow.BorrowDate.Date; // <-- TimeSpan
+                    var days = span.TotalDays;                                      // <-- .TotalDays burada var
+
+                    if (days < 0)
+                        ModelState.AddModelError("DueDate", "İade tarihi, alış tarihinden önce olamaz.");
+
+                    if (days > 30)
+                        ModelState.AddModelError("DueDate", "İade tarihi en fazla 30 gün sonrası olabilir.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Members = new SelectList(_context.Members, "MemberId", "Name");
+                    ViewBag.Books = new SelectList(_context.Books, "BookId", "Title");
                     return View(borrow);
                 }
-                book.AvailableCopies -= 1; 
-                _context.Borrows.Add(borrow);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
 
-            ViewBag.Members = new SelectList(_context.Members.ToList(), "MemberId", "Name");
-            ViewBag.Books = new SelectList(_context.Books.ToList(), "BookId", "Title");
-            return View(borrow);
-        }
+                // stok düş
+                book.AvailableCopies = Math.Max(0, book.AvailableCopies - 1);
+
+        _context.Borrows.Add(borrow);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+
+    ViewBag.Members = new SelectList(_context.Members.ToList(), "MemberId", "Name", borrow.MemberId);
+    ViewBag.Books   = new SelectList(_context.Books.ToList(), "BookId", "Title", borrow.BookId);
+    return View(borrow);
+}
 
         public async Task<IActionResult> Return(int? id)
         {

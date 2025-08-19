@@ -347,34 +347,509 @@
     .customf-input-group input[type="number"]:last-child {
         margin-right: 0;
     }
+    /* Google Books Modal Stilleri */
+    #googleBooksModal .modal-dialog {
+        max-width: 95%;
+        width: 1200px; /* Genişliği artırdık */
+        margin: 1.75rem auto;
+    }
+
+    #googleBooksModal .modal-content {
+        min-height: 80vh; /* Yüksekliği artırdık */
+    }
+
+    #googleBooksModal .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    /* Kitap kartları için düzenlemeler */
+    .book-card {
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+    .book-cover-container {
+        height: 300px; /* Kapak yüksekliğini artırdık */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        overflow: hidden;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .book-cover {
+        max-height: 100%;
+        width: auto;
+        object-fit: contain; /* Resmin oranlarını koruyarak sığdırır */
+    }
+
+    .book-details {
+        padding: 20px;
+        background: white;
+        border-radius: 0 0 5px 5px;
+        height: calc(100% - 300px); /* Kapak yüksekliğine göre ayar */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .book-author {
+        color: #666;
+        margin-bottom: 8px;
+    }
+
+    .book-meta {
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    /* Responsive düzenlemeler */
+    @@media (max-width: 1200px) {
+        #googleBooksModal .modal-dialog
+
+    {
+        width: 95%;
+    }
+
+    .book-cover-container {
+        height: 250px;
+    }
+
+    }
+
+    @@media (max-width: 768px) {
+        .book-cover-container
+
+    {
+        height: 200px;
+    }
+
+    .book-title {
+        font-size: 1.1rem;
+    }
+
+    }
+
+    .loading-spinner {
+        font-size: 3rem;
+        color: #007bff;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .btn {
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        }
+
+    .btn-cta {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        border: none;
+        color: #fff;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(78,115,223,0.25);
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+        .btn-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(78,115,223,0.35);
+        }
+
+        .btn-cta:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(78,115,223,0.25);
+        }
+
+    #googleBooksModal .modal-header {
+        background: linear-gradient(135deg, #4e73df, #224abe) !important;
+        color: #fff !important;
+        border-bottom: none !important;
+    }
+
+        #googleBooksModal .modal-header .modal-title {
+            color: #fff !important;
+        }
+
+    #googleBooksModal .close {
+        color: #fff !important;
+        opacity: 1 !important;
+    }
+
+    #googleBooksModal .modal-footer {
+        border-top: 2px solid rgba(0,0,0,0.1);
+        background-color: #f9f9f9;
+        font-size: 0.9rem;
+    }
+
+    /* Google Books modal close butonu */
+    #googleBooksModal .close {
+        outline: none !important;
+        box-shadow: none !important;
+        color: #fff; /* beyaz ikon */
+        opacity: 0.9; /* hafif şeffaf */
+        transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+
+        #googleBooksModal .close:hover {
+            opacity: 1; /* tam beyaz */
+            transform: rotate(90deg); /* hover’da ufak animasyon */
+        }
+
+        #googleBooksModal .close:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+    .btn-cta:focus,
+    .btn-cta:active,
+    .btn-cta:focus:active {
+        background: linear-gradient(135deg, #4e73df, #224abe) !important;
+        color: #fff !important;
+        outline: none !important;
+        box-shadow: 0 0 0 0 transparent !important; /* beyaz glow'u kaldır */
+    }
+
+    .book-card {
+        cursor: pointer;
+    }
+
+        .book-card .btn, .book-card form, .book-card a {
+            cursor: default;
+        }
+
+    #bookDetailView .detail-cover {
+        max-height: 520px; /* 420 → 520 (istersen 560-600 yap) */
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto; /* ortalama */
+    }
+
+    .dt-elevated {
+        border: 0;
+        border-radius: 16px;
+        background: rgba(255,255,255,.86);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 16px rgba(27,31,35,.08), 0 18px 40px rgba(27,31,35,.10);
+        position: relative;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+        .dt-elevated:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,.06), 0 12px 26px rgba(27,31,35,.10), 0 28px 60px rgba(27,31,35,.12);
+        }
+
+        /* Kartın altında yumuşak “hale” */
+        .dt-elevated::after {
+            content: "";
+            position: absolute;
+            inset: auto 8% -14px 8%;
+            height: 28px;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+    /* Tablo görünümü */
+    .dt-pretty {
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(255,255,255,.92);
+    }
+
+        .dt-pretty thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: inherit !important; /* THEAD'in arkaplanını aynen al */
+            background-color: inherit !important;
+            color: inherit !important; /* text-white devralsın */
+            box-shadow: 0 1px 0 rgba(0,0,0,.06);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        /* Güvenlik için: thead'e bg-info verilmişse yazılar beyaz kalsın */
+        .dt-pretty thead.bg-info th {
+            color: #fff !important;
+        }
+
+        .dt-pretty td, .dt-pretty th {
+            border-color: #eef2f7 !important;
+        }
+
+        .dt-pretty tbody tr {
+            transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+
+            .dt-pretty tbody tr:hover {
+                background: #f8fbff !important;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 14px rgba(30,41,59,.06);
+            }
+
+    /* Üst bar (arama, buttons) ufak yükselti */
+    .dataTables_wrapper .dt-buttons .btn,
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 10px !important;
+        border: 1px solid #e6e9f0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+
+    /* Perspectif hissi (opsiyonel ama hoş) */
+    .dt-float {
+        transform: translateZ(0);
+        perspective: 1200px;
+    }
+    /* Datatables butonları: görünüm + animasyon */
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+        position: relative;
+        overflow: hidden; /* hover parıltısı için */
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: #fff !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        box-shadow: 0 8px 20px rgba(78,115,223,0.25);
+        transition: transform .12s ease, box-shadow .12s ease, filter .18s ease;
+    }
+
+        /* İkon ile metin arası boşluk */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy i,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button i {
+            margin-right: 6px;
+        }
+
+        /* Hover/active durumları */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(78,115,223,0.35);
+        }
+
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:active,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(78,115,223,0.25);
+        }
+
+        /* Hover’da hafif “parıltı” geçişi */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy::after,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.20) 20%, transparent 40%);
+            transform: translateX(-120%);
+            transition: transform .55s ease;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover::after,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover::after {
+            transform: translateX(120%);
+        }
+
+    /* Mavi odak halkasını/outline'ı KALDIR */
+    .dataTables_wrapper .dt-buttons .dt-button:focus,
+    .dataTables_wrapper .dt-buttons .dt-button:focus-visible,
+    .dataTables_wrapper .dt-buttons .dt-button:active:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Bazı tarayıcılar için iç odak kenarlığı */
+    .dataTables_wrapper .dt-buttons .dt-button::-moz-focus-inner {
+        border: 0;
+    }
+
+    /* Datatables buton grubu taşmasın diye */
+    .dataTables_wrapper .dt-buttons {
+        display: flex;
+        gap: 8px;
+        overflow: visible; /* rozet ve parıltı taşarsa kesilmesin */
+    }
+
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+            padding-right: 28px !important; /* rozet için sağdan yer */
+        }
+
+    .enhanced-search-box button:hover,
+    .enhanced-search-box button:focus {
+        background-color: #007bff !important; /* normal rengi koru */
+        color: #fff !important;
+    }
+
+    /* DataTables butonları (Filtre / Copy) */
+    .dataTables_wrapper .dt-buttons .dt-button:hover,
+    .dataTables_wrapper .dt-buttons .dt-button:focus {
+        background: linear-gradient(135deg, #4e73df, #224abe) !important;
+        color: #fff !important;
+        filter: none !important;
+    }
+    /* Pagination: temel görünüm */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border: 1px solid transparent !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        margin: 0 2px !important;
+        background: transparent !important;
+        color: inherit !important;
+    }
+
+        /* Varsayılan hover’daki siyah kutuyu iptal et ve yumuşak bir hover ver */
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: rgba(78,115,223,.12) !important; /* hafif mavi */
+            border-color: rgba(78,115,223,.25) !important;
+            color: #224abe !important;
+            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+        }
+
+        /* Aktif sayfa (current) */
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: linear-gradient(135deg, #4e73df, #224abe) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+            box-shadow: 0 8px 18px rgba(78,115,223,.25) !important;
+        }
+
+        /* Disabled (önceki/sonraki pasif) */
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            background: transparent !important;
+            border-color: transparent !important;
+            color: #999 !important;
+            box-shadow: none !important;
+        }
+
+        /* Focus halka kaldır */
+        .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
 </style>
 
 
-<!-- Yeni eklenen buton -->
-<div class="mb-4">
-    <a asp-action="SearchInApi" class="btn btn-primary">
-        <i class="bi bi-search"></i> Google Books'ta Ara
-    </a>
-</div>
+
 
 <div class="container-fluid">
-    <!-- Sayfa Başlığı ve Yeni Kitap Butonu -->
     <div class="row mb-4">
-        <div class="col-md-12 d-flex justify-content-between align-items-center">
+        <div class="col-md-12 d-flex justify-content-between align-items-center flex-wrap">
             <h4 class="card-title mb-0">📚 Kitap Listesi</h4>
-            <a class="btn btn-success btn-rounded waves-effect waves-light" asp-action="Create">
-                <i class="fa fa-plus mr-1"></i> Yeni Kitap Ekle
-            </a>
+
+            <div class="d-flex align-items-center">
+                <button id="searchGoogleBooksBtn" class="btn btn-cta mr-2">
+                    <i class="fas fa-search mr-1"></i> Google Books’ta Ara
+                </button>
+
+                <a class="btn btn-success btn-rounded waves-effect waves-light" asp-action="Create">
+                    <i class="fa fa-plus mr-1"></i> Yeni Kitap Ekle
+                </a>
+            </div>
         </div>
     </div>
 
 
 
+    <!-- Google Books Arama Modalı -->
+    <div id="googleBooksModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header ">
+                    <h5 class="modal-title">
+                        <i class="fas fa-book-open mr-2"></i> Google Books'ta Arama
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="bookDetailView" class="d-none"></div>
+                    <!-- Arama Formu -->
+                    <form id="googleBooksSearchForm" class="mb-4">
+                        <div class="input-group input-group-lg">
+                            <input type="text" name="query" class="form-control"
+                                   placeholder="Kitap adı, yazar veya ISBN..."
+                                   autocomplete="off">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-cta">
+                                    <i class="fas fa-search"></i> Ara
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Popüler Kitaplar -->
+                    <div id="popularBooks" class="row">
+                        <!-- İçerik dinamik olarak yüklenecek -->
+                    </div>
+
+                    <!-- Arama Sonuçları -->
+                    <div id="searchResults" class="row">
+                        <!-- İçerik dinamik olarak yüklenecek -->
+                    </div>
+
+                    <!-- Hata Mesajı -->
+                    <div id="errorMessage" class="alert alert-danger d-none"></div>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <small class="text-muted">Veriler Google Books API üzerinden alınmaktadır.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Kitap Tablosu -->
-    <div class="card">
+    <div class="card dt-elevated">
         <div class="card-body">
-            <div class="table-responsive">
-                <table id="bookTable" class="table table-bordered table-hover table-striped">
+            <div class="table-responsive dt-float">
+                <table id="bookTable" class="table table-bordered table-hover table-striped dt-pretty">
                     <thead class="bg-info text-white">
                         <tr>
                             <th>Durum</th>
@@ -412,7 +887,7 @@
                                 <td>@book.Category</td>
                                 <td>@book.TotalCopies</td>
                                 <td>@book.AvailableCopies</td>
-                                <td>
+                                <td class="text-right">
                                     <a asp-action="Details" asp-route-id="@book.BookId"
                                        class="btn btn-sm btn-info">
                                         <i class="fas fa-info-circle"></i> Detay
@@ -432,6 +907,7 @@
                 </table>
             </div>
         </div>
+       
     </div>
 </div>
 <!-- 🔍 Filtreleme Modalı -->
@@ -468,6 +944,7 @@
         </div>
     </div>
 </div>
+
 
 
 
@@ -519,6 +996,19 @@
                     }
                 ],
                 dom: 'Bfrtip'
+            });
+            $('#googleBooksModal').on('show.bs.modal', function() {
+                loadPopularBooks();
+            });
+             $('#googleBooksSearchForm').submit(function(e) {
+                e.preventDefault();
+                const query = $(this).find('input[name="query"]').val();
+                searchBooks(query);
+            });
+
+            // Modal aç butonu
+            $('#searchGoogleBooksBtn').click(function() {
+                $('#googleBooksModal').modal('show');
             });
         });
 
@@ -701,6 +1191,7 @@
             previousFilterValues = {};
             generateCustomfFilterForm("bookTable");
             $.fn.dataTable.ext.search = [];
+            updateFilterBadge();
             $('#bookTable').DataTable().draw();
         });
 
@@ -771,9 +1262,10 @@
 
                 return pass;
             });
-
+           updateFilterBadge();
             table.draw();
             $('#customf-filter-modal').hide();
+
         });
 
         function isValidDate(dateStr) {
@@ -803,6 +1295,89 @@
             return isNaN(iso.getTime()) ? null : iso;
         }
 
+         // Popüler kitapları yükle
+        function loadPopularBooks() {
+            $('#searchResults').empty();
+            $('#popularBooks').html('<div class="col-12 text-center"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
+
+            $.get('@Url.Action("GetPopularBooks", "Book")', function(data) {
+                if (data && data.length > 0) {
+                    $('#popularBooks').empty();
+                    data.forEach(book => {
+                        $('#popularBooks').append(renderBookCard(book));
+                    });
+                } else {
+                    $('#popularBooks').html('<div class="col-12 text-center">Popüler kitap bulunamadı.</div>');
+                }
+            }).fail(function() {
+                $('#popularBooks').html('<div class="col-12 text-center text-danger">Popüler kitaplar yüklenirken hata oluştu.</div>');
+            });
+        }
+
+        // Kitapları ara
+               function searchBooks(query) {
+            $('#popularBooks').empty();
+            $('#searchResults').html('<div class="col-12 text-center"><i class="fas fa-spinner fa-spin"></i> Aranıyor...</div>');
+            $('#errorMessage').addClass('d-none');
+
+            $.get('@Url.Action("SearchInApi", "Book")', {
+                query: query,
+                returnJson: true
+            }, function(data) {
+                $('#searchResults').empty();
+                if (data.error) {
+                    $('#errorMessage').removeClass('d-none').text(data.error);
+                } else if (data && data.length > 0) {
+                    data.forEach(book => {
+                        $('#searchResults').append(renderBookCard(book));
+                    });
+                } else {
+                    $('#searchResults').html('<div class="col-12 text-center">Sonuç bulunamadı.</div>');
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.error("Arama hatası:", textStatus, errorThrown);
+                $('#errorMessage').removeClass('d-none')
+                    .text('Arama yapılırken hata oluştu: ' + textStatus);
+            });
+        }
+          // Kitap kartı oluştur
+                        function renderBookCard(book) {
+            return `
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="book-card card h-100" data-id="${book.id}">
+                        <div class="book-cover-container">
+                            <img src="${book.thumbnailUrl || '/images/book.png'}"
+                                 class="book-cover"
+                                 alt="${book.title || 'Kitap kapağı'}"
+                                 style="width:150px; height:auto;">
+                        </div>
+                        <div class="book-details">
+                            <h5 class="book-title">${book.title || 'Başlık yok'}</h5>
+                            <p class="book-author"><strong>Yazar:</strong> ${book.author || 'Bilinmiyor'}</p>
+                            <p class="book-meta"><strong>Yayınevi:</strong> ${book.publisher || 'Bilinmiyor'}</p>
+                            <p class="book-meta"><strong>ISBN:</strong> ${book.isbn || 'Bilinmiyor'}</p>
+                            <p class="book-meta"><small class="text-muted">Yayın Tarihi: ${book.publishedDate || 'Bilinmiyor'}</small></p>
+
+                            <form class="add-book-form mt-auto" method="post" action="@Url.Action("AddFromApi", "Book")">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="bookId" value="${book.id}" />
+                                <input type="hidden" name="isbn" value="${book.isbn}" />
+                                <input type="hidden" name="title" value="${book.title}" />
+                                <input type="hidden" name="author" value="${book.author}" />
+                                <input type="hidden" name="publisher" value="${book.publisher}" />
+                                <input type="hidden" name="thumbnailUrl" value="${book.thumbnailUrl}" />
+                                <input type="hidden" name="category" value="${book.category}" />
+                                <input type="hidden" name="description" value="${book.description}" />
+                                <button type="submit" class="btn btn-success btn-block mt-3">
+                                    <i class="fas fa-plus-circle"></i> Kütüphaneye Ekle
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('customf-filter-modal');
             const closeBtn = document.querySelector('.customf-close');
@@ -815,6 +1390,109 @@
                 modal.style.display = 'none';
             };
         });
+
+                // Kart tıklama -> detay aç
+        $(document).on('click', '.book-card', function (e) {
+            // İçerideki form/btn tıklanırsa kart click çalışmasın
+            if ($(e.target).closest('button, a, form, input').length) return;
+            const id = $(this).data('id');
+            showBookDetailsInModal(id);
+        });
+
+        // Detay görünümünü yükle
+        function showBookDetailsInModal(googleId) {
+            // Görünümleri değiştir
+            $('#googleBooksSearchForm, #popularBooks, #searchResults').hide();
+            $('#bookDetailView')
+                .removeClass('d-none')
+                .html('<div class="text-center py-5"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
+
+            // Sunucudan tek kitap detayını JSON al (id ile)
+            $.get('@Url.Action("GetBookByIdFromApi", "Book")', { id: googleId }, function (data) {
+                // data: { id, title, author, publisher, isbn, publishedDate, language, pageCount, description, thumbnailUrl, category ... }
+                $('#bookDetailView').html(renderBookDetail(data));
+            }).fail(function () {
+                $('#bookDetailView').html('<div class="alert alert-danger">Detaylar yüklenirken bir hata oluştu.</div>');
+            });
+        }
+
+        // Detay görünümü şablonu
+                function renderBookDetail(book) {
+          const rawThumb = (book.thumbnailUrl || '/images/book.png').replace('http://','https://');
+          // Google Books’tan daha büyük görsel denemesi (zoom=2’ye yükselt)
+          const thumb = rawThumb.replace('zoom=1', 'zoom=2');
+
+          const desc   = book.description || 'Açıklama bulunamadı.';
+          const lang   = book.language || 'Bilinmiyor';
+          const page   = book.pageCount || 'Bilinmiyor';
+          const pub    = book.publisher || 'Bilinmiyor';
+          const cat    = book.category || 'Bilinmiyor';
+          const isbn   = book.isbn || 'Bilinmiyor';
+          const title  = book.title || 'Başlık yok';
+          const author = book.author || 'Bilinmiyor';
+
+          return `
+            <div class="container-fluid">
+              <div class="row">
+                <!-- SOL: Kapak -->
+                <div class="col-md-4 d-flex justify-content-center align-items-start mb-3 mb-md-0">
+                  <img src="${thumb}" class="detail-cover img-fluid rounded shadow" alt="${title}">
+                </div>
+
+                <!-- SAĞ: Bilgiler -->
+                <div class="col-md-8">
+                  <h3 class="mb-1">${title}</h3>
+                  <h5 class="text-muted">${author}</h5>
+                  <hr/>
+                  <div class="mb-2"><strong>ISBN:</strong> ${isbn}</div>
+                  <div class="mb-2"><strong>Yayınevi:</strong> ${pub}</div>
+                  <div class="mb-2"><strong>Kategori:</strong> ${cat}</div>
+                  <div class="mb-2"><strong>Yayın Tarihi:</strong> ${book.publishedDate || 'Bilinmiyor'}</div>
+                  <div class="mb-2"><strong>Dil:</strong> ${lang}</div>
+                  <div class="mb-2"><strong>Sayfa:</strong> ${page}</div>
+
+                  <div class="mt-3 p-3 bg-light rounded" style="max-height: 260px; overflow:auto;">
+                    <h6 class="mb-2">Açıklama</h6>
+                    <div>${desc}</div>
+                  </div>
+
+                  <div class="d-flex flex-wrap gap-2 mt-4">
+                    <form method="post" action="@Url.Action("AddFromApi", "Book")" class="mr-2">
+                      @Html.AntiForgeryToken()
+                      <input type="hidden" name="bookId" value="${book.id}">
+                      <input type="hidden" name="isbn" value="${book.isbn}">
+                      <input type="hidden" name="title" value="${title}">
+                      <input type="hidden" name="author" value="${author}">
+                      <input type="hidden" name="publisher" value="${pub}">
+                      <input type="hidden" name="thumbnailUrl" value="${rawThumb}">
+                      <input type="hidden" name="category" value="${cat}">
+                      <input type="hidden" name="description" value="${desc}">
+                      <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus-circle"></i> Kütüphaneye Ekle
+                      </button>
+                    </form>
+
+                    ${book.previewLink ? `
+                      <a href="${book.previewLink}" target="_blank" class="btn btn-outline-primary">
+                        <i class="fas fa-external-link-alt"></i> Google Books’ta Önizle
+                      </a>` : ``}
+
+                    <button type="button" class="btn btn-secondary" onclick="closeBookDetailInModal()">
+                      <i class="fas fa-arrow-left"></i> Geri Dön
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+
+        // Detaydan listeye geri dön
+        function closeBookDetailInModal() {
+            $('#bookDetailView').addClass('d-none').empty();
+            $('#googleBooksSearchForm, #popularBooks, #searchResults').show();
+        }
         function deleteBook(id) {
             Swal.fire({
                 title: "Silmek istediğinize emin misiniz?",
@@ -842,6 +1520,40 @@
                     form.submit();
                 }
             });
+        }
+                           function updateFilterBadge() {
+          const count = Object.values(previousFilterValues || {})
+            .filter(v => v && Object.values(v).some(x => x && String(x).trim() !== ''))
+            .length;
+
+          const $btn = $('.customf-filter-button');
+
+          // Rozeti yeniden oluştur
+          $btn.find('.filter-badge').remove();
+
+          // Butonu konumlandır (CSS yazmadan inline)
+          $btn.css({ position: 'relative', overflow: 'visible' });
+
+          if (count > 0) {
+            // Rozeti sağ ÜST iç köşeye yerleştir (taşmadan görünsün)
+            $btn.append(
+              `<span class="filter-badge" style="
+                position:absolute;
+                top:2px;            /* dilersen 4-6px yapabilirsin */
+                right:2px;          /* dilersen 4-6px yapabilirsin */
+                transform: translate(0,0);
+                min-width:18px;
+                height:18px;
+                padding:0 6px;
+                border-radius:9999px;
+                display:flex;align-items:center;justify-content:center;
+                font-size:11px;font-weight:800;
+                background:#ef4444;color:#fff;
+                line-height:1; z-index:3;
+                box-shadow:0 6px 14px rgba(239,68,68,.35);
+              ">${count}</span>`
+            );
+          }
         }
     </script>
 }

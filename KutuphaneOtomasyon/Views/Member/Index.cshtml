@@ -56,6 +56,623 @@
                 background-color: #0056b3;
             }
 
+    .btn {
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        }
+
+    .customf-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        overflow: hidden;
+    }
+
+
+    .customf-modal-content {
+        background: #fff;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 480px;
+        margin: 5% auto;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .customf-modal-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .customf-modal-title i {
+            font-size: 20px;
+            color: #52616B;
+            background-color: #fafafa;
+            padding: 8px;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0,0,0,0.1);
+        }
+
+    .customf-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 32px 12px 32px;
+        border-bottom: 1px solid #eee;
+        background-color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+        .customf-modal-header h5 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+
+    .customf-modal-dropdown {
+        padding: 16px 32px 0 32px;
+        background: #fafafa;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 58px;
+        z-index: 9;
+        padding-bottom: 30px;
+    }
+
+    .customf-modal-body {
+        padding: 24px 32px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .customf-modal-dropdown .customf-input-group {
+        margin-bottom: 0;
+    }
+
+    .customf-modal-footer {
+        padding: 16px 32px 24px 32px;
+        border-top: 1px solid #eee;
+        background: #fff;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    .customf-close {
+        float: right;
+        font-size: 22px;
+        font-weight: 600;
+        color: #bbb;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+        background-color: #f2f2f2;
+        border-radius: 40%;
+        padding: 1px 9px;
+        transition: all 0.3s ease;
+    }
+
+        .customf-close:hover {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+
+        .customf-close i {
+            pointer-events: none;
+        }
+
+    .customf-modal-content h5 {
+        font-size: 22px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .customf-input-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+
+        .customf-input-group label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .customf-input-group input,
+        .customf-input-group select {
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fff;
+            transition: all 0.25s ease-in-out;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+            .customf-input-group input:focus,
+            .customf-input-group select:focus {
+                border-color: #C9D6DF;
+                background: #fefefe;
+                box-shadow: 0 0 0 3px rgba(201, 214, 223, 1);
+                outline: none;
+            }
+
+    .customf-button-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+        .customf-button-group .customf-btn {
+            flex: unset;
+            text-align: center;
+        }
+
+    .customf-btn {
+        color: #fff;
+        font-size: 16px;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.1s ease;
+    }
+
+    .customf-filter-btn {
+        width: 75%;
+        background: linear-gradient(135deg,#C9D6DF, #52616B);
+    }
+
+        .customf-filter-btn:hover {
+            background: linear-gradient(135deg, #52616B,#C9D6DF);
+        }
+
+    .customf-clear-btn {
+        color: #000;
+        width: 25%;
+        background: linear-gradient(135deg, #ffffff, #C9D6DF);
+    }
+
+        .customf-clear-btn:hover {
+            background: linear-gradient(135deg, #C9D6DF,#ffffff );
+        }
+
+        .customf-clear-btn:focus,
+        .customf-filter-btn:focus {
+            outline: none !important;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+            border: none !important;
+        }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #F0F5F9 !important;
+        color: #333;
+        border: none !important;
+        font-weight: 600;
+        padding: 10px 12px;
+        font-size: 1.05em;
+        margin-top: 4px;
+        margin-right: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #666;
+        font-size: 1.1em;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: #000;
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        min-height: 42px !important;
+        height: auto !important;
+        overflow-y: auto;
+        max-height: 120px;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        background-color: #fff !important;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 6px;
+        line-height: normal;
+    }
+
+        .select2-container--default .select2-selection--multiple::-webkit-scrollbar {
+            display: none;
+        }
+
+
+    .select2-container--default .select2-results__option {
+        padding: 10px 14px;
+        font-size: 15px;
+        color: #333;
+        background-color: #fff;
+        transition: background 0.2s ease-in-out;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg, #ffffff, #F0F5F9) !important;
+        color: #fff !important;
+        font-weight: 600;
+        border-radius: 6px;
+        outline: none !important;
+    }
+
+
+    .select2-container--default .select2-results__option[aria-selected="true"] {
+        background-color: #F0F5F9 !important;
+        color: #222 !important;
+        font-weight: 500;
+        outline: none !important;
+    }
+
+
+    .select2-container--default .select2-dropdown {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+
+    .select2-container--default .select2-selection--multiple:focus,
+    .select2-container--default .select2-selection--single:focus,
+    .select2-container--default .select2-dropdown:focus,
+    .select2-container--default .select2-selection:focus-visible {
+        outline: none !important;
+        border-color: #F0F5F9 !important;
+        box-shadow: none !important;
+    }
+
+    .empty-placeholder {
+        text-align: center;
+        padding: 30px 20px;
+        color: #666;
+        font-size: 16px;
+        background: #fafafa;
+        border-radius: 12px;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
+    }
+
+        .empty-placeholder i {
+            font-size: 32px;
+            color: #ccc;
+        }
+
+    .customf-inline-inputs {
+        display: flex;
+        justify-content: space-between;
+        gap: 0%;
+    }
+
+        .customf-inline-inputs input[type="number"],
+        .customf-inline-inputs input[type="datetime-local"] {
+            flex: 1;
+            width: 48%;
+            display: inline-block;
+            margin-right: 4%;
+        }
+
+    .customf-input-group input[type="datetime-local"]:last-child,
+    .customf-input-group input[type="number"]:last-child {
+        margin-right: 0;
+    }
+
+    .btn-cta {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        border: none;
+        color: #fff;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(78,115,223,0.25);
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+        .btn-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(78,115,223,0.35);
+        }
+
+        .btn-cta:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(78,115,223,0.25);
+        }
+
+    /* Google Books modal başlığı same look */
+    #googleBooksModal .modal-header {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: #fff;
+        border-bottom: none;
+    }
+
+    #googleBooksModal .modal-title {
+        color: #fff;
+    }
+
+    #googleBooksModal .close {
+        color: #fff;
+        opacity: 1;
+    }
+
+        #googleBooksModal .close:hover {
+            opacity: .85;
+        }
+
+    /* Form içindeki arama butonunu da aynı renge çek */
+    #googleBooksModal .input-group-append .btn {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        border: none;
+        color: #fff;
+    }
+
+        #googleBooksModal .input-group-append .btn:hover {
+            filter: brightness(0.95);
+        }
+
+    .dt-elevated {
+        border: 0;
+        border-radius: 16px;
+        background: rgba(255,255,255,.86);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 16px rgba(27,31,35,.08), 0 18px 40px rgba(27,31,35,.10);
+        position: relative;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+        .dt-elevated:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,.06), 0 12px 26px rgba(27,31,35,.10), 0 28px 60px rgba(27,31,35,.12);
+        }
+
+        /* Kartın altında yumuşak “hale” */
+        .dt-elevated::after {
+            content: "";
+            position: absolute;
+            inset: auto 8% -14px 8%;
+            height: 28px;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+    /* Tablo görünümü */
+    .dt-pretty {
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(255,255,255,.92);
+    }
+
+        .dt-pretty thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: inherit !important; /* THEAD'in arkaplanını aynen al */
+            background-color: inherit !important;
+            color: inherit !important; /* text-white devralsın */
+            box-shadow: 0 1px 0 rgba(0,0,0,.06);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        /* Güvenlik için: thead'e bg-info verilmişse yazılar beyaz kalsın */
+        .dt-pretty thead.bg-info th {
+            color: #fff !important;
+        }
+
+        .dt-pretty td, .dt-pretty th {
+            border-color: #eef2f7 !important;
+        }
+
+        .dt-pretty tbody tr {
+            transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+
+            .dt-pretty tbody tr:hover {
+                background: #f8fbff !important;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 14px rgba(30,41,59,.06);
+            }
+
+    /* Üst bar (arama, buttons) ufak yükselti */
+    .dataTables_wrapper .dt-buttons .btn,
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 10px !important;
+        border: 1px solid #e6e9f0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+
+    /* Perspectif hissi (opsiyonel ama hoş) */
+    .dt-float {
+        transform: translateZ(0);
+        perspective: 1200px;
+    }
+    /* Datatables butonları: görünüm + animasyon */
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+        position: relative;
+        overflow: hidden; /* hover parıltısı için */
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: #fff !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        box-shadow: 0 8px 20px rgba(78,115,223,0.25);
+        transition: transform .12s ease, box-shadow .12s ease, filter .18s ease;
+    }
+
+        /* İkon ile metin arası boşluk */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy i,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button i {
+            margin-right: 6px;
+        }
+
+        /* Hover/active durumları */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(78,115,223,0.35);
+        }
+
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:active,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(78,115,223,0.25);
+        }
+
+        /* Hover’da hafif “parıltı” geçişi */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy::after,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.20) 20%, transparent 40%);
+            transform: translateX(-120%);
+            transition: transform .55s ease;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover::after,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover::after {
+            transform: translateX(120%);
+        }
+
+    /* Mavi odak halkasını/outline'ı KALDIR */
+    .dataTables_wrapper .dt-buttons .dt-button:focus,
+    .dataTables_wrapper .dt-buttons .dt-button:focus-visible,
+    .dataTables_wrapper .dt-buttons .dt-button:active:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Bazı tarayıcılar için iç odak kenarlığı */
+    .dataTables_wrapper .dt-buttons .dt-button::-moz-focus-inner {
+        border: 0;
+    }
+
+    /* Datatables buton grubu taşmasın diye */
+    .dataTables_wrapper .dt-buttons {
+        display: flex;
+        gap: 8px;
+        overflow: visible; /* rozet ve parıltı taşarsa kesilmesin */
+    }
+
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+            padding-right: 28px !important; /* rozet için sağdan yer */
+        }
+
+    .enhanced-search-box button:hover,
+    .enhanced-search-box button:focus {
+        background-color: #007bff !important; /* normal rengi koru */
+        color: #fff !important;
+    }
+
+    /* DataTables butonları (Filtre / Copy) */
+    .dataTables_wrapper .dt-buttons .dt-button:hover,
+    .dataTables_wrapper .dt-buttons .dt-button:focus {
+        background: linear-gradient(135deg, #4e73df, #224abe) !important;
+        color: #fff !important;
+        filter: none !important;
+    }
+    /* Pagination: temel görünüm */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border: 1px solid transparent !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        margin: 0 2px !important;
+        background: transparent !important;
+        color: inherit !important;
+    }
+
+        /* Varsayılan hover’daki siyah kutuyu iptal et ve yumuşak bir hover ver */
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: rgba(78,115,223,.12) !important; /* hafif mavi */
+            border-color: rgba(78,115,223,.25) !important;
+            color: #224abe !important;
+            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+        }
+
+        /* Aktif sayfa (current) */
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: linear-gradient(135deg, #4e73df, #224abe) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+            box-shadow: 0 8px 18px rgba(78,115,223,.25) !important;
+        }
+
+        /* Disabled (önceki/sonraki pasif) */
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            background: transparent !important;
+            border-color: transparent !important;
+            color: #999 !important;
+            box-shadow: none !important;
+        }
+
+        /* Focus halka kaldır */
+        .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
 </style>
 
 <div class="container-fluid">
@@ -84,10 +701,10 @@
         </button>
     </div>
 
-    <div class="card">
+    <div class="card dt-elevated">
         <div class="card-body">
-            <div class="table-responsive">
-                <table id="memberTable" class="table table-bordered table-hover table-striped">
+            <div class="table-responsive dt-float">
+                <table id="memberTable" class="table table-bordered table-hover table-striped dt-pretty">
                     <thead class="bg-info text-white">
                         <tr>
                             <th>ID</th>
@@ -121,43 +738,684 @@
         </div>
     </div>
 </div>
+<div id="customf-filter-modal" class="customf-modal">
+    <div class="customf-modal-content">
+        <div class="customf-modal-header">
+            <div class="customf-modal-title">
+                <i class="fas fa-filter"></i>
+                <h5>Filtreleme Seçenekleri</h5>
+            </div>
+            <span class="customf-close" title="Kapat">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
 
+        <!-- Dropdown üstte ve sabit -->
+        <div class="customf-modal-dropdown">
+            <div class="customf-input-group">
+                <label for="columnSelector">Filtrelenecek Sütunlar</label>
+                <select id="columnSelector" class="select2-column-selector" style="width: 100%;" multiple></select>
+            </div>
+        </div>
+
+        <!-- Scroll edilebilir içerik -->
+        <div class="customf-modal-body">
+            <form id="customf-dynamic-filter-form"></form>
+        </div>
+
+        <div class="customf-modal-footer">
+            <div class="customf-button-group">
+                <button id="customf-clear-filter" class="customf-btn customf-clear-btn">Temizle</button>
+                <button id="customf-apply-filter" class="customf-btn customf-filter-btn">Filtrele</button>
+
+            </div>
+        </div>
+    </div>
+</div>
 <form id="tokenForm">
     @Html.AntiForgeryToken()
 </form>
 
+
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        $(document).ready(function () {
-            var table = $('#memberTable').DataTable({
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
-                }
-            });
+          let previousFilterValues = {};
+                let selectedColumns = [];
+                let columnTypesCache = {};
+                let parsedDatesCache = [];
+                $(document).ready(function () {
 
-            $('#memberFilterValue').on('input', function () {
-                var colIndex = $('#memberFilterColumn').val();
-                var searchTerm = $(this).val().trim();
+                    const table = $('#memberTable').DataTable({
+                        responsive: true,
+                        autoWidth: false,
+                        lengthChange: true,
+                        deferRender: true,
+                        order: [],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
+                        },
+                        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                        pageLength: 10,
+                        paging: true,
+                        buttons: [
+                            {
+                                extend: "copy",
+                                text: '<i class="fas fa-copy"></i>',
+                                titleAttr: "Kopyala",
+                                className: "btn-copy"
+                            },
+                            {
+                                text: '<i class="fas fa-filter"></i> Filtrele',
+                                titleAttr: "Filtreleme seçeneklerini aç",
+                                className: "customf-filter-button",
+                                action: function () {
+                                        populateColumnSelector("memberTable");
+                                        generateCustomfFilterForm("memberTable");
+                                        $('#customf-filter-modal').show();
+                                        activateSelect2();
+                                }
+                            }
+                        ],
+                        dom: 'Bfrtip'
+                    });
+                            $('#memberFilterValue').on('input', function () {
+            var colIndex = $('#memberFilterColumn').val();
+            var searchTerm = $(this).val().trim();
 
-                table.search('').columns().search('');
+            table.search('').columns().search('');
 
-                if (searchTerm.length > 0) {
-                    if (colIndex === "all") {
-                        table.search(searchTerm).draw();
-                    } else {
-                        table.column(parseInt(colIndex)).search(searchTerm).draw();
-                    }
+            if (searchTerm.length > 0) {
+                if (colIndex === "all") {
+                    table.search(searchTerm).draw();
                 } else {
-                    table.draw();
+                    table.column(parseInt(colIndex)).search(searchTerm).draw();
+                }
+            } else {
+                table.draw();
+            }
+        });
+
+        $('#memberFilterColumn').on('change', function () {
+            $('#memberFilterValue').trigger('input');
+        });
+                    cacheColumnDataAndTypes("memberTable");
+                });
+
+                function stripHtml(x) {
+            const div = document.createElement('div');
+            div.innerHTML = String(x ?? '');
+            return (div.textContent || '').replace(/\s+/g, ' ').replace(/\u00A0/g, ' ').trim();
+        }
+                function cellToText(cell) {
+            if (cell == null) return '';
+
+            // Date nesnesi
+            if (cell instanceof Date && !isNaN(cell)) return cell.toISOString();
+
+            // Nesne ise Kendo/Custom olasılıklarını kontrol et
+            if (typeof cell === 'object') {
+                if ('value' in cell) return cellToText(cell.value);
+                if ('text'  in cell) return cellToText(cell.text);
+                if ('name'  in cell) return cellToText(cell.name);
+                if ('title' in cell) return cellToText(cell.title);
+                if ('html'  in cell) return stripHtml(cell.html);
+                return stripHtml(cell);
+            }
+
+            // String veya HTML string
+            return stripHtml(cell);
+        }
+        function normTR(s){
+          if(s==null) return '';
+          let t=s.toString().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+          t=t.replace(/İ/g,'I').replace(/ı/g,'i');
+          return t.toLocaleLowerCase('tr');
+        }
+                function activateSelect2() {
+            if ($('#columnSelector').data('select2')) {
+                $('#columnSelector').select2('destroy');
+            }
+            if ($('#columnSelector option[value="select-all-option"]').length === 0) {
+                $('#columnSelector').prepend('<option value="select-all-option">Tümünü Seç</option>');
+            }
+            $('#columnSelector').select2({
+                placeholder: "Filtrelenecek sütunları seçin...",
+                width: '100%',
+                multiple: true,
+                dropdownParent: $('#customf-filter-modal .customf-modal-content'),
+                templateResult: function (data) {
+                    if (data.id === 'select-all-option') {
+                        return $('<span><i class="fas fa-check-double"></i> Tümünü Seç</span>');
+                    }
+                    return data.text;
+                },
+                templateSelection: function (data) {
+                    if (data.id === 'select-all-option') {
+                        const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
+                        const currentSelectedCount = $('#columnSelector').val() ? $('#columnSelector').val().length : 0;
+                        if (currentSelectedCount === totalSelectableOptions) {
+                            return `Tümü Seçili (${totalSelectableOptions})`;
+                        }
+                        return `(${currentSelectedCount}/${totalSelectableOptions}) Sütun Seçili`;
+                    }
+                    return data.text;
+                }
+            });
+            $('#columnSelector').on('select2:select', function (e) {
+                const selectedId = e.params.data.id;
+                if (selectedId === 'select-all-option') {
+                    const $selector = $(this);
+                    const allOptions = $selector.find('option').not('[value="select-all-option"]').map(function () {
+                        return $(this).val();
+                    }).get();
+                    $selector.val(allOptions).trigger('change');
+                    $selector.select2('close');
+                }
+            });
+            $('#columnSelector').on('select2:unselect', function (e) {
+                const unselectedId = e.params.data.id;
+                if (unselectedId === 'select-all-option') {
+                    $(this).val(null).trigger('change');
+                }
+            });
+        }
+
+        function populateColumnSelector(tableId) {
+            const table = $(`#${tableId}`).DataTable();
+            const columns = table.columns().header().toArray();
+            const selector = $('#columnSelector');
+            selector.empty();
+            columns.forEach((col, index) => {
+                const colName = $(col).text().trim();
+                if (colName && colName !== "İşlemler") {
+
+                    const selectedAttr = previousFilterValues.hasOwnProperty(index) ? 'selected' : '';
+                    selector.append(`<option value="${index}" ${selectedAttr}>${colName}</option>`);
+                }
+            });
+            selector.trigger('change.select2');
+            const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
+            const currentSelectedCount = Object.keys(previousFilterValues).length;
+            if (currentSelectedCount > 0 && currentSelectedCount === totalSelectableOptions) {
+                selector.find('option[value="select-all-option"]').prop('selected', true);
+                selector.trigger('change.select2');
+            }
+        }
+
+        function generateCustomfFilterForm(tableId) {
+            try {
+                const table = $(`#${tableId}`).DataTable();
+                const columns = table.columns().header().toArray();
+                const selectedIndexes = $('#columnSelector').val()?.map(Number) || [];
+                let formHtml = "";
+                selectedIndexes.forEach(index => {
+                    try {
+                        const col = columns[index];
+                        const colName = $(col).text().trim();
+                        if (!colName || colName === "İşlemler") return;
+
+                        const columnType = columnTypesCache[index] || 'text';
+
+                        const prev = previousFilterValues[index] || {};
+
+                        formHtml += `<div class="customf-input-group"><label>${colName}</label>`;
+                        if (columnType === 'date') {
+                            const startVal = (prev['date'] && prev['date'].start) ? prev['date'].start : '';
+                            const endVal = (prev['date'] && prev['date'].end) ? prev['date'].end : '';
+                            formHtml += `<div class="customf-inline-inputs">`;
+                            formHtml += `<input type="datetime-local" class="filter-input" data-type="date-start" data-index="${index}" value="${startVal}">`;
+                            formHtml += `<input type="datetime-local" class="filter-input" data-type="date-end" data-index="${index}" value="${endVal}">`;
+                            formHtml += `</div>`;
+                        console.log("[DEBUG] Tarih Input Değerleri:",
+                             "Sütun:", colName,
+                             "Start:", startVal,
+                             "End:", endVal
+                         );
+                        } else if (columnType === 'number') {
+                            const min = (prev['range'] && !isNaN(prev['range'][0])) ? prev['range'][0] : '';
+                            const max = (prev['range'] && !isNaN(prev['range'][1])) ? prev['range'][1] : '';
+                            formHtml += `<div class="customf-inline-inputs">`;
+                            formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Min" value="${min}">`;
+                            formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Max" value="${max}">`;
+                            formHtml += `</div>`;
+                        } else {
+                            const allDataForColumn = table.column(index).data().toArray();
+                           const sampleForSelect = allDataForColumn.slice(0, 50).map(cellToText);
+                            const uniqueValues = [...new Set(sampleForSelect)];
+                            const useSelect = uniqueValues.length > 0 && uniqueValues.length <= 10;
+
+                            if (useSelect) {
+                                formHtml += `<select class="filter-input" data-type="select" data-index="${index}">`;
+                                formHtml += `<option value="">Tümü</option>`;
+                                uniqueValues.forEach(val => {
+                                    const selected = (prev['select'] === val) ? 'selected' : '';
+                                    formHtml += `<option value="${val}" ${selected}>${val}</option>`;
+                                });
+                                formHtml += `</select>`;
+                            } else {
+                                const val = prev['text'] || '';
+                                formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
+                            }
+                        }
+                        formHtml += `</div>`;
+                    } catch (e) {
+                        console.error(`Sütun işleme hatası (index ${index}):`, e);
+                    }
+                });
+                $('#customf-dynamic-filter-form').html(formHtml || getEmptyPlaceholder());
+            } catch (e) {
+                console.error("Filtre formu oluşturma hatası:", e);
+                $('#customf-dynamic-filter-form').html('<div class="alert alert-danger">Filtre oluşturulurken hata oluştu</div>');
+            }
+        }
+
+        function getEmptyPlaceholder() {
+            return `
+                        <div class="empty-placeholder">
+                            <i class="fas fa-sliders-h"></i><br>
+                            <b>Filtrelemek istediğiniz sütunları seçin.</b>
+                            <div style="font-size:13px; margin-top: 6px;">Yukarıdaki listeden bir veya daha fazla sütun seçin.</div>
+                        </div>
+                    `;
+        }
+
+        $('#customf-clear-filter').on('click', function () {
+            $('#columnSelector').val(null).trigger('change');
+            previousFilterValues = {};
+            generateCustomfFilterForm("memberTable");
+              updateFilterBadge();
+            $.fn.dataTable.ext.search = [];
+            $('#memberTable').DataTable().draw();
+        });
+
+        $(document).on('change', '#columnSelector', function () {
+            setTimeout(() => {
+                generateCustomfFilterForm("memberTable");
+            }, 100);
+        });
+
+        $('#customf-apply-filter').on('click', function () {
+                console.log("[DEBUG] Uygulanan Filtreler:", previousFilterValues);
+            try {
+                const table = $('#memberTable').DataTable();
+                selectedColumns = $('#columnSelector').val()?.map(Number) || [];
+
+
+                const currentActiveFilters = {};
+
+                $('.filter-input').each(function () {
+                    const type = $(this).data('type');
+                    const index = parseInt($(this).data('index'));
+                    const value = $(this).val().trim();
+
+                    if (value) {
+                        if (!currentActiveFilters[index]) currentActiveFilters[index] = {};
+                        if (type === 'range') {
+                            const inputs = $(`input[data-type="range"][data-index="${index}"]`);
+                            currentActiveFilters[index][type] = [
+                                parseFloat(inputs.eq(0).val().replace(',', '.')) || -Infinity,
+                                parseFloat(inputs.eq(1).val().replace(',', '.')) || Infinity
+                            ];
+                        } else if (type === 'date-start' || type === 'date-end') {
+                            if (!currentActiveFilters[index]['date']) currentActiveFilters[index]['date'] = { start: null, end: null };
+                            if (type === 'date-start') currentActiveFilters[index]['date'].start = value;
+                            if (type === 'date-end') currentActiveFilters[index]['date'].end = value;
+                        } else {
+                            currentActiveFilters[index][type] = value;
+                        }
+                    }
+                });
+
+                previousFilterValues = {};
+                for (const index in currentActiveFilters) {
+                    if (currentActiveFilters.hasOwnProperty(index)) {
+                        previousFilterValues[index] = currentActiveFilters[index];
+                    }
+                }
+
+
+                $.fn.dataTable.ext.search = [];
+
+                $.fn.dataTable.ext.search.push(function (settings, rowData, dataIndex) {
+                    let pass = true;
+
+                    const cleanedRowData = {};
+                    selectedColumns.forEach(idx => {
+                        if (columnTypesCache[idx] !== 'ignored') {
+                                   const cell = rowData[idx];
+        cleanedRowData[idx] = cellToText(cell);
+                        }
+                    });
+
+                    for (const index in previousFilterValues) {
+                        if (!previousFilterValues.hasOwnProperty(index)) continue;
+
+                        const filtersForColumn = previousFilterValues[index];
+                        const colIndex = parseInt(index);
+                        const columnType = columnTypesCache[colIndex];
+
+                        switch (columnType) {
+                            case 'date':
+
+                                const dateFilters = filtersForColumn['date'];
+                                if (dateFilters) {
+                                    const cellDate = parsedDatesCache[dataIndex]?.[colIndex];
+                                    const filterStartDate = dateFilters.start ? new Date(dateFilters.start) : null;
+                                    const filterEndDate = dateFilters.end ? new Date(dateFilters.end) : null;
+
+                                if (dataIndex < 3) {
+                                    console.log("[DEBUG] Filtre Tarih Aralığı (" + dataIndex + ". satır):",
+                                        "Start:", filterStartDate,
+                                        "End:", filterEndDate,
+                                        "Hücre Tarihi:", cellDate
+                                    );
+
+                                }
+
+                                    if (!cellDate) {
+                                        if (filterStartDate || filterEndDate) {
+                                            pass = false;
+                                        }
+                                        break;
+                                    }
+
+                                    if (filterStartDate && cellDate) {
+                                        const cellTime = cellDate.getTime();
+                                        const startTime = filterStartDate.getTime();
+                                        if (cellTime < startTime) pass = false;
+                                    }
+
+                                    if (filterEndDate && cellDate && pass) { // pass kontrolü önceki filtrenin geçilip geçilmediğini kontrol eder
+                                        const cellTime = cellDate.getTime();
+                                        const endTime = filterEndDate.getTime();
+                                        if (cellTime > endTime) pass = false;
+                                    }
+                                   console.log("[DEBUG] Applied Date Filter Summary:", {
+            start: filterStartDate,
+            end: filterEndDate,
+            totalRows: table.rows().count(),
+            matchedRows: table.rows({ filter: 'applied' }).count()
+        });
+                                }
+
+                                break;
+                            case 'number':
+                                const rangeFilters = filtersForColumn['range'];
+                                if (rangeFilters) {
+                                    const [min, max] = rangeFilters;
+                                    const num = parseFloat(cleanedRowData[colIndex]?.replace(',', '.')) || 0;
+                                    if (num < min || num > max) {
+                                        pass = false;
+                                    }
+                                }
+                                break;
+                            case 'text':
+                                const textFilter = filtersForColumn['text'];
+                                        if (textFilter && !normTR(cleanedRowData[colIndex]).includes(normTR(textFilter))) {
+            pass = false;
+        }
+                                break;
+                                case 'select':
+        const selectFilter = filtersForColumn['select'];
+        if (selectFilter) {
+            const cellVal = normTR(cleanedRowData[colIndex] || '');
+            const filterVal = normTR(selectFilter || '');
+
+             console.log(`[SELECT DEBUG] Kolon: ${colIndex}`, {
+            orijinalHücre: cleanedRowData[colIndex],
+            temizlenmişHücre: cellVal,
+            seçilenFiltre: selectFilter,
+            normalizeFiltre: filterVal,
+            eşleşme: cellVal === filterVal
+        });
+
+            if (cellVal !== filterVal) {
+                pass = false;
+            }
+        }
+        break;
+                        }
+
+                        if (!pass) break;
+                    }
+                    return pass;
+                });
+                  updateFilterBadge();
+                table.search('').columns().search('').draw();
+                table.draw();
+                $('#customf-filter-modal').hide();
+            } catch (e) {
+                console.error("Filtre uygulama hatası:", e);
+            }
+
+                           console.log("[DEBUG] Filter applied. Remaining rows:",
+            $('#memberTable').DataTable().rows({ filter: 'applied' }).count()
+        );
+
+        });
+                function isValidDate(val) {
+            // Date nesnesi
+            if (val instanceof Date && !isNaN(val)) return true;
+
+            // Null veya boş
+            if (val == null || val === '') return false;
+
+            // String değilse önce metne çevir
+            if (typeof val !== 'string') val = cellToText(val);
+
+            // ISO format (YYYY-MM-DD [T veya boşluk])
+            if (/^\d{4}-\d{2}-\d{2}([T\s].*)?$/.test(val)) {
+                return !isNaN(new Date(val));
+            }
+
+            // ASP.NET formatı /Date(1722384000000)/
+            const aspMatch = String(val).match(/\/Date\((\d+)\)\//);
+            if (aspMatch) {
+                return !isNaN(new Date(parseInt(aspMatch[1], 10)));
+            }
+
+            // TR formatı: dd.MM.yyyy [HH:mm[:ss]]
+            const trPatterns = [
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/,
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/,
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/
+            ];
+            for (const pattern of trPatterns) {
+                if (pattern.test(val)) return true;
+            }
+
+            return false;
+        }
+
+                       function parseDate(val) {
+            if (val instanceof Date && !isNaN(val)) return val;
+            if (val == null) return null;
+            if (typeof val !== 'string') val = cellToText(val);
+            if (!val) return null;
+
+            // ISO format
+            if (/^\d{4}-\d{2}-\d{2}([T\s].*)?$/.test(val)) {
+                const d = new Date(val);
+                return isNaN(d) ? null : d;
+            }
+
+            // ASP.NET formatı
+            const aspMatch = val.match(/\/Date\((\d+)\)\//);
+            if (aspMatch) return new Date(parseInt(aspMatch[1], 10));
+
+            // TR formatları
+            const trFormats = [
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/, fn: m => new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5], +m[6]) },
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/,          fn: m => new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5]) },
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,                              fn: m => new Date(+m[3], +m[2]-1, +m[1]) }
+            ];
+            for (const { regex, fn } of trFormats) {
+                const match = val.match(regex);
+                if (match) {
+                    const d = fn(match);
+                    return isNaN(d) ? null : d;
+                }
+            }
+
+            return null;
+        }
+
+
+                        function cacheColumnDataAndTypes(tableId) {
+            const table = $(`#${tableId}`).DataTable();
+
+            // reset
+            columnTypesCache = {};
+            parsedDatesCache = [];
+
+            const colCount = table.columns().header().toArray().length;
+
+            // 1) Başlıktan tip ipucu
+            table.columns().every(function (i) {
+                const name = $(this.header()).text().trim().toLowerCase();
+                if (name.includes('tarih') || name.includes('date')) {
+                    columnTypesCache[i] = 'date';
                 }
             });
 
-            $('#memberFilterColumn').on('change', function () {
-                $('#memberFilterValue').trigger('input');
+            // 2) data-order veya görünmeyen ISO sütun
+            for (let i = 0; i < colCount; i++) {
+                if (columnTypesCache[i]) continue;
+
+                // a) data-order var mı?
+                let hasDataOrderDate = false;
+                $(table.column(i).nodes()).each(function () {
+                    const $td = $(this);
+                    // kendi üzerinde
+                    let v = $td.attr('data-order') || $td.data('order');
+                    // iç elemanda
+                    if (!v) v = $td.find('[data-order]').attr('data-order');
+                    if (v && isValidDate(v)) { hasDataOrderDate = true; return false; }
+                });
+                if (hasDataOrderDate) { columnTypesCache[i] = 'date'; continue; }
+
+                // b) görünmeyen & ISO gibi sütun mu?
+                const isVisible = table.column(i).visible();
+                const sample = table.column(i).data().toArray()
+                    .slice(0, 100)
+                    .map(cellToText);
+                const looksIso = sample.length &&
+                    sample.every(v => !v || /^\d{4}-\d{2}-\d{2}([T\s].*)?$/.test(v));
+                if (!isVisible && looksIso) {
+                    columnTypesCache[i] = 'date';
+                }
+            }
+
+            // 3) Veri analizi (date/number/text ayrımı)
+            for (let i = 0; i < colCount; i++) {
+                if (columnTypesCache[i]) continue;
+
+                let dateCount = 0, numberCount = 0, total = 0;
+                const uniq = new Set();
+
+                table.column(i).data().each(function (cell) {
+                    const txt = cellToText(cell);
+                    if (!txt) return;
+                    total++;
+                    uniq.add(txt);
+                    if (isValidDate(txt)) dateCount++;
+                    else if (!isNaN(parseFloat(txt.replace(',', '.')))) numberCount++;
+                });
+
+                if (dateCount > total * 0.6) columnTypesCache[i] = 'date';
+                else if (numberCount > total * 0.75) columnTypesCache[i] = 'number';
+                else if (uniq.size > 0 && uniq.size <= 10) columnTypesCache[i] = 'select';
+                else columnTypesCache[i] = 'text';
+            }
+
+            // 4) parsedDatesCache'i doldur (öncelik data-order)
+            const rows = table.rows({ order: 'applied', search: 'applied' }).indexes();
+            rows.each(function (rowIdx) {
+                parsedDatesCache[rowIdx] = {};
+                for (let i = 0; i < colCount; i++) {
+                    if (columnTypesCache[i] !== 'date') continue;
+
+                    // hücre DOM’unu al
+                    const cellNode = table.cell(rowIdx, i).node();
+                    const $td = $(cellNode);
+
+                    // 1. tercih: data-order
+                    let rawOrder = $td.attr('data-order') || $td.data('order');
+                    if (!rawOrder) rawOrder = $td.find('[data-order]').attr('data-order');
+
+                    let d = null;
+                    if (rawOrder) {
+                        d = parseDate(rawOrder);
+                    }
+                    // 2. tercih: metin
+                    if (!d) {
+                        const txt = cellToText(table.cell(rowIdx, i).data());
+                        d = parseDate(txt);
+                    }
+
+                    parsedDatesCache[rowIdx][i] = d || null;
+                }
             });
+
+                   console.log("[DEBUG] Column Types:", columnTypesCache);
+                   console.log("[DEBUG] parsedDatesCache Sample:", parsedDatesCache.slice(0, 5));
+
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('customf-filter-modal');
+            const closeBtn = document.querySelector('.customf-close');
+            window.onclick = function (event) {
+                if (event.target === modal) modal.style.display = 'none';
+            };
+            closeBtn.onclick = function () {
+                modal.style.display = 'none';
+            };
         });
+
+             function updateFilterBadge() {
+          const count = Object.values(previousFilterValues || {})
+            .filter(v => v && Object.values(v).some(x => x && String(x).trim() !== ''))
+            .length;
+
+          const $btn = $('.customf-filter-button');
+
+          // Rozeti yeniden oluştur
+          $btn.find('.filter-badge').remove();
+
+          // Butonu konumlandır (CSS yazmadan inline)
+          $btn.css({ position: 'relative', overflow: 'visible' });
+
+          if (count > 0) {
+            // Rozeti sağ ÜST iç köşeye yerleştir (taşmadan görünsün)
+            $btn.append(
+              `<span class="filter-badge" style="
+                position:absolute;
+                top:2px;            /* dilersen 4-6px yapabilirsin */
+                right:2px;          /* dilersen 4-6px yapabilirsin */
+                transform: translate(0,0);
+                min-width:18px;
+                height:18px;
+                padding:0 6px;
+                border-radius:9999px;
+                display:flex;align-items:center;justify-content:center;
+                font-size:11px;font-weight:800;
+                background:#ef4444;color:#fff;
+                line-height:1; z-index:3;
+                box-shadow:0 6px 14px rgba(239,68,68,.35);
+              ">${count}</span>`
+            );
+          }
+        }
+
 
         function deleteMember(id) {
             Swal.fire({

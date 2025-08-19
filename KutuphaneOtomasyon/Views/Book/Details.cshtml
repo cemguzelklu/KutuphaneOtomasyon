@@ -1,120 +1,687 @@
-﻿
-@model KutuphaneOtomasyon.Models.Book
-
+﻿@model KutuphaneOtomasyon.ViewModels.Books.BookDetailsVm
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["Title"] = Model.Book.Title;
+
+    var available = Model.Book.AvailableCopies;
+    var total = Math.Max(Model.Book.TotalCopies, 1);
+    var pct = (int)Math.Round((double)available / total * 100);
+
+    // ⬇️ Fonksiyon yerine değişken
+    var lang = !string.IsNullOrWhiteSpace(Model.GbLanguage)
+               ? Model.GbLanguage
+               : (!string.IsNullOrWhiteSpace(Model.Book.Language) ? Model.Book.Language : "Bilinmiyor");
+
+    var pages = !string.IsNullOrWhiteSpace(Model.GbPageCount)
+                ? Model.GbPageCount
+                : "Bilinmiyor";
 }
-<div class="book-detail-container">
-    <div class="row">
-        <!-- Kitap Kapak -->
-        <div class="col-md-4 book-cover-container">
-            @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
-            {
-                <img src="@Model.ThumbnailUrl.Replace("http://", "https://")"
-                     class="img-fluid rounded shadow"
-                     alt="@Model.Title kitap kapağı">
-            }
-            else
-            {
-                <div class="no-cover">
-                    <i class="fas fa-book-open fa-5x text-muted"></i>
-                </div>
-            }
-        </div>
 
-        <!-- Kitap Bilgileri -->
-        <div class="col-md-8">
-            <h1>@Model.Title</h1>
-            <h4 class="text-muted">@Model.Author</h4>
+<div class="container-fluid px-0 book-details">
+    <div class="row g-4 align-items-stretch">
+        <!-- Sol Sütun: Kapak + Uygunluk + Kısa Özet -->
+        <div class="col-lg-4">
+            <div class="card h-100 shadow-sm rounded-4 glass-wrap">
+                <div class="glass glass-inner">
+                <div class="card-body p-3 p-md-4 d-flex flex-column">
+                    <div class="cover-box mb-3">
+                        @if (!string.IsNullOrWhiteSpace(Model.Book.ThumbnailUrl))
+                        {
+                            <img src="@Model.Book.ThumbnailUrl.Replace("http://", "https://")"
+                                 class="cover-img rounded-3 border"
+                                 alt="@Model.Book.Title kitap kapağı">
+                        }
+                        else
+                        {
+                            <div class="cover-fallback rounded-3 d-flex align-items-center justify-content-center border">
+                                <i class="fas fa-book-open fa-3x text-muted"></i>
+                            </div>
+                        }
+                    </div>
 
-            <hr />
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                        <span>Uygunluk</span>
+                        <span>@available / @Model.Book.TotalCopies</span>
+                    </div>
+                        <div class="progress mb-3" style="height:10px; border-radius:999px;">
+                        <div class="progress-bar @((available > 0) ? "bg-success" : "bg-danger")" style="width:@pct%"></div>
+                    </div>
 
-            <dl class="row">
-                <dt class="col-sm-3">ISBN</dt>
-                <dd class="col-sm-9">@(Model.ISBN ?? "Bilinmiyor")</dd>
-
-                <dt class="col-sm-3">Yayınevi</dt>
-                <dd class="col-sm-9">@(Model.Publisher ?? "Bilinmiyor")</dd>
-
-                <dt class="col-sm-3">Kategori</dt>
-                <dd class="col-sm-9">@Model.Category</dd>
-
-                <dt class="col-sm-3">Stok Durumu</dt>
-                <dd class="col-sm-9">
-                    <span class="badge @(Model.AvailableCopies > 0 ? "bg-success" : "bg-danger")">
-                        @Model.AvailableCopies / @Model.TotalCopies
-                    </span>
-                </dd>
-            </dl>
-
-            <!-- API'den gelen ekstra bilgiler -->
-            @if (ViewBag.Description != null)
-            {
-                <div class="mt-3 p-3 bg-light">
-                    <h5>Kitap Açıklaması</h5>
-                    <p>@Html.Raw(ViewBag.Description)</p>  <!-- Null kontrolü zaten yapıldı -->
-                    <!-- Diğer bilgiler -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <small><strong>Sayfa Sayısı:</strong> @(ViewBag.PageCount ?? "Bilinmiyor")</small>
+                    <div class="small row g-3">
+                        <div class="col-6">
+                            <div class="muted">ISBN</div>
+                            <div class="fw-semibold">@(!string.IsNullOrWhiteSpace(Model.Book.ISBN) ? Model.Book.ISBN : "Bilinmiyor")</div>
                         </div>
-                        <div class="col-md-6">
-                            <small><strong>Dil:</strong> @ViewBag.Language</small>
+                        <div class="col-6">
+                            <div class="muted">Yayınevi</div>
+                            <div class="fw-semibold">@(!string.IsNullOrWhiteSpace(Model.Book.Publisher) ? Model.Book.Publisher : "Bilinmiyor")</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="muted">Dil</div>
+                            <div class="fw-semibold">@lang</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="muted">Sayfa</div>
+                            <div class="fw-semibold">@pages</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="muted">Kategori</div>
+                            <div class="fw-semibold">@Model.Book.Category</div>
                         </div>
                     </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill">
+                            <i class="fas fa-arrow-left me-1"></i> Kitaplığa Dön
+                        </a>
+                        @if (available > 0)
+                        {
+                            <a asp-controller="Borrow" asp-action="Create" asp-route-bookId="@Model.Book.BookId"
+                               class="btn btn-primary btn-sm rounded-pill">
+                                <i class="fas fa-bookmark me-1"></i> Ödünç Al
+                            </a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary btn-sm rounded-pill" disabled>
+                                <i class="fas fa-clock me-1"></i> Şu an uygun değil
+                            </button>
+                        }
+                    </div>
+
+                    <div class="mt-3 d-flex flex-wrap gap-2">
+                        @if (!string.IsNullOrWhiteSpace(Model.Book.Category))
+                        {
+                            <span class="chip badge rounded-pill bg-info-subtle text-info-emphasis px-3 py-2"><i class="fas fa-tag me-1"></i>@Model.Book.Category</span>
+                        }
+                      
+                    </div>
                 </div>
-            }
+            </div>
+            </div>
         </div>
-    </div>
 
-    <!-- Action Butonları -->
-    <div class="mt-4">
-        <a asp-action="Index" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Kitaplığa Dön
-        </a>
+        <!-- Sağ Sütun: Başlık + Sekmeler -->
+        <div class="col-lg-8">
+            <div class="card h-100 shadow-sm rounded-4 glass-wrap">
+                <div class="glass glass-inner">
+                <div class="card-body p-3 p-md-4">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div>
+                            <h1 class="h4 mb-1">@Model.Book.Title</h1>
+                            <div class="text-muted">@Model.Book.Author</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge rounded-pill @((available > 0) ? "bg-success" : "bg-danger") px-3 py-2">
+                                <i class="fas @(available > 0 ? "fa-check" : "fa-times") me-1"></i>
+                                @(available > 0 ? "Uygun" : "Müsait değil")
+                            </span>
+                        </div>
 
-        @if (Model.AvailableCopies > 0)
+                    </div>
+
+                    <!-- Sayaçlar -->
+                    <div class="row text-center g-2 my-3">
+                        <div class="col-4">
+                            <div class="stat small">
+                                <div class="muted">Toplam Ödünç</div>
+                                <div class="fs-5 fw-bold">@Model.TotalBorrowCount</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat small">
+                                <div class="muted">Geç İade</div>
+                                <div class="fs-5 fw-bold text-danger">@Model.LateReturnCount</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat small">
+                                <div class="muted">Stok</div>
+                                <div class="fs-5 fw-bold">@available/@Model.Book.TotalCopies</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sekmeler -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-detay" type="button">Detaylar</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-aktuel" type="button">Şu An Kimde?</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-gecmis" type="button">Ödünç Geçmişi</button></li>
+                    </ul>
+
+                    <div class="tab-content pt-3">
+                        <!-- Detaylar -->
+                        <div class="tab-pane fade show active" id="tab-detay">
+                            @if (!string.IsNullOrWhiteSpace(Model.GbDescription))
+                            {
+                                <div class="bg-light p-3 rounded-3 small text-secondary">
+                                    @Html.Raw(Model.GbDescription)
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted small">Bu kitap için ek açıklama bulunmuyor.</div>
+                            }
+                        </div>
+
+                        <!-- Şu An Kimde? -->
+                            @{
+                                var hasActive = Model.CurrentBorrow != null
+                                && Model.CurrentBorrower != null
+                                && !Model.CurrentBorrow.ReturnDate.HasValue;
+
+                                var due = Model.CurrentBorrow?.DueDate; // null olabilir
+                            }
+                            <div class="tab-pane fade" id="tab-aktuel">
+                                @if (hasActive)
+                                {
+                                    <div class="glass p-3">
+                                        <div class="list-group list-group-flush rounded-3 border small">
+                                            <div class="list-group-item d-flex flex-wrap align-items-center justify-content-between">
+                                                <div class="me-2">
+                                                    <div class="fw-semibold">@Model.CurrentBorrower!.Name</div>
+                                                    <div class="text-muted">
+                                                        Alış: @Model.CurrentBorrow!.BorrowDate.ToString("dd.MM.yyyy HH:mm")
+                                                        @if (due.HasValue)
+                                                        {
+                                                            <span class="ms-2">| Son teslim: @due.Value.ToString("dd.MM.yyyy")</span>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    @if (due.HasValue)
+                                                    {
+                                                        var gun = (due.Value.Date - DateTime.Now.Date).Days;
+                                                        if (gun < 0)
+                                                        {
+                                                            <span class="badge rounded-pill bg-danger px-3 py-2">@Math.Abs(gun) gün gecikti</span>
+                                                        }
+                                                        else if (gun == 0)
+                                                        {
+                                                            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">Son gün</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge rounded-pill bg-success px-3 py-2">@gun gün kaldı</span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge rounded-pill bg-secondary px-3 py-2">Son teslim yok</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted small">Bu kitabı üzerinde bulunduran aktif üye yok.</div>
+                                }
+                            </div>
+
+                        <!-- Ödünç Geçmişi -->
+                        <div class="tab-pane fade" id="tab-gecmis">
+                            @if (Model.History != null && Model.History.Any())
+                            {
+                                 <div class="glass p-2">
+                                    <div class="table-wrap">
+                                <div class="table-responsive">
+                                    <table class="table table-sm align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Üye</th>
+                                                <th>Alış</th>
+                                                <th>İade</th>
+                                                <th>Süre (gün)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var b in Model.History)
+                                            {
+                                                var sure = (b.ReturnDate.HasValue ? (b.ReturnDate.Value.Date - b.BorrowDate.Date).Days : (int?)null);
+                                                <tr>
+                                                    <td>@b.Member?.Name</td>
+                                                    <td>@b.BorrowDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                                    <td>@(b.ReturnDate.HasValue? b.ReturnDate.Value.ToString("dd.MM.yyyy") : "—")</td>
+                                                    <td>@(sure.HasValue? sure.Value: (object)"—")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted small">Geçmiş ödünç kaydı bulunamadı.</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Bu kitabı alanlar bunları da aldı -->
+                    @* === ÖNERİLER (küçük kartlar + fallback) === *@
+@* === ÖNERİLER (2x2 sabit; önce primary, eksikse rastgele doldur) === *@
+@{
+    // 1) Asıl öneriler (primary)
+    var primary = (Model.AlsoBorrowedTop ?? Enumerable.Empty<KutuphaneOtomasyon.ViewModels.Books.AlsoBorrowedVm>())
+                  .ToList();
+
+    // 2) Fallback havuzu: benzer yazar + benzer kategori -> AlsoBorrowedVm'e map
+    var pool = new List<KutuphaneOtomasyon.ViewModels.Books.AlsoBorrowedVm>();
+    if (Model.SimilarByAuthor != null)
+    {
+        pool.AddRange(Model.SimilarByAuthor.Select(b => new KutuphaneOtomasyon.ViewModels.Books.AlsoBorrowedVm {
+            BookId = b.BookId, Title = b.Title, Author = b.Author,
+            AvailableCopies = b.AvailableCopies, ThumbnailUrl = b.ThumbnailUrl
+        }));
+    }
+    if (Model.SimilarByCategory != null)
+    {
+        pool.AddRange(Model.SimilarByCategory.Select(b => new KutuphaneOtomasyon.ViewModels.Books.AlsoBorrowedVm {
+            BookId = b.BookId, Title = b.Title, Author = b.Author,
+            AvailableCopies = b.AvailableCopies, ThumbnailUrl = b.ThumbnailUrl
+        }));
+    }
+
+    // 3) Hedef liste: önce primary'den ekle, 4'ü bulamazsa havuzdan rastgele tamamla
+    var target = new List<KutuphaneOtomasyon.ViewModels.Books.AlsoBorrowedVm>();
+    foreach (var p in primary)
+    {
+        if (!target.Any(t => t.BookId == p.BookId)) target.Add(p);
+        if (target.Count == 4) break;
+    }
+
+    var rnd = new Random();
+    var candidates = pool
+        .Where(p => !target.Any(t => t.BookId == p.BookId))
+        .GroupBy(x => x.BookId).Select(g => g.First()) // uniq
+        .OrderBy(_ => rnd.Next())
+        .ToList();
+
+    foreach (var c in candidates)
+    {
+        target.Add(c);
+        if (target.Count == 4) break;
+    }
+
+    var hasPrimaryAny = primary.Any();
+}
+
+@if (target.Any())
+{
+    <h6 class="mt-4 mb-2">
+        @(hasPrimaryAny ? "Bu kitabı alanlar bunları da aldı" : "Şunlara da göz atabilirsiniz")
+    </h6>
+
+    <!-- 2 sütun, toplam en fazla 4 kart -->
+    <div class="row row-cols-2 g-2 g-md-3">
+        @foreach (var x in target)
         {
-            <a asp-controller="Borrow" asp-action="Create" asp-route-bookId="@Model.BookId"
-               class="btn btn-primary ms-2">
-                <i class="fas fa-bookmark"></i> Ödünç Al
-            </a>
+            <div class="col">
+                <a asp-action="Details" asp-route-id="@x.BookId" class="rec-card text-decoration-none text-reset">
+                    <div class="rec-cover">
+                        @if (!string.IsNullOrWhiteSpace(x.ThumbnailUrl))
+                        {
+                            <img src="@x.ThumbnailUrl.Replace("http://","https://")" alt="@x.Title" />
+                        }
+                        else
+                        {
+                            <div class="rec-fallback"><i class="fas fa-book"></i></div>
+                        }
+                    </div>
+                    <div class="rec-body">
+                        <div class="rec-title" title="@x.Title">@x.Title</div>
+                        @if (!string.IsNullOrWhiteSpace(x.Author))
+                        {
+                            <div class="rec-author" title="@x.Author">@x.Author</div>
+                        }
+                    </div>
+                    <div class="rec-meta">
+                        <span class="badge rounded-pill @(x.AvailableCopies > 0 ? "bg-success" : "bg-secondary")">
+                            @(x.AvailableCopies > 0 ? "Uygun" : "Meşgul")
+                        </span>
+                        @* primary’den geldiyse ve count varsa göster *@
+                        @if (hasPrimaryAny && x.Count > 0)
+                        {
+                            <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">@x.Count ×</span>
+                        }
+                    </div>
+                </a>
+            </div>
         }
+    </div>
+}
+
+
+
+                    <!-- Benzer Kitaplar -->
+                    @if ((Model.SimilarByAuthor?.Any() ?? false) || (Model.SimilarByCategory?.Any() ?? false))
+                    {
+                        <div class="row g-4 mt-2">
+                            @if (Model.SimilarByAuthor?.Any() ?? false)
+                            {
+                                <div class="col-12">
+                                    <h6 class="mb-2">Yazara Benzer</h6>
+                                  <div class="row row-cols-2 row-cols-md-4 g-3">
+                                        @foreach (var b in Model.SimilarByAuthor.Take(8))
+                                        {
+                                            <div class="col">
+                                                <a asp-action="Details" asp-route-id="@b.BookId" class="card card-link h-100 p-2 rounded-3 shadow-xs text-reset text-decoration-none">
+
+                                                    <div class="fix-cover mb-2">
+                                                        @if (!string.IsNullOrWhiteSpace(b.ThumbnailUrl))
+                                                        {
+                                                            <img src="@b.ThumbnailUrl.Replace("http://", "https://")" class="w-100 h-100 object-fit-contain rounded" alt="@b.Title" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center"><i class="fas fa-book text-muted"></i></div>
+                                                        }
+                                                    </div>
+                                                    </a>
+                                                    <div class="small fw-semibold text-truncate" title="@b.Title">@b.Title</div>
+                                                    <div class="small text-muted text-truncate">@b.Author</div>
+                                              
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.SimilarByCategory?.Any() ?? false)
+                            {
+                                <div class="col-12">
+                                    <h6 class="mb-2">Kategoriye Benzer</h6>
+                                    <div class="row row-cols-2 row-cols-md-4 g-3">
+                                        @foreach (var b in Model.SimilarByCategory.Take(8))
+                                        {
+                                            <div class="col">
+                                                <a asp-action="Details" asp-route-id="@b.BookId" class="card card-link h-100 p-2 rounded-3 shadow-xs text-reset text-decoration-none">
+                                                    <div class="fix-cover mb-2">
+                                                        @if (!string.IsNullOrWhiteSpace(b.ThumbnailUrl))
+                                                        {
+                                                            <img src="@b.ThumbnailUrl.Replace("http://", "https://")" class="w-100 h-100 object-fit-contain rounded" alt="@b.Title" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center"><i class="fas fa-book text-muted"></i></div>
+                                                        }
+                                                    </div>
+                                                    <div class="small fw-semibold text-truncate" title="@b.Title">@b.Title</div>
+                                                    <div class="small text-muted text-truncate">@b.Author</div>
+                                                </a>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        </div>
     </div>
 </div>
 
 @section Styles {
     <style>
+        .book-details .card {
+            border: 0
+        }
+
         .no-cover {
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+            background: #f8f9fa
         }
 
-        .book-detail-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        .object-fit-contain {
+            object-fit: contain
         }
 
-            .book-detail-container .row {
-                align-items: flex-start; /* Üst hizala */
+        .muted {
+            font-size: .75rem;
+            color: #6c757d
+        }
+
+        .chip {
+            font-size: .8rem
+        }
+
+        .hover-up {
+            transition: transform .12s ease, box-shadow .12s ease
+        }
+
+            .hover-up:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.08)
             }
 
-        .book-cover-container {
+        .shadow-xs {
+            box-shadow: 0 .25rem .75rem rgba(0,0,0,.06) !important
+        }
+
+        .card-link:hover {
+            background: #f8f9fa
+        }
+
+
+        .book-details {
+            --bd-radius: 16px;
+            --bd-gap: 1rem;
+            --title-size: clamp(1.125rem, 0.8rem + 1.2vw, 1.6rem);
+            --sub-size: clamp(.9rem, .8rem + .2vw, 1rem);
+            --text-size: .95rem;
+        }
+
+            .book-details .card {
+                border: 0;
+            }
+
+            .book-details .card-body {
+                font-size: var(--text-size);
+            }
+
+            /* Başlık boyutları */
+            .book-details h1.h4 {
+                font-size: var(--title-size);
+                margin: 0;
+            }
+
+            .book-details .text-muted {
+                font-size: var(--sub-size);
+            }
+
+        /* ====== GLASS / YÜZEN PANEL ====== */
+        .glass {
+            background: rgba(255,255,255,.86);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 12px 30px rgba(16,24,40,.08);
+            border-radius: var(--bd-radius);
+            border: 1px solid rgba(17, 24, 39, .06);
+        }
+
+        /* Sağ taraftaki sekme kartını ve sol kartı glass yapalım */
+        .book-details .card.shadow-sm.rounded-4 {
+            background: transparent;
+        }
+
+            .book-details .card.shadow-sm.rounded-4 > .card-body {
+                background: transparent;
+            }
+
+        .book-details .card.h-100.shadow-sm.rounded-4 {
+            box-shadow: none !important;
+        }
+
+            .book-details .card.h-100.shadow-sm.rounded-4.glass-wrap {
+                padding: 0;
+            }
+
+        .book-details .glass-inner {
+            padding: 1rem 1rem 1.25rem;
+        }
+        @@media (min-width: 768px) {
+            .book-details .glass-inner
+
+        {
+            padding: 1.25rem 1.5rem 1.5rem;
+        }
+
+        }
+
+        /* ====== KAPAK GÖRSELİ ====== */
+        .cover-box {
+            height: 320px; /* masaüstü */
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        @@media (max-width: 575.98px) {
+            .cover-box
+
+        {
+            height: 280px;
+        }
+        /* mobilde biraz küçült */
+        }
+        /* === Küçük öneri kartları === */
+.rec-grid { margin-top: .25rem; }
+.rec-card{
+  display:block;background:#fff;border:1px solid rgba(17,24,39,.06);
+  border-radius:12px;padding:.5rem;box-shadow:0 6px 18px rgba(2,6,23,.06);
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+  height:100%;
+}
+.rec-card:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(0,0,0,.08); }
+
+.rec-cover{
+  height:120px; border-radius:8px; background:#fcfcfd; display:flex; align-items:center; justify-content:center;
+  overflow:hidden; margin-bottom:.5rem;
+}
+@@media (min-width:768px){ .rec-cover{ height:140px; } }
+.rec-cover img{ max-height:100%; max-width:100%; object-fit:contain; display:block; }
+.rec-fallback{ color:#9aa1aa; font-size:1.25rem; }
+
+.rec-body{ min-height:44px; }
+.rec-title{
+  font-weight:700; font-size:.83rem; line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.rec-author{
+  font-size:.75rem; color:#6b7280; margin-top:.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.rec-meta{ margin-top:.4rem; display:flex; gap:.35rem; align-items:center; flex-wrap:wrap; }
+.rec-meta .badge{ font-size:.7rem; padding:.25rem .5rem; }
+        .badge {
+            white-space: nowrap;
+        }
+        
+        /* --- Benzer kart kapakları için sabit oran --- */
+.book-details .fix-cover{
+  height: clamp(140px, 18vw, 200px);  /* her ekranda kontrollü yükseklik */
+  width: 100%;
+  border-radius: 8px;
+  background: #fcfcfd;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.book-details .fix-cover img{
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+}
+.book-details .card .small.fw-semibold,
+.book-details .card .small.text-muted{
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+/* Güvenlik ağı: .card içindeki rasgele img’ler ratio’yu taşırmasın */
+.book-details .card img{
+  max-width:100%;
+}
+        .cover-img, .cover-fallback {
+            width: 100%;
             height: 100%;
-            display: flex;
-            flex-direction: column;
+            object-fit: contain;
+            background: #fcfcfd;
         }
 
-            .book-cover-container img {
-                max-height: 300px;
-                object-fit: contain;
-                margin-bottom: 20px;
+        /* ====== BUTONLAR ====== */
+        .book-details .btn {
+            font-weight: 600;
+        }
+
+            .book-details .btn.rounded-pill {
+                border-radius: 999px !important;
             }
+
+        /* ====== NAV TABS (daha belirgin) ====== */
+        .book-details .nav-tabs {
+            border: 0;
+            gap: .25rem;
+        }
+
+            .book-details .nav-tabs .nav-link {
+                border: 0;
+                border-radius: 999px;
+                padding: .45rem .9rem;
+                background: #f3f4f6;
+                color: #374151;
+                font-weight: 600;
+            }
+
+                .book-details .nav-tabs .nav-link.active {
+                    background: linear-gradient(135deg, #E8F3FF, #eef6ff);
+                    color: #1d4ed8;
+                    box-shadow: 0 6px 16px rgba(29,78,216,.18);
+                }
+
+        /* ====== KÜÇÜK BİLGİ BLOKLARI ====== */
+        .muted {
+            font-size: .78rem;
+            color: #6b7280;
+        }
+
+        .fw-semibold {
+            font-weight: 600;
+        }
+
+        /* ====== LİST GROUP (Şu an kimde?) ====== */
+        .book-details .list-group {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .book-details .list-group-item {
+            border: 0;
+            border-bottom: 1px solid rgba(17,24,39,.06);
+        }
+
+            .book-details .list-group-item:last-child {
+                border-bottom: 0;
+            }
+
+        /* ====== TABLONUN PANEL İÇİNDE DURMASI ====== */
+        .table-wrap {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(17,24,39,.06);
+            box-shadow: 0 6px 20px rgba(2,6,23,.06);
+            background: #fff;
+        }
+
+        /* ====== KART IZGARALARI ====== */
+        .card-link, .hover-up {
+            transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+
+            .card-link:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 26px rgba(0,0,0,.08);
+            }
+
+        /* ====== İKON + METİN TEK SATIR ZORLAMASI ====== */
+        .badge .fa-check, .badge .fa-times {
+            vertical-align: -1px;
+        }
+
     </style>
 }

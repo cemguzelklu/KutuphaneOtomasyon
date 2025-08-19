@@ -348,6 +348,354 @@
         margin-right: 0;
     }
 
+    .btn {
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        }
+
+    .dt-elevated {
+        border: 0;
+        border-radius: 16px;
+        background: rgba(255,255,255,.86);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 16px rgba(27,31,35,.08), 0 18px 40px rgba(27,31,35,.10);
+        position: relative;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+        .dt-elevated:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,.06), 0 12px 26px rgba(27,31,35,.10), 0 28px 60px rgba(27,31,35,.12);
+        }
+
+        /* Kartın altında yumuşak “hale” */
+        .dt-elevated::after {
+            content: "";
+            position: absolute;
+            inset: auto 8% -14px 8%;
+            height: 28px;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+    /* Tablo görünümü */
+    .dt-pretty {
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(255,255,255,.92);
+    }
+
+        .dt-pretty thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: inherit !important; /* THEAD'in arkaplanını aynen al */
+            background-color: inherit !important;
+            color: inherit !important; /* text-white devralsın */
+            box-shadow: 0 1px 0 rgba(0,0,0,.06);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        /* Güvenlik için: thead'e bg-info verilmişse yazılar beyaz kalsın */
+        .dt-pretty thead.bg-info th {
+            color: #fff !important;
+        }
+
+        .dt-pretty td, .dt-pretty th {
+            border-color: #eef2f7 !important;
+        }
+
+        .dt-pretty tbody tr {
+            transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+
+            .dt-pretty tbody tr:hover {
+                background: #f8fbff !important;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 14px rgba(30,41,59,.06);
+            }
+
+    /* Üst bar (arama, buttons) ufak yükselti */
+    .dataTables_wrapper .dt-buttons .btn,
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 10px !important;
+        border: 1px solid #e6e9f0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+
+    /* Perspectif hissi (opsiyonel ama hoş) */
+    .dt-float {
+        transform: translateZ(0);
+        perspective: 1200px;
+    }
+    /* Datatables butonları: görünüm + animasyon */
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+        position: relative;
+        overflow: hidden; /* hover parıltısı için */
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: #fff !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        box-shadow: 0 8px 20px rgba(78,115,223,0.25);
+        transition: transform .12s ease, box-shadow .12s ease, filter .18s ease;
+    }
+
+        /* İkon ile metin arası boşluk */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy i,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button i {
+            margin-right: 6px;
+        }
+
+        /* Hover/active durumları */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(78,115,223,0.35);
+        }
+
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:active,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px rgba(78,115,223,0.25);
+        }
+
+        /* Hover’da hafif “parıltı” geçişi */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy::after,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.20) 20%, transparent 40%);
+            transform: translateX(-120%);
+            transition: transform .55s ease;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover::after,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover::after {
+            transform: translateX(120%);
+        }
+
+    /* Mavi odak halkasını/outline'ı KALDIR */
+    .dataTables_wrapper .dt-buttons .dt-button:focus,
+    .dataTables_wrapper .dt-buttons .dt-button:focus-visible,
+    .dataTables_wrapper .dt-buttons .dt-button:active:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Bazı tarayıcılar için iç odak kenarlığı */
+    .dataTables_wrapper .dt-buttons .dt-button::-moz-focus-inner {
+        border: 0;
+    }
+
+    /* Datatables buton grubu taşmasın diye */
+    .dataTables_wrapper .dt-buttons {
+        display: flex;
+        gap: 8px;
+        overflow: visible; /* rozet ve parıltı taşarsa kesilmesin */
+    }
+
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+            padding-right: 28px !important; /* rozet için sağdan yer */
+        }
+
+    .enhanced-search-box button:hover,
+    .enhanced-search-box button:focus {
+        background-color: #007bff !important; /* normal rengi koru */
+        color: #fff !important;
+    }
+
+    /* DataTables butonları (Filtre / Copy) */
+    .dataTables_wrapper .dt-buttons .dt-button:hover,
+    .dataTables_wrapper .dt-buttons .dt-button:focus {
+        background: linear-gradient(135deg, #4e73df, #224abe) !important;
+        color: #fff !important;
+        filter: none !important;
+    }
+    /* Pagination: temel görünüm */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border: 1px solid transparent !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        margin: 0 2px !important;
+        background: transparent !important;
+        color: inherit !important;
+    }
+
+        /* Varsayılan hover’daki siyah kutuyu iptal et ve yumuşak bir hover ver */
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: rgba(78,115,223,.12) !important; /* hafif mavi */
+            border-color: rgba(78,115,223,.25) !important;
+            color: #224abe !important;
+            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+        }
+
+        /* Aktif sayfa (current) */
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: linear-gradient(135deg, #4e73df, #224abe) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+            box-shadow: 0 8px 18px rgba(78,115,223,.25) !important;
+        }
+
+        /* Disabled (önceki/sonraki pasif) */
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            background: transparent !important;
+            border-color: transparent !important;
+            color: #999 !important;
+            box-shadow: none !important;
+        }
+
+        /* Focus halka kaldır */
+        .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+    .badge-custom {
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 12px;
+        color: #fff !important; /* ✅ Yazıyı hep beyaz yap */
+    }
+
+    .badge-overdue {
+        background: linear-gradient(45deg, #e53935, #b71c1c);
+    }
+
+    .badge-warning-custom {
+        background: linear-gradient(45deg, #fbc02d, #f57f17);
+    }
+
+    .badge-success-custom {
+        background: linear-gradient(45deg, #43a047, #1b5e20);
+    }
+
+    .badge-secondary-custom {
+        background: linear-gradient(45deg, #757575, #424242);
+    }
+
+    .btn-return {
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 6px 12px; /* ✅ badge ile aynı yükseklik */
+        border-radius: 12px; /* ✅ daha yuvarlak görünüm */
+        display: inline-flex;
+        align-items: center;
+        gap: 6px; /* ikon ile yazı arası boşluk */
+    }
+    /* === Sabit ölçülü "pill" görünüm (badge + butonlar için) === */
+    .pill-fixed {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        height: 34px; /* sabit yükseklik */
+        min-width: 160px; /* sabit genişlik */
+        padding: 0 12px; /* iç boşluk */
+        border-radius: 999px; /* tam kapsül */
+        font-size: 0.85rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* Mevcut rozetlerin hepsi için sabit ölçü + beyaz yazı */
+    .badge-custom {
+        color: #fff !important;
+    }
+
+        .badge-custom.pill-fixed { /* rozetlere sabit boyut ver */
+            line-height: 1 !important;
+        }
+
+    /* "… gün kaldı" ile aynı renk tonunda iade butonu */
+    .btn-return {
+        border: none;
+        box-shadow: 0 6px 14px rgba(27, 94, 32, .25);
+    }
+
+        .btn-return.btn-success-match, .btn-return.btn-success {
+            background: linear-gradient(45deg, #43a047, #1b5e20) !important; /* badge-success-custom */
+            color: #fff !important;
+        }
+
+        .btn-return.pill-fixed {
+            height: 34px;
+            min-width: 160px;
+            border-radius: 999px;
+            gap: 6px;
+        }
+
+    /* Var olan rozet tonları (değiştirmiyoruz) */
+    .badge-overdue {
+        background: linear-gradient(45deg, #e53935, #b71c1c);
+    }
+
+    .badge-warning-custom {
+        background: linear-gradient(45deg, #fbc02d, #f57f17);
+    }
+
+    .badge-success-custom {
+        background: linear-gradient(45deg, #43a047, #1b5e20);
+    }
+
+    .badge-secondary-custom {
+        background: linear-gradient(45deg, #757575, #424242);
+    }
+
+    /* === YENİ: Kalan Gün sütunu için özel renkler === */
+    /* Kalan Gün sütununda "İade edildi" (nötr-mavi) */
+    .badge-returned-kg {
+        background: linear-gradient(45deg, #5C6BC0, #283593); /* indigo ton */
+        color: #fff !important;
+    }
+    /* Kalan Gün sütununda "Son teslim yok" (mor) */
+    .badge-noduedate-kg {
+        background: linear-gradient(45deg, #8E24AA, #4A148C); /* mor ton */
+        color: #fff !important;
+    }
+
+    .pill-fixed {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        height: 28px; /* 34px -> 28px yaptım */
+        min-width: 120px; /* 160px -> 120px yaptım */
+        padding: 0 10px; /* padding biraz küçültüldü */
+        border-radius: 999px;
+        font-size: 0.75rem; /* Yazı biraz küçültüldü */
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* İade et butonu da aynı ölçüde olsun */
+    .btn-return.pill-fixed {
+        height: 28px;
+        min-width: 120px;
+        font-size: 0.75rem;
+        padding: 0 10px;
+        gap: 4px; /* ikon ve yazı arası daha dar */
+    }
 </style>
 
 <div class="container-fluid">
@@ -360,44 +708,85 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card dt-elevated">
         <div class="card-body">
-            <div class="table-responsive">
-                <table id="borrowTable" class="table table-bordered table-hover table-striped">
+            <div class="table-responsive dt-float">
+                <table id="borrowTable" class="table table-bordered table-hover table-striped dt-pretty">
                     <thead class="bg-info text-white">
                         <tr>
                             <th>Üye</th>
                             <th>Kitap</th>
                             <th>Alış Tarihi</th>
                             <th>İade Tarihi</th>
+                            <th>Kalan Gün</th>
                             <th class="text-center">İşlemler</th>
                         </tr>
                     </thead>
-                    @*  <tbody>
+                    <tbody>
                         @foreach (var item in Model)
                         {
+                            var today = DateTime.Now.Date;
                             <tr>
                                 <td>@item.Member.Name</td>
                                 <td>@item.Book.Title</td>
+                                <td>@item.BorrowDate.ToString("dd.MM.yyyy HH:mm")</td>
                                 <td>
-                                    @item.BorrowDate.ToString("dd.MM.yyyy HH:mm")
+                                    @(
+                                                                    item.ReturnDate.HasValue
+                                                                    ? item.ReturnDate.Value.ToString("dd.MM.yyyy")
+                                                                    : (item.DueDate.HasValue ? item.DueDate.Value.ToString("dd.MM.yyyy") : "—")
+                                                                    )
+                            </td>
+
+                                <td>
+                                @if (!item.ReturnDate.HasValue)
+                                    {  // HENÜZ İADE EDİLMEDİ
+                                        if (item.DueDate.HasValue)
+                                        {
+                                            var kalanGun = (item.DueDate.Value.Date - today).Days;
+                                            if (kalanGun < 0)
+                                            {
+                                                <span class="badge badge-custom badge-overdue pill-fixed">@Math.Abs(kalanGun) gün gecikti</span>
+                                            }
+                                            else if (kalanGun == 0)
+                                            {
+                                                <span class="badge badge-custom badge-warning-custom pill-fixed">Son gün!</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-custom badge-success-custom pill-fixed">@kalanGun gün kaldı</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-noduedate-kg pill-fixed">Son teslim yok</span>
+                                        }
+                                    }
+                                    else
+                                    { // İADE EDİLMİŞ
+                                        var sure = (item.ReturnDate.Value.Date - item.BorrowDate.Date).Days;
+                                        <span class="badge badge-returned-kg pill-fixed">
+                                            İade edildi (@sure gün)
+                                        </span>
+                                    }
                                 </td>
-                                <td>@(item.ReturnDate?.ToShortDateString() ?? "Henüz iade edilmedi")</td>
+
                                 <td class="text-center">
-                                    @if (item.ReturnDate == null)
+                                    @if (!item.ReturnDate.HasValue)
                                     {
-                                        <a asp-action="Return" asp-route-id="@item.BorrowId" class="btn btn-success btn-sm btn-rounded waves-effect waves-light">
+                                        <a asp-action="Return" asp-route-id="@item.BorrowId"
+                                           class="btn btn-return btn-success-match pill-fixed waves-effect waves-light">
                                             <i class="fa fa-undo"></i> İade Et
                                         </a>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary text-white">İade Edildi</span>
+                                        <span class="badge badge-custom badge-secondary-custom pill-fixed">İade Edildi</span>
                                     }
                                 </td>
                             </tr>
                         }
-                    </tbody>*@
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -453,50 +842,7 @@
 
             $(document).ready(function () {
                 // Örnek veri seti oluşturucu
-                               function generateMockData(rowCount = 5000) {
-            const firstNames = ["Ahmet", "Mehmet"];
-            const lastNames = ["Yılmaz", "Kaya"];
-            const bookTitles = [
-                "Suç ve Ceza", "Sefiller", "1984",
-                "Hayvan Çiftliği", "Küçük Prens", "Dönüşüm",
-                "Satranç", "Beyaz Diş", "İnce Memed", "Anna Karenina",
-                "Anna Karenina2"
-            ];
-
-            const data = [];
-            const currentYear = new Date().getFullYear();
-
-            for (let i = 0; i < rowCount; i++) {
-                // 1. Rastgele tarih oluştur (sayı ve karakterlerle)
-                const day = Math.floor(Math.random() * 28) + 1; // 1-28 arası gün
-                const month = Math.floor(Math.random() * 12) + 1; // 1-12 arası ay
-                const year = currentYear - Math.floor(Math.random() * 5); // Son 5 yıl
-                const hours = Math.floor(Math.random() * 24);
-                const minutes = Math.floor(Math.random() * 60);
-                const seconds = Math.floor(Math.random() * 60);
-
-                // 2. Tarihi string olarak formatla: "dd.MM.yyyy HH:mm:ss"
-                const borrowDateStr =
-                    `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year} ` +
-                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                // 3. İade tarihi (30% boş, 70% rastgele tarih)
-                const returnDateStr = Math.random() > 0.3
-                    ? `${Math.floor(Math.random() * 28) + 1}.${month}.${year}`
-                    : "30.12.2024";
-
-                data.push([
-                    `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
-                    bookTitles[Math.floor(Math.random() * bookTitles.length)],
-                    borrowDateStr, // "14.10.2024 09:33:10" formatında string
-                    returnDateStr,
-                    Math.random() > 0.3
-                        ? '<span class="badge bg-secondary text-white">İade Edildi</span>'
-                        : '<button class="btn btn-success btn-sm">İade Et</button>'
-                ]);
-            }
-            return data;
-        }
+                              
 
                 // DataTable başlatma
                 const table = $('#borrowTable').DataTable({
@@ -504,9 +850,6 @@
                     autoWidth: false,
                     lengthChange: true,
                     deferRender: true,
-                    scrollY: '60vh',
-                    scrollCollapse: true,
-                    scroller: true,
                     order: [],
                     language: {
                         url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
@@ -535,21 +878,7 @@
                         }
                     ],
                     dom: 'Bfrtip',
-                    data: generateMockData(5000),
-                    columns: [
-                        { data: 0, title: "Üye" },
-                        { data: 1, title: "Kitap" },
-                        { data: 2, title: "Alış Tarihi" },
-                        { data: 3, title: "İade Tarihi" },
-                        {
-                            data: 4,
-                            title: "İşlemler",
-                            orderable: false,
-                            render: function (data) {
-                                return data;
-                            }
-                        }
-                    ]
+                    
                 });
 
                 // Tablo yüklendiğinde sütun tiplerini ve tarihleri önbelleğe al
@@ -722,6 +1051,7 @@
                 previousFilterValues = {}; // Filtreleri temizlerken kayıtlı değerleri de sıfırla
                 generateCustomfFilterForm("borrowTable"); // Formu boş olarak yeniden oluştur
                 $.fn.dataTable.ext.search = [];
+                 updateFilterBadge();
                 $('#borrowTable').DataTable().draw();
             });
              $(document).on('change', '#columnSelector', function () {
@@ -867,7 +1197,7 @@
                         }
                         return pass;
                     });
-
+                    updateFilterBadge();
                     table.search('').columns().search('').draw();
                     table.draw();
                     $('#customf-filter-modal').hide();
@@ -929,7 +1259,7 @@
                     day >= 1 && day <= new Date(year, month, 0).getDate()
                 );
             }
-                     function parseDate(dateStr) {
+            function parseDate(dateStr) {
             console.log("[DEBUG] parseDate Girdisi:", dateStr);
             if (!dateStr) {
                 console.warn("[WARN] Boş tarih değeri!");
@@ -1099,7 +1429,40 @@
             console.log("[DEBUG] Sütun Tip Önbelleği:", columnTypesCache);
             console.log("[DEBUG] İlk 5 Satır Tarih Önbelleği:", parsedDatesCache.slice(0, 5));
         }
+             function updateFilterBadge() {
+          const count = Object.values(previousFilterValues || {})
+            .filter(v => v && Object.values(v).some(x => x && String(x).trim() !== ''))
+            .length;
 
+          const $btn = $('.customf-filter-button');
+
+          // Rozeti yeniden oluştur
+          $btn.find('.filter-badge').remove();
+
+          // Butonu konumlandır (CSS yazmadan inline)
+          $btn.css({ position: 'relative', overflow: 'visible' });
+
+          if (count > 0) {
+            // Rozeti sağ ÜST iç köşeye yerleştir (taşmadan görünsün)
+            $btn.append(
+              `<span class="filter-badge" style="
+                position:absolute;
+                top:2px;            /* dilersen 4-6px yapabilirsin */
+                right:2px;          /* dilersen 4-6px yapabilirsin */
+                transform: translate(0,0);
+                min-width:18px;
+                height:18px;
+                padding:0 6px;
+                border-radius:9999px;
+                display:flex;align-items:center;justify-content:center;
+                font-size:11px;font-weight:800;
+                background:#ef4444;color:#fff;
+                line-height:1; z-index:3;
+                box-shadow:0 6px 14px rgba(239,68,68,.35);
+              ">${count}</span>`
+            );
+          }
+        }
     </script>
 }
 

@@ -12,18 +12,18 @@
 
     <div class="form-group">
         <label>Kitap</label>
-        <input class="form-control text-white" style="background-color: #6c757d;" value="@Model.Book.Title" readonly />
+        <input class="form-control text-white" style="background-color:#6c757d;" value="@Model.Book.Title" readonly />
     </div>
 
     <div class="form-group">
         <label>Üye</label>
-        <input class="form-control text-white" style="background-color: #6c757d;" value="@Model.Member.Name" readonly />
+        <input class="form-control text-white" style="background-color:#6c757d;" value="@Model.Member.Name" readonly />
     </div>
 
     <div class="form-group">
-        <label>İade Tarihi</label>
-        <input type="date" class="form-control" name="returnDate" required />
-        <span class="text-danger">@Html.ValidationMessage("returnDate")</span>
+        <label>İade Tarihi (Gerçek)</label>
+        <input type="date" class="form-control" name="returnDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+        <span class="text-danger">@Html.ValidationMessage("ReturnDate")</span>
     </div>
 
     <button type="submit" class="btn btn-primary mt-2">İade Et</button>
