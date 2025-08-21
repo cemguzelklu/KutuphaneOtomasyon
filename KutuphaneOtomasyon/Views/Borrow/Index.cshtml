@@ -696,6 +696,99 @@
         padding: 0 10px;
         gap: 4px; /* ikon ve yazı arası daha dar */
     }
+
+    .chip-pill {
+        --bg: #f8fafc;
+        --fg: #334155;
+        --ring: rgba(2,6,23,.06);
+        --glow: rgba(2,132,199,0);
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        font-weight: 700;
+        font-size: .78rem;
+        line-height: 1;
+        padding: .48rem .72rem;
+        border-radius: 999px;
+        background: var(--bg);
+        color: var(--fg);
+        border: 1px solid var(--ring);
+        box-shadow: 0 4px 14px var(--glow);
+        transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+        white-space: nowrap;
+    }
+
+        .chip-pill .dot {
+            width: .5rem;
+            height: .5rem;
+            border-radius: 999px;
+            display: inline-block;
+            background: currentColor;
+            box-shadow: 0 0 0 3px color-mix(in oklab, currentColor 20%, transparent);
+        }
+
+        .chip-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px var(--glow);
+        }
+
+        /* küçük boy */
+        .chip-pill.sm {
+            font-size: .74rem;
+            padding: .36rem .6rem;
+        }
+
+        /* durum temaları */
+        .chip-pill.is-overdue { /* gecikmiş (kırmızı) */
+            --bg: color-mix(in oklab, #ef4444 14%, white);
+            --fg: #7f1d1d;
+            --ring: rgba(239,68,68,.22);
+            --glow: rgba(239,68,68,.18);
+        }
+
+        .chip-pill.is-today { /* son gün (amber) */
+            --bg: color-mix(in oklab, #f59e0b 14%, white);
+            --fg: #7c2d12;
+            --ring: rgba(245,158,11,.22);
+            --glow: rgba(245,158,11,.16);
+        }
+
+        .chip-pill.is-left { /* gün kaldı (yeşil) */
+            --bg: color-mix(in oklab, #22c55e 14%, white);
+            --fg: #166534;
+            --ring: rgba(34,197,94,.22);
+            --glow: rgba(34,197,94,.16);
+        }
+
+        .chip-pill.is-noduedate { /* son teslim yok (mor) */
+            --bg: color-mix(in oklab, #a78bfa 14%, white);
+            --fg: #4c1d95;
+            --ring: rgba(167,139,250,.22);
+            --glow: rgba(167,139,250,.16);
+        }
+
+        .chip-pill.is-returned { /* iade edildi (indigo) */
+            --bg: color-mix(in oklab, #60a5fa 14%, white);
+            --fg: #1e3a8a;
+            --ring: rgba(59,130,246,.22);
+            --glow: rgba(59,130,246,.16);
+        }
+        /* === CHIP'LERİ SABİT BOYUTTA TUT === */
+        .chip-pill.sm {
+            width: 120px; /* hepsi aynı genişlik */
+            height: 28px; /* hepsi aynı yükseklik */
+            padding: 0 10px; /* metin/ikon taşıyan iç boşluk */
+            justify-content: center; /* ortala */
+            overflow: hidden; /* taşmaları gizle */
+            text-overflow: ellipsis; /* metin taşarsa üç nokta */
+            white-space: nowrap; /* satır kırma */
+            box-sizing: border-box; /* padding genişliği etkilemesin */
+        }
+
+            .chip-pill.sm i,
+            .chip-pill.sm .dot {
+                flex: 0 0 auto; /* ikon/dot sabit kalsın */
+            }
 </style>
 
 <div class="container-fluid">
@@ -722,7 +815,7 @@
                             <th class="text-center">İşlemler</th>
                         </tr>
                     </thead>
-                    <tbody>
+                   @* <tbody>
                         @foreach (var item in Model)
                         {
                             var today = DateTime.Now.Date;
@@ -739,38 +832,47 @@
                             </td>
 
                                 <td>
-                                @if (!item.ReturnDate.HasValue)
-                                    {  // HENÜZ İADE EDİLMEDİ
+                             
+                                    @if (!item.ReturnDate.HasValue)
+                                    {
+                                        // Henüz iade edilmedi
                                         if (item.DueDate.HasValue)
                                         {
                                             var kalanGun = (item.DueDate.Value.Date - today).Days;
                                             if (kalanGun < 0)
                                             {
-                                                <span class="badge badge-custom badge-overdue pill-fixed">@Math.Abs(kalanGun) gün gecikti</span>
+                                                <span class="chip-pill sm is-overdue">
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>@Math.Abs(kalanGun) gün gecikti
+                                                </span>
                                             }
                                             else if (kalanGun == 0)
                                             {
-                                                <span class="badge badge-custom badge-warning-custom pill-fixed">Son gün!</span>
+                                                <span class="chip-pill sm is-today">
+                                                    <span class="dot"></span>Son gün
+                                                </span>
                                             }
                                             else
                                             {
-                                                <span class="badge badge-custom badge-success-custom pill-fixed">@kalanGun gün kaldı</span>
+                                                <span class="chip-pill sm is-left">
+                                                    <i class="fas fa-clock me-1"></i>@kalanGun gün kaldı
+                                                </span>
                                             }
                                         }
                                         else
                                         {
-                                            <span class="badge badge-noduedate-kg pill-fixed">Son teslim yok</span>
+                                            <span class="chip-pill sm is-noduedate">
+                                                <i class="fas fa-infinity me-1"></i>Son teslim yok
+                                            </span>
                                         }
                                     }
                                     else
-                                    { // İADE EDİLMİŞ
+                                    {
                                         var sure = (item.ReturnDate.Value.Date - item.BorrowDate.Date).Days;
-                                        <span class="badge badge-returned-kg pill-fixed">
-                                            İade edildi (@sure gün)
+                                        <span class="chip-pill sm is-returned">
+                                            <i class="fas fa-check-circle me-1"></i>İade edildi (@sure gün)
                                         </span>
                                     }
                                 </td>
-
                                 <td class="text-center">
                                     @if (!item.ReturnDate.HasValue)
                                     {
@@ -786,7 +888,7 @@
                                 </td>
                             </tr>
                         }
-                    </tbody>
+                    </tbody>*@
                 </table>
             </div>
         </div>
@@ -839,11 +941,56 @@
             let selectedColumns = [];
             let columnTypesCache = {}; // Her sütunun tipini (date, number, text) önbelleğe almak için , "Ayşe", "Fatma", "Zeynep", "Mustafa", "Emre", "Elif", "Cem", "Yılmaz", "Hakan"
             let parsedDatesCache = []; // Sadece tarih sütunlarındaki dönüştürülmüş Date objelerini tutmak için , "Demir", "Çelik", "Şahin", "Arslan", "Güzel", "Sabun"
-
+            let textCache = [];   // Hücrelerin HTML'siz düz metni
+            let canonCache = [];  // TR-normalize edilmiş kanonik metin
             $(document).ready(function () {
                 // Örnek veri seti oluşturucu
-                              
 
+                  function generateMockData(rowCount = 5000) {
+            const firstNames = ["Ahmet", "Mehmet"];
+            const lastNames = ["Yılmaz", "Kaya"];
+            const bookTitles = [
+                "Suç ve Ceza", "Sefiller", "1984",
+                "Hayvan Çiftliği", "Küçük Prens", "Dönüşüm",
+                "Satranç", "Beyaz Diş", "İnce Memed", "Anna Karenina",
+                "Anna Karenina2"
+            ];
+
+            const data = [];
+            const currentYear = new Date().getFullYear();
+
+            for (let i = 0; i < rowCount; i++) {
+                // 1. Rastgele tarih oluştur (sayı ve karakterlerle)
+                const day = Math.floor(Math.random() * 28) + 1; // 1-28 arası gün
+                const month = Math.floor(Math.random() * 12) + 1; // 1-12 arası ay
+                const year = currentYear - Math.floor(Math.random() * 5); // Son 5 yıl
+                const hours = Math.floor(Math.random() * 24);
+                const minutes = Math.floor(Math.random() * 60);
+                const seconds = Math.floor(Math.random() * 60);
+
+                // 2. Tarihi string olarak formatla: "dd.MM.yyyy HH:mm:ss"
+                const borrowDateStr =
+                    `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year} ` +
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                // 3. İade tarihi (30% boş, 70% rastgele tarih)
+                const returnDateStr = Math.random() > 0.3
+                    ? `${Math.floor(Math.random() * 28) + 1}.${month}.${year}`
+                    : "30.12.2024";
+
+                data.push([
+                    `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
+                    bookTitles[Math.floor(Math.random() * bookTitles.length)],
+                    borrowDateStr, // "14.10.2024 09:33:10" formatında string
+                    returnDateStr,
+                    Math.random() > 0.3
+                        ? '<span class="badge bg-secondary text-white">İade Edildi</span>'
+                        : '<button class="btn btn-success btn-sm">İade Et</button>'
+                ]);
+            }
+
+            return data;
+        }
                 // DataTable başlatma
                 const table = $('#borrowTable').DataTable({
                     responsive: true,
@@ -878,7 +1025,22 @@
                         }
                     ],
                     dom: 'Bfrtip',
-                    
+                    data: generateMockData(5000),
+                    columns: [
+                        { data: 0, title: "Üye" },
+                        { data: 1, title: "Kitap" },
+                        { data: 2, title: "Alış Tarihi" },
+                        { data: 3, title: "İade Tarihi" },
+                        {
+                            data: 4,
+                            title: "İşlemler",
+                            orderable: false,
+                            render: function (data) {
+                                return data;
+                            }
+                        }
+                    ]
+
                 });
 
                 // Tablo yüklendiğinde sütun tiplerini ve tarihleri önbelleğe al
@@ -886,583 +1048,523 @@
             });
 
 
-            function activateSelect2() {
-                if ($('#columnSelector').data('select2')) {
-                    $('#columnSelector').select2('destroy');
-                }
-                if ($('#columnSelector option[value="select-all-option"]').length === 0) {
-                    $('#columnSelector').prepend('<option value="select-all-option">Tümünü Seç</option>');
-                }
-                $('#columnSelector').select2({
-                    placeholder: "Filtrelenecek sütunları seçin...",
-                    width: '100%',
-                    multiple: true,
-                    dropdownParent: $('#customf-filter-modal .customf-modal-content'),
-                    templateResult: function (data) {
-                        if (data.id === 'select-all-option') {
-                            return $('<span><i class="fas fa-check-double"></i> Tümünü Seç</span>');
-                        }
-                        return data.text;
-                    },
-                    templateSelection: function (data) {
-                        if (data.id === 'select-all-option') {
-                            const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
-                            const currentSelectedCount = $('#columnSelector').val() ? $('#columnSelector').val().length : 0;
-                            if (currentSelectedCount === totalSelectableOptions) {
-                                return `Tümü Seçili (${totalSelectableOptions})`;
-                            }
-                            return `(${currentSelectedCount}/${totalSelectableOptions}) Sütun Seçili`;
-                        }
-                        return data.text;
-                    }
-                });
-                $('#columnSelector').on('select2:select', function (e) {
-                    const selectedId = e.params.data.id;
-                    if (selectedId === 'select-all-option') {
-                        const $selector = $(this);
-                        const allOptions = $selector.find('option').not('[value="select-all-option"]').map(function () {
-                            return $(this).val();
-                        }).get();
-                        $selector.val(allOptions).trigger('change');
-                        $selector.select2('close');
-                    }
-                });
-                $('#columnSelector').on('select2:unselect', function (e) {
-                    const unselectedId = e.params.data.id;
-                    if (unselectedId === 'select-all-option') {
-                        $(this).val(null).trigger('change');
-                    }
-                });
+                          function stripHtml(x){
+          const html = String(x ?? '');
+
+          const spaced = html.replace(/>(\s*)</g, '><')
+                             .replace(/></g, '>\u2009<');
+          const div = document.createElement('div');
+          div.innerHTML = spaced;
+          return (div.textContent || '')
+            .replace(/\u00A0/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        }
+            
+                function cellToText(cell) {
+            if (cell == null) return '';
+
+
+            if (cell instanceof Date && !isNaN(cell)) return cell.toISOString();
+
+
+            if (typeof cell === 'object') {
+                if ('value' in cell) return cellToText(cell.value);
+                if ('text'  in cell) return cellToText(cell.text);
+                if ('name'  in cell) return cellToText(cell.name);
+                if ('title' in cell) return cellToText(cell.title);
+                if ('html'  in cell) return stripHtml(cell.html);
+                return stripHtml(cell);
             }
 
-            function populateColumnSelector(tableId) {
-                const table = $(`#${tableId}`).DataTable();
-                const columns = table.columns().header().toArray();
-                const selector = $('#columnSelector');
-                selector.empty();
-                columns.forEach((col, index) => {
-                    const colName = $(col).text().trim();
-                    if (colName && colName !== "İşlemler") {
 
-                        const selectedAttr = previousFilterValues.hasOwnProperty(index) ? 'selected' : '';
-                        selector.append(`<option value="${index}" ${selectedAttr}>${colName}</option>`);
+            return stripHtml(cell);
+        }
+        function normTR(s){
+          if(s==null) return '';
+          let t=s.toString().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+          t=t.replace(/İ/g,'I').replace(/ı/g,'i');
+          return t.toLocaleLowerCase('tr');
+        }
+                function extractDataOrder(html){
+          const m = String(html || '').match(/data-order=["']([^"']+)["']/i);
+          return m ? m[1] : null;
+        }
+                function buildTextAndCanonCaches(tableId){
+          const api = $('#'+tableId).DataTable();
+          const all = api.rows().data().toArray();
+          const rowCount = all.length;
+          const colCount = api.columns().header().toArray().length;
+
+          textCache  = new Array(rowCount);
+          canonCache = new Array(rowCount);
+
+          for(let r=0; r<rowCount; r++){
+            textCache[r]  = new Array(colCount);
+            canonCache[r] = new Array(colCount);
+            for(let c=0; c<colCount; c++){
+              // 1 defa: mevcut cellToText (yavaş ama tek sefer)
+              const txt = cellToText(all[r][c]);
+              textCache[r][c]  = txt;
+              canonCache[r][c] = canon(txt);
+            }
+          }
+        }
+                function activateSelect2() {
+            if ($('#columnSelector').data('select2')) {
+                $('#columnSelector').select2('destroy');
+            }
+            if ($('#columnSelector option[value="select-all-option"]').length === 0) {
+                $('#columnSelector').prepend('<option value="select-all-option">Tümünü Seç</option>');
+            }
+            $('#columnSelector').select2({
+                placeholder: "Filtrelenecek sütunları seçin...",
+                width: '100%',
+                multiple: true,
+                dropdownParent: $('#customf-filter-modal .customf-modal-content'),
+                templateResult: function (data) {
+                    if (data.id === 'select-all-option') {
+                        return $('<span><i class="fas fa-check-double"></i> Tümünü Seç</span>');
                     }
-                });
+                    return data.text;
+                },
+                templateSelection: function (data) {
+                    if (data.id === 'select-all-option') {
+                        const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
+                        const currentSelectedCount = $('#columnSelector').val() ? $('#columnSelector').val().length : 0;
+                        if (currentSelectedCount === totalSelectableOptions) {
+                            return `Tümü Seçili (${totalSelectableOptions})`;
+                        }
+                        return `(${currentSelectedCount}/${totalSelectableOptions}) Sütun Seçili`;
+                    }
+                    return data.text;
+                }
+            });
+            $('#columnSelector').on('select2:select', function (e) {
+                const selectedId = e.params.data.id;
+                if (selectedId === 'select-all-option') {
+                    const $selector = $(this);
+                    const allOptions = $selector.find('option').not('[value="select-all-option"]').map(function () {
+                        return $(this).val();
+                    }).get();
+                    $selector.val(allOptions).trigger('change');
+                    $selector.select2('close');
+                }
+            });
+            $('#columnSelector').on('select2:unselect', function (e) {
+                const unselectedId = e.params.data.id;
+                if (unselectedId === 'select-all-option') {
+                    $(this).val(null).trigger('change');
+                }
+            });
+        }
+
+        function populateColumnSelector(tableId) {
+            const table = $(`#${tableId}`).DataTable();
+            const columns = table.columns().header().toArray();
+            const selector = $('#columnSelector');
+            selector.empty();
+            columns.forEach((col, index) => {
+                const colName = $(col).text().trim();
+                if (colName && colName !== "İşlemler") {
+
+                    const selectedAttr = previousFilterValues.hasOwnProperty(index) ? 'selected' : '';
+                    selector.append(`<option value="${index}" ${selectedAttr}>${colName}</option>`);
+                }
+            });
+            selector.trigger('change.select2');
+            const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
+            const currentSelectedCount = Object.keys(previousFilterValues).length;
+            if (currentSelectedCount > 0 && currentSelectedCount === totalSelectableOptions) {
+                selector.find('option[value="select-all-option"]').prop('selected', true);
                 selector.trigger('change.select2');
-                const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
-                const currentSelectedCount = Object.keys(previousFilterValues).length;
-                if (currentSelectedCount > 0 && currentSelectedCount === totalSelectableOptions) {
-                    selector.find('option[value="select-all-option"]').prop('selected', true);
-                    selector.trigger('change.select2');
-                }
             }
+        }
 
-             function generateCustomfFilterForm(tableId) {
+         function generateCustomfFilterForm(tableId) {
+             try {
+                 const table = $(`#${tableId}`).DataTable();
+                 const columns = table.columns().header().toArray();
+                 const selectedIndexes = $('#columnSelector').val()?.map(Number) || [];
+                 let formHtml = "";
+                 selectedIndexes.forEach(index => {
+                     try {
+                         const col = columns[index];
+                         const colName = $(col).text().trim();
+                         if (!colName || colName === "İşlemler") return;
+
+                         const columnType = columnTypesCache[index] || 'text';
+
+                         const prev = previousFilterValues[index] || {};
+
+                         formHtml += `<div class="customf-input-group"><label>${colName}</label>`;
+                         if (columnType === 'date') {
+                             const startVal = (prev['date'] && prev['date'].start) ? prev['date'].start : '';
+                             const endVal = (prev['date'] && prev['date'].end) ? prev['date'].end : '';
+                             formHtml += `<div class="customf-inline-inputs">`;
+                             formHtml += `<input type="datetime-local" class="filter-input" data-type="date-start" data-index="${index}" value="${startVal}">`;
+                             formHtml += `<input type="datetime-local" class="filter-input" data-type="date-end" data-index="${index}" value="${endVal}">`;
+                             formHtml += `</div>`;
+                         console.log("[DEBUG] Tarih Input Değerleri:",
+                              "Sütun:", colName,
+                              "Start:", startVal,
+                              "End:", endVal
+                          );
+                         } else if (columnType === 'number') {
+                             const min = (prev['range'] && !isNaN(prev['range'][0])) ? prev['range'][0] : '';
+                             const max = (prev['range'] && !isNaN(prev['range'][1])) ? prev['range'][1] : '';
+                             formHtml += `<div class="customf-inline-inputs">`;
+                             formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Min" value="${min}">`;
+                             formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Max" value="${max}">`;
+                             formHtml += `</div>`;
+                         } else {
+                             const allDataForColumn = table.column(index).data().toArray();
+                            const sampleForSelect = allDataForColumn.slice(0, 200).map(cellToText);
+                             const uniqueValues = [...new Set(sampleForSelect)];
+                             const useSelect = uniqueValues.length > 0 && uniqueValues.length <= 10;
+
+                             if (useSelect) {
+                                 formHtml += `<select class="filter-input" data-type="select" data-index="${index}">`;
+                                 formHtml += `<option value="">Tümü</option>`;
+                                 uniqueValues.forEach(val => {
+                                     const selected = (prev['select'] === val) ? 'selected' : '';
+                                     formHtml += `<option value="${val}" ${selected}>${val}</option>`;
+                                 });
+                                 formHtml += `</select>`;
+                             } else {
+                                 const val = prev['text'] || '';
+                                 formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
+                             }
+                         }
+                         formHtml += `</div>`;
+                     } catch (e) {
+                         console.error(`Sütun işleme hatası (index ${index}):`, e);
+                     }
+                 });
+                 $('#customf-dynamic-filter-form').html(formHtml || getEmptyPlaceholder());
+             } catch (e) {
+                 console.error("Filtre formu oluşturma hatası:", e);
+                 $('#customf-dynamic-filter-form').html('<div class="alert alert-danger">Filtre oluşturulurken hata oluştu</div>');
+             }
+         }
+
+        function getEmptyPlaceholder() {
+            return `
+                        <div class="empty-placeholder">
+                            <i class="fas fa-sliders-h"></i><br>
+                            <b>Filtrelemek istediğiniz sütunları seçin.</b>
+                            <div style="font-size:13px; margin-top: 6px;">Yukarıdaki listeden bir veya daha fazla sütun seçin.</div>
+                        </div>
+                    `;
+        }
+
+        $('#customf-clear-filter').on('click', function () {
+            $('#columnSelector').val(null).trigger('change');
+            previousFilterValues = {};
+            generateCustomfFilterForm("borrowTable");
+            $.fn.dataTable.ext.search = [];
+            $('#borrowTable').DataTable().draw();
+        });
+
+        $(document).on('change', '#columnSelector', function () {
+            setTimeout(() => {
+                generateCustomfFilterForm("borrowTable");
+            }, 100);
+        });
+
+        $('#customf-apply-filter').on('click', function () {
+                console.log("[DEBUG] Uygulanan Filtreler:", previousFilterValues);
             try {
-                const table = $(`#${tableId}`).DataTable();
-                const columns = table.columns().header().toArray();
-                // selectedColumns artık `populateColumnSelector` tarafından güncelleniyor ve previousFilterValues'dan türetiliyor
-                const selectedIndexes = $('#columnSelector').val()?.map(Number) || [];
-                let formHtml = "";
+                const table = $('#borrowTable').DataTable();
+                selectedColumns = $('#columnSelector').val()?.map(Number) || [];
 
-                selectedIndexes.forEach(index => {
-                    try {
-                        const col = columns[index];
-                        const colName = $(col).text().trim();
-                        if (!colName || colName === "İşlemler") return;
 
-                        const columnType = columnTypesCache[index] || 'text';
-                        // previousFilterValues'daki o sütuna ait filtre değerlerini al
-                        const prev = previousFilterValues[index] || {};
+                const currentActiveFilters = {};
 
-                        formHtml += `<div class="customf-input-group"><label>${colName}</label>`;
-                        if (columnType === 'date') {
-                            // Tarih filtreleri için:
-                            // 'prev' objesinden doğrudan string değeri alıyoruz, Date objesi değil.
-                            // Çünkü input[type="datetime-local"] bir ISO string bekler.
-                                    const startVal = (prev['date'] && prev['date'].start) ? prev['date'].start : '';
-            const endVal = (prev['date'] && prev['date'].end) ? prev['date'].end : '';
-                            formHtml += `<div class="customf-inline-inputs">`;
-                            formHtml += `<input type="datetime-local" class="filter-input" data-type="date-start" data-index="${index}" value="${startVal}">`;
-                            formHtml += `<input type="datetime-local" class="filter-input" data-type="date-end" data-index="${index}" value="${endVal}">`;
-                            formHtml += `</div>`;
-                                // ++++ EKLENECEK KOD ++++
-            console.log("[DEBUG] Tarih Input Değerleri:",
-                "Sütun:", colName,
-                "Start:", startVal,
-                "End:", endVal
-            );
-            // ++++ EKLENECEK KOD ++++
-                        } else if (columnType === 'number') {
-                            const min = (prev['range'] && !isNaN(prev['range'][0])) ? prev['range'][0] : '';
-                            const max = (prev['range'] && !isNaN(prev['range'][1])) ? prev['range'][1] : '';
-                            formHtml += `<div class="customf-inline-inputs">`;
-                            formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Min" value="${min}">`;
-                            formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Max" value="${max}">`;
-                            formHtml += `</div>`;
-                        } else { // Metin veya select tipleri için
-                            const allDataForColumn = table.column(index).data().toArray();
-                            const sampleForSelect = allDataForColumn.slice(0, Math.min(allDataForColumn.length, 500)).map(cell => {
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = cell;
-                                return (tempDiv.textContent || tempDiv.innerText || "").trim();
-                            }).filter(v => v);
-                            const uniqueValues = [...new Set(sampleForSelect)];
-                            const useSelect = uniqueValues.length > 0 && uniqueValues.length <= 10;
+                $('.filter-input').each(function () {
+                    const type = $(this).data('type');
+                    const index = parseInt($(this).data('index'));
+                    const value = $(this).val().trim();
 
-                            if (useSelect) {
-                                formHtml += `<select class="filter-input" data-type="select" data-index="${index}">`;
-                                formHtml += `<option value="">Tümü</option>`;
-                                uniqueValues.forEach(val => {
-                                    // Selectbox'ta kaydedilmiş değeri hatırlama
-                                    const selected = (prev['select'] === val) ? 'selected' : '';
-                                    formHtml += `<option value="${val}" ${selected}>${val}</option>`;
-                                });
-                                formHtml += `</select>`;
-                            } else {
-                                // Text input'ta kaydedilmiş değeri hatırlama
-                                const val = prev['text'] || '';
-                                formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
-                            }
+                    if (value) {
+                        if (!currentActiveFilters[index]) currentActiveFilters[index] = {};
+                        if (type === 'range') {
+                            const inputs = $(`input[data-type="range"][data-index="${index}"]`);
+                            currentActiveFilters[index][type] = [
+                                parseFloat(inputs.eq(0).val().replace(',', '.')) || -Infinity,
+                                parseFloat(inputs.eq(1).val().replace(',', '.')) || Infinity
+                            ];
+                        } else if (type === 'date-start' || type === 'date-end') {
+                            if (!currentActiveFilters[index]['date']) currentActiveFilters[index]['date'] = { start: null, end: null };
+                            if (type === 'date-start') currentActiveFilters[index]['date'].start = value;
+                            if (type === 'date-end') currentActiveFilters[index]['date'].end = value;
+                        } else {
+                            currentActiveFilters[index][type] = value;
                         }
-                        formHtml += `</div>`;
-                    } catch (e) {
-                        console.error(`Sütun işleme hatası (index ${index}):`, e);
                     }
                 });
-                $('#customf-dynamic-filter-form').html(formHtml || getEmptyPlaceholder());
-            } catch (e) {
-                console.error("Filtre formu oluşturma hatası:", e);
-                $('#customf-dynamic-filter-form').html('<div class="alert alert-danger">Filtre oluşturulurken hata oluştu</div>');
-            }}
+
+                previousFilterValues = {};
+                for (const index in currentActiveFilters) {
+                    if (currentActiveFilters.hasOwnProperty(index)) {
+                        previousFilterValues[index] = currentActiveFilters[index];
+                    }
+                }
 
 
-             function getEmptyPlaceholder() {
-                return `
-                    <div class="empty-placeholder">
-                        <i class="fas fa-sliders-h"></i><br>
-                        <b>Filtrelemek istediğiniz sütunları seçin.</b>
-                        <div style="font-size:13px; margin-top: 6px;">Yukarıdaki listeden bir veya daha fazla sütun seçin.</div>
-                    </div>
-                `;
-            }
-              $('#customf-clear-filter').on('click', function () {
-                $('#columnSelector').val(null).trigger('change');
-                previousFilterValues = {}; // Filtreleri temizlerken kayıtlı değerleri de sıfırla
-                generateCustomfFilterForm("borrowTable"); // Formu boş olarak yeniden oluştur
                 $.fn.dataTable.ext.search = [];
-                 updateFilterBadge();
-                $('#borrowTable').DataTable().draw();
-            });
-             $(document).on('change', '#columnSelector', function () {
-                setTimeout(() => {
-                    generateCustomfFilterForm("borrowTable");
-                }, 100);
-            });
-             $('#customf-apply-filter').on('click', function () {
-                      // ++++ EKLENECEK KOD ++++
-            console.log("[DEBUG] Uygulanan Filtreler:", previousFilterValues);
-            // ++++ EKLENECEK KOD ++++
-                try {
-                    const table = $('#borrowTable').DataTable();
-                    // selectedColumns'ı tekrar güncelle, çünkü kullanıcı modal içinde sütun seçimini değiştirmiş olabilir
-                    selectedColumns = $('#columnSelector').val()?.map(Number) || [];
 
-                    // Yeni aktif filtreleri `previousFilterValues`'a kaydetmeden önce sıfırlamıyoruz!
-                    // Sadece önceki değerleri üzerine yazacağız.
-                    const currentActiveFilters = {}; // Geçerli uygulama için geçici bir değişken
+                          $.fn.dataTable.ext.search = [];
+        $.fn.dataTable.ext.search.push(function (settings, rowData, dataIndex) {
+          for (const index in previousFilterValues) {
+            if (!previousFilterValues.hasOwnProperty(index)) continue;
 
-                    $('.filter-input').each(function () {
-                        const type = $(this).data('type');
-                        const index = parseInt($(this).data('index'));
-                        const value = $(this).val().trim();
+            const colIndex = parseInt(index, 10);
+            const fset     = previousFilterValues[index];   // o sütun için aktif filtreler
+            const cellText  = textCache[dataIndex]?.[colIndex]  ?? '';
+            const cellCanon = canonCache[dataIndex]?.[colIndex] ?? '';
 
-                        if (value) {
-                            if (!currentActiveFilters[index]) currentActiveFilters[index] = {};
-                            if (type === 'range') {
-                                const inputs = $(`input[data-type="range"][data-index="${index}"]`);
-                                currentActiveFilters[index][type] = [
-                                    parseFloat(inputs.eq(0).val().replace(',', '.')) || -Infinity,
-                                    parseFloat(inputs.eq(1).val().replace(',', '.')) || Infinity
-                                ];
-                            } else if (type === 'date-start' || type === 'date-end') {
-                                if (!currentActiveFilters[index]['date']) currentActiveFilters[index]['date'] = { start: null, end: null };
-                                if (type === 'date-start') currentActiveFilters[index]['date'].start = value; // ISO string olarak kaydet
-                                if (type === 'date-end') currentActiveFilters[index]['date'].end = value; // ISO string olarak kaydet
-                            } else {
-                                currentActiveFilters[index][type] = value;
-                            }
-                        }
-                    });
-
-                    // Aktif filtreleri `previousFilterValues`'a atayalım.
-                    // Sadece gerçekten filtrelenmiş sütunları kaydedelim.
-                    previousFilterValues = {}; // Önceki tüm filtreleri temizle
-                    for (const index in currentActiveFilters) {
-                        if (currentActiveFilters.hasOwnProperty(index)) {
-                            previousFilterValues[index] = currentActiveFilters[index];
-                        }
-                    }
-
-
-                    // 2. Önceki tüm özel filtreleri temizle
-                    $.fn.dataTable.ext.search = [];
-
-                    // 3. Yeni filtreleme fonksiyonunu ekle
-                    $.fn.dataTable.ext.search.push(function (settings, rowData, dataIndex) {
-                        let pass = true;
-
-                        const cleanedRowData = {};
-                        selectedColumns.forEach(idx => {
-                            if (columnTypesCache[idx] !== 'ignored') {
-                                const cell = rowData[idx];
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = cell;
-                                cleanedRowData[idx] = (tempDiv.textContent || tempDiv.innerText || "").trim();
-                            }
-                        });
-
-                        for (const index in previousFilterValues) { // activeFilters yerine previousFilterValues kullan
-                            if (!previousFilterValues.hasOwnProperty(index)) continue;
-
-                            const filtersForColumn = previousFilterValues[index]; // currentActiveFilters yerine previousFilterValues kullan
-                            const colIndex = parseInt(index);
-                            const columnType = columnTypesCache[colIndex];
-
-                            switch (columnType) {
-                                case 'date':
-                                    const dateFilters = filtersForColumn['date'];
-                                    if (dateFilters) {
-                                        const cellDate = parsedDatesCache[dataIndex]?.[colIndex];
-                                        // Filtre değerlerini Date objesine dönüştürüyoruz
-                                        const filterStartDate = dateFilters.start ? new Date(dateFilters.start) : null;
-                                        const filterEndDate = dateFilters.end ? new Date(dateFilters.end) : null;
-                                                                    // ++++ EKLENECEK KOD ++++
-                       if (dataIndex < 3) { // Sadece ilk 5 satır için log göster
-            console.log("[DEBUG] Filtre Tarih Aralığı (" + dataIndex + ". satır):",
-                "Start:", filterStartDate,
-                "End:", filterEndDate,
-                "Hücre Tarihi:", cellDate
-            );
-        }
-                // ++++ EKLENECEK KOD ++++
-                                        if (!cellDate) {
-                                            if (filterStartDate || filterEndDate) {
-                                                pass = false;
-                                            }
-                                            break;
-                                        }
-
-                                                // Daha sağlam hali:
-                                        if (filterStartDate && cellDate) {
-                const cellTime = cellDate.getTime();
-                const startTime = filterStartDate.getTime();
-                if (cellTime < startTime) pass = false;
+            // 1) Tarih
+            if (fset.date) {
+              const start = fset.date.start ? new Date(fset.date.start) : null;
+              const end   = fset.date.end   ? new Date(fset.date.end)   : null;
+              const cellDate = parsedDatesCache[dataIndex]?.[colIndex] ?? null;
+              if (!cellDate && (start || end)) return false;
+              if (cellDate && start && cellDate.getTime() < start.getTime()) return false;
+              if (cellDate && end   && cellDate.getTime() > end.getTime())   return false;
+              continue;
             }
 
-                                        if (filterEndDate && cellDate && pass) { // pass kontrolü önceki filtrenin geçilip geçilmediğini kontrol eder
-                const cellTime = cellDate.getTime();
-                const endTime = filterEndDate.getTime();
-                if (cellTime > endTime) pass = false;
+            // 2) Sayı aralığı
+            if (fset.range) {
+              const num = parseFloat(cellText.replace(',', '.')) || 0;
+              if (num < fset.range[0] || num > fset.range[1]) return false;
+              continue;
             }
 
-        }
-
-                                    break;
-                                case 'number':
-                                    const rangeFilters = filtersForColumn['range'];
-                                    if (rangeFilters) {
-                                        const [min, max] = rangeFilters;
-                                        const num = parseFloat(cleanedRowData[colIndex]?.replace(',', '.')) || 0;
-                                        if (num < min || num > max) {
-                                            pass = false;
-                                        }
-                                    }
-                                    break;
-                                case 'text':
-                                    const textFilter = filtersForColumn['text'];
-                                    if (textFilter && !cleanedRowData[colIndex]?.toLowerCase().includes(textFilter.toLowerCase())) {
-                                        pass = false;
-                                    }
-                                    break;
-                                case 'select':
-                                    const selectFilter = filtersForColumn['select'];
-                                    if (selectFilter && cleanedRowData[colIndex] !== selectFilter) {
-                                        pass = false;
-                                    }
-                                    break;
-                            }
-
-                            if (!pass) break;
-                        }
-                        return pass;
-                    });
-                    updateFilterBadge();
-                    table.search('').columns().search('').draw();
-                    table.draw();
-                    $('#customf-filter-modal').hide();
-                } catch (e) {
-                    console.error("Filtre uygulama hatası:", e);
-                }
-            });
-
-
-            document.addEventListener('DOMContentLoaded', function () {
-                const modal = document.getElementById('customf-filter-modal');
-                const closeBtn = document.querySelector('.customf-close');
-                window.onclick = function (event) {
-                    if (event.target === modal) modal.style.display = 'none';
-                };
-                closeBtn.onclick = function () {
-                    modal.style.display = 'none';
-                };
-            });
-
-              function isValidDate(dateStr) {
-                if (!dateStr || typeof dateStr !== 'string') return false;
-
-                    const digits = (dateStr.match(/\d/g) || []).length;
-            const dots = (dateStr.match(/\./g) || []).length;
-            const colons = (dateStr.match(/:/g) || []).length;
-
-                if (digits >= 8 && dots === 2 && colons === 2) {
-            console.log("[DEBUG] Özel Tarih Formatı Kabul Edildi:", dateStr);
-            return true;
-        }
-                // Şirketin kullandığı formatlar
-                const dateFormats = [
-                    /^\d{1,2}\.\d{1,2}\.\d{4}$/,                          // dd.MM.yyyy
-                    /^\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2}$/,          // dd.MM.yyyy HH:mm
-                    /^\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2}:\d{2}$/     // dd.MM.yyyy HH:mm:ss
-                ];
-
-
-                // Format kontrolü
-                       const isFormatValid = dateFormats.some(format => {
-                const match = dateStr.match(format);
-                return match && match[0] === dateStr; // Tam eşleşme kontrolü
-            });
-                if (!isFormatValid) return false;
-
-                // Gerçek tarih kontrolü
-                const date = parseDate(dateStr);
-                if (!date || isNaN(date.getTime())) return false;
-
-                // Gün/Ay kontrolü (32.01 gibi geçersiz tarihleri yakala)
-                const parts = dateStr.split(/[\.\s:]/);
-                const day = parseInt(parts[0]);
-                const month = parseInt(parts[1]);
-                const year = parseInt(parts[2]);
-
-                return (
-                    month >= 1 && month <= 12 &&
-                    day >= 1 && day <= new Date(year, month, 0).getDate()
-                );
-            }
-            function parseDate(dateStr) {
-            console.log("[DEBUG] parseDate Girdisi:", dateStr);
-            if (!dateStr) {
-                console.warn("[WARN] Boş tarih değeri!");
-                return null;
+            // 3) SELECT filtresi (formda select kullanıldıysa)
+            if ('select' in fset) {                       // tip cache'e bakma; formdaki inputa bak
+              const sel = fset.select;
+              if (sel) {
+                const f = canon(sel);                     // "seymanur gokmen"
+                const p = escapeRegExp(f);
+                // yapışık tekrarları tek ifadeye indir
+                let hay = cellCanon.replace(new RegExp(`(?:${p})(?:\\s*${p})+`, 'g'), f)
+                                   .replace(/\s+/g, ' ')
+                                   .trim();
+                // kelime sınırıyla test et
+                const token = new RegExp(`(^|\\s)${p}(\\s|$)`);
+                if (!token.test(hay)) return false;
+              }
+              continue;
             }
 
-            // Eğer zaten Date objesiyse
-            if (dateStr instanceof Date && !isNaN(dateStr.getTime())) {
-                return dateStr;
+            // 4) Serbest metin
+            if (fset.text) {
+              const f = canon(fset.text);
+              if (!cellCanon.includes(f)) return false;
+              continue;
+            }
+          }
+          return true;
+        });
+
+
+                table.draw();
+                $('#customf-filter-modal').hide();
+            } catch (e) {
+                console.error("Filtre uygulama hatası:", e);
             }
 
-            // Eğer object ise ve toString() metodu varsa kullan
-            if (typeof dateStr === 'object' && dateStr.toString) {
-                dateStr = dateStr.toString();
+                           console.log("[DEBUG] Filter applied. Remaining rows:",
+            $('#borrowTable').DataTable().rows({ filter: 'applied' }).count()
+        );
+
+        });
+                function isValidDate(val) {
+
+            if (val instanceof Date && !isNaN(val)) return true;
+
+
+            if (val == null || val === '') return false;
+
+
+            if (typeof val !== 'string') val = cellToText(val);
+
+
+            if (/^\d{4}-\d{2}-\d{2}([T\s].*)?$/.test(val)) {
+                return !isNaN(new Date(val));
             }
 
-            // HTML etiketlerini temizle
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = dateStr;
-            dateStr = (tempDiv.textContent || tempDiv.innerText || "").trim();
 
-            // Fazla boşlukları ve non-breaking space'leri temizle
-            dateStr = dateStr.replace(/\s+/g, ' ').replace(/[\u00A0]/g, ' ').trim();
-
-            // Artık string olduğundan emin olalım
-            if (!dateStr || typeof dateStr !== 'string') return null;
-
-            // trimmedStr değişkenini tanımlıyoruz (hata buradan geliyordu)
-            const trimmedStr = dateStr;
-
-            // 1) ISO-benzeri formatlar (YYYY-MM-DD veya YYYY-MM-DDTHH:MM...) -> güvenle new Date ile dene
-            if (/^\d{4}-\d{2}-\d{2}([T\s].*)?$/.test(trimmedStr)) {
-                const isoDate = new Date(trimmedStr);
-                if (!isNaN(isoDate.getTime())) return isoDate;
+            const aspMatch = String(val).match(/\/Date\((\d+)\)\//);
+            if (aspMatch) {
+                return !isNaN(new Date(parseInt(aspMatch[1], 10)));
             }
 
-            // 2) Slash'li ortak formatlara bir şans daha ver (ör. MM/DD/YYYY veya YYYY/MM/DD)
-            if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(trimmedStr) || /^\d{4}\/\d{2}\/\d{2}/.test(trimmedStr)) {
-                const tryDate = new Date(trimmedStr);
-                if (!isNaN(tryDate.getTime())) return tryDate;
-            }
 
-            // 3) Şirketin kullandığı dd.MM.yyyy tabanlı formatları manuel parse et
-            const formats = [
-                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/, handler: (m) => new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), Number(m[4]), Number(m[5]), Number(m[6])) },
-                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/, handler: (m) => new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), Number(m[4]), Number(m[5])) },
-                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/, handler: (m) => new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])) }
+            const trPatterns = [
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/,
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/,
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/
             ];
+            for (const pattern of trPatterns) {
+                if (pattern.test(val)) return true;
+            }
 
-            for (const { regex, handler } of formats) {
-                const match = trimmedStr.match(regex);
+            return false;
+        }
+
+                       function parseDate(val) {
+            if (val instanceof Date && !isNaN(val)) return val;
+            if (val == null) return null;
+            if (typeof val !== 'string') val = cellToText(val);
+            if (!val) return null;
+
+
+            if (/^\d{4}-\d{2}-\d{2}([T\s].*)?$/.test(val)) {
+                const d = new Date(val);
+                return isNaN(d) ? null : d;
+            }
+
+
+            const aspMatch = val.match(/\/Date\((\d+)\)\//);
+            if (aspMatch) return new Date(parseInt(aspMatch[1], 10));
+
+
+            const trFormats = [
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/, fn: m => new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5], +m[6]) },
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/,          fn: m => new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5]) },
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,                              fn: m => new Date(+m[3], +m[2]-1, +m[1]) }
+            ];
+            for (const { regex, fn } of trFormats) {
+                const match = val.match(regex);
                 if (match) {
-                    try {
-                        const date = handler(match);
-                        if (!isNaN(date.getTime())) return date;
-                    } catch (e) {
-                        console.error("Tarih dönüşüm hatası:", e);
-                    }
+                    const d = fn(match);
+                    return isNaN(d) ? null : d;
                 }
             }
 
-            console.warn("Tarih formatı tanınmadı:", dateStr);
             return null;
         }
 
-                   function cacheColumnDataAndTypes(tableId) {
-            const table = $(`#${tableId}`).DataTable();
-            const allData = table.rows().data().toArray();
-            const columnsCount = table.columns().header().toArray().length;
 
-            columnTypesCache = {};
-            parsedDatesCache = [];
+                           function cacheColumnDataAndTypes(tableId) {
+        const table = $(`#${tableId}`).DataTable();
+        const allData = table.rows().data().toArray();
+        const columnsCount = table.columns().header().toArray().length;
 
-            // 1. Sütun başlıklarına göre ön filtreleme
-            table.columns().every(function(index) {
-                const colHeader = this.header();
-                const colName = $(colHeader).text().trim().toLowerCase();
-                if (colName.includes('tarih') || colName.includes('date')) {
-                    columnTypesCache[index] = 'date';
-                }
-            });
+        columnTypesCache = {};
+        parsedDatesCache = [];
 
-            // 2. Veri analizi ile tip tespiti
-            const sampleSize = Math.min(300, allData.length);
-            for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
-                if (columnTypesCache[colIndex]) continue;
+        // 1) Başlıklardan ön etiketleme
+        table.columns().every(function (index) {
+          const colHeader = this.header();
+          const colName = $(colHeader).text().trim().toLowerCase();
+          if (colName.includes('tarih') || colName.includes('date')) {
+            columnTypesCache[index] = 'date';
+          }
+        });
 
-                const uniqueValues = new Set();
-                for (let rowIndex = 0; rowIndex < sampleSize; rowIndex++) {
-                    const cell = allData[rowIndex][colIndex];
-                    if (!cell) continue;
+        // 2) Veri analizi ile tip tespiti (DOM yok)
+        const sampleSize = Math.min(300, allData.length);
 
-                    let cellText;
-                    if (typeof cell === 'object' && cell.toString) {
-                        cellText = cell.toString();
-                    } else {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = cell;
-                        cellText = (tempDiv.textContent || tempDiv.innerText || "").trim();
-                    }
+        for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
+          if (columnTypesCache[colIndex]) continue;
 
-                    if (cellText) {
-                        uniqueValues.add(cellText);
-                        if (uniqueValues.size > 10) break;
-                    }
-                }
-
-                if (uniqueValues.size > 0 && uniqueValues.size <= 10) {
-                    columnTypesCache[colIndex] = 'select';
-                    continue;
-                }
-
-                let dateCount = 0, numberCount = 0, totalChecked = 0;
-                for (let rowIndex = 0; rowIndex < sampleSize; rowIndex++) {
-                    const cell = allData[rowIndex][colIndex];
-                    if (!cell) continue;
-
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = cell;
-                    const cellText = (tempDiv.textContent || tempDiv.innerText || "").trim();
-                    if (!cellText) continue;
-
-                    totalChecked++;
-                    if (isValidDate(cellText)) dateCount++;
-                    else if (!isNaN(parseFloat(cellText.replace(',', '.')))) numberCount++;
-                }
-
-                if (totalChecked > 0) {
-                    columnTypesCache[colIndex] = dateCount / totalChecked > 0.6 ? 'date' :
-                                                numberCount / totalChecked > 0.75 ? 'number' : 'text';
-                } else {
-                    columnTypesCache[colIndex] = 'text';
-                }
+          const uniqueValues = new Set();
+          for (let rowIndex = 0; rowIndex < sampleSize; rowIndex++) {
+            const cell = allData[rowIndex][colIndex];
+            if (!cell) continue;
+            const t = cellToText(cell);
+            if (t) {
+              uniqueValues.add(t);
+              if (uniqueValues.size > 10) break;
             }
+          }
+          if (uniqueValues.size > 0 && uniqueValues.size <= 10) {
+            columnTypesCache[colIndex] = 'select';
+            continue;
+          }
 
-            // 3. Tarih verilerini önbelleğe al (DEBUG özellikli yeni versiyon)
-            for (let rowIndex = 0; rowIndex < allData.length; rowIndex++) {
-                const row = allData[rowIndex];
-                parsedDatesCache[rowIndex] = {}; // Her satır için yeni object
+          let dateCount = 0, numberCount = 0, totalChecked = 0;
+          for (let rowIndex = 0; rowIndex < sampleSize; rowIndex++) {
+            const cell = allData[rowIndex][colIndex];
+            if (!cell) continue;
+            const txt = cellToText(cell);
+            if (!txt) continue;
 
-                for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
-                    if (columnTypesCache[colIndex] === 'date') {
-                        const cell = row[colIndex];
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = cell;
-                        const cleanedCell = (tempDiv.textContent || tempDiv.innerText || "").trim();
-                        const parsed = parseDate(cleanedCell);
-                        parsedDatesCache[rowIndex][colIndex] = parsed;
+            totalChecked++;
+            if (isValidDate(txt)) dateCount++;
+            else if (!isNaN(parseFloat(txt.replace(',', '.')))) numberCount++;
+          }
 
-                        // DEBUG için ilk 3 satır
-                        if (rowIndex < 3) {
-                            console.log(`[CACHE DEBUG] Satır ${rowIndex}, Sütun ${colIndex}:`, {
-                                "Ham Veri": cell,
-                                "Temizlenmiş": cleanedCell,
-                                "Parse Sonucu": parsed,
-                                "Sütun Tipi": columnTypesCache[colIndex]
-                            });
-                        }
-
-                        if (!parsed) {
-                            console.warn(`Tarih parse edilemedi - Satır ${rowIndex}, Sütun ${colIndex}:`, cleanedCell);
-                        }
-                    }
-                }
-            }
-
-            console.log("[DEBUG] Sütun Tip Önbelleği:", columnTypesCache);
-            console.log("[DEBUG] İlk 5 Satır Tarih Önbelleği:", parsedDatesCache.slice(0, 5));
-        }
-             function updateFilterBadge() {
-          const count = Object.values(previousFilterValues || {})
-            .filter(v => v && Object.values(v).some(x => x && String(x).trim() !== ''))
-            .length;
-
-          const $btn = $('.customf-filter-button');
-
-          // Rozeti yeniden oluştur
-          $btn.find('.filter-badge').remove();
-
-          // Butonu konumlandır (CSS yazmadan inline)
-          $btn.css({ position: 'relative', overflow: 'visible' });
-
-          if (count > 0) {
-            // Rozeti sağ ÜST iç köşeye yerleştir (taşmadan görünsün)
-            $btn.append(
-              `<span class="filter-badge" style="
-                position:absolute;
-                top:2px;            /* dilersen 4-6px yapabilirsin */
-                right:2px;          /* dilersen 4-6px yapabilirsin */
-                transform: translate(0,0);
-                min-width:18px;
-                height:18px;
-                padding:0 6px;
-                border-radius:9999px;
-                display:flex;align-items:center;justify-content:center;
-                font-size:11px;font-weight:800;
-                background:#ef4444;color:#fff;
-                line-height:1; z-index:3;
-                box-shadow:0 6px 14px rgba(239,68,68,.35);
-              ">${count}</span>`
-            );
+          if (totalChecked > 0) {
+            columnTypesCache[colIndex] =
+              (dateCount / totalChecked > 0.6) ? 'date' :
+              (numberCount / totalChecked > 0.75) ? 'number' : 'text';
+          } else {
+            columnTypesCache[colIndex] = 'text';
           }
         }
+
+        // 3) Tüm satırlar için tarih önbelleği (DOM yok, data-order regex ile)
+        for (let rowIndex = 0; rowIndex < allData.length; rowIndex++) {
+          parsedDatesCache[rowIndex] = {};
+          const row = allData[rowIndex];
+
+          for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
+            if (columnTypesCache[colIndex] !== 'date') continue;
+
+            const cell = row[colIndex];
+            let d = null;
+
+            // data-order varsa kullan
+            const rawOrder = extractDataOrder(cell);
+            if (rawOrder && isValidDate(rawOrder)) {
+              d = parseDate(rawOrder);
+            }
+            // yoksa düz metni parse et
+            if (!d) {
+              const txt = cellToText(cell);
+              d = parseDate(txt);
+            }
+            parsedDatesCache[rowIndex][colIndex] = d || null;
+          }
+        }
+
+        // 4) Tek seferlik metin/kanonik önbellek
+        buildTextAndCanonCaches(tableId);
+
+                   console.log("[DEBUG] Column Types:", columnTypesCache);
+                   console.log("[DEBUG] parsedDatesCache Sample:", parsedDatesCache.slice(0, 5));
+
+        }
+
+         function escapeRegExp(s){
+                     return (s||'').toString().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+                 }
+                
+
+         function canon(s){
+           let t = cellToText(s ?? '');
+           t = t.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+           t = normTR(t);
+           t = t.replace(/[^a-z0-9]+/gi,' ').replace(/\s+/g,' ').trim();
+           return t;
+         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('customf-filter-modal');
+            const closeBtn = document.querySelector('.customf-close');
+            window.onclick = function (event) {
+                if (event.target === modal) modal.style.display = 'none';
+            };
+            closeBtn.onclick = function () {
+                modal.style.display = 'none';
+            };
+        });
+
     </script>
 }
 

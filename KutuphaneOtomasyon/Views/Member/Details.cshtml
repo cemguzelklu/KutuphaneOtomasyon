@@ -1,0 +1,143 @@
+﻿@model KutuphaneOtomasyon.ViewModels.Members.MemberDetailsVm
+@{
+    ViewData["Title"] = "Üye Detayları";
+}
+
+<div class="container mt-4">
+    <h2>@Model.Member.Name</h2>
+    <p class="text-muted">@Model.Member.Email | @Model.Member.Phone</p>
+    <hr />
+
+    <!-- Risk Skoru -->
+    @if (Model.Risk != null)
+    {
+        <div class="mb-4">
+            <h4>Risk Durumu</h4>
+            <div class="alert @(Model.Risk.Level == "High" ? "alert-danger" : (Model.Risk.Level == "Medium" ? "alert-warning" : "alert-success"))">
+                <strong>Skor:</strong> @Model.Risk.Score / 100
+                <br />
+                <strong>Seviye:</strong> @Model.Risk.Level
+                <br />
+                <strong>Gecikmiş Kitap:</strong> @Model.Risk.OverdueCount
+                <br />
+                <strong>Yakında Teslim:</strong> @Model.Risk.DueSoonCount
+                <br />
+                <em>@Model.Risk.Summary</em>
+            </div>
+
+            <h6>Detaylar:</h6>
+            <ul>
+                @foreach (var item in Model.Risk.Items)
+                {
+                    <li>
+                        <strong>@item.Title:</strong> @item.Status (Katkı: @item.Weight)
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+    <!-- İstatistikler -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <strong>Toplam Ödünç:</strong> @Model.TotalBorrowCount
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <strong>Geç Getirilen:</strong> @Model.LateReturnCount
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <strong>Zamanında Getirme Oranı:</strong> @($"{Model.OnTimeRate:P0}")
+            </div>
+        </div>
+    </div>
+
+    <!-- Şu anki kitaplar -->
+    <h4>Şu An Elinde Olan Kitaplar</h4>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Başlık</th>
+                <th>Yazar</th>
+                <th>Alım Tarihi</th>
+                <th>Son Teslim</th>
+                <th>Durum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model.CurrentBorrows)
+            {
+                <tr class="@(b.IsOverdue ? "table-danger" : "")">
+                    <td>@b.Title</td>
+                    <td>@b.Author</td>
+                    <td>@b.BorrowDate.ToShortDateString()</td>
+                    <td>@b.DueDate?.ToShortDateString()</td>
+                    <td>
+                        @if (b.IsReturned)
+                        {
+                            <span class="badge bg-success">İade Edildi</span>
+                        }
+                        else if (b.IsOverdue)
+                        {
+                            <span class="badge bg-danger">Gecikti</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Devam Ediyor</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Geçmiş -->
+    <h4>Ödünç Geçmişi</h4>
+    <table class="table table-sm table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>Başlık</th>
+                <th>Yazar</th>
+                <th>Alım Tarihi</th>
+                <th>İade Tarihi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model.History)
+            {
+                <tr>
+                    <td>@b.Title</td>
+                    <td>@b.Author</td>
+                    <td>@b.BorrowDate.ToShortDateString()</td>
+                    <td>@b.ReturnDate?.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Önerilen Kitaplar -->
+    @if (Model.Suggestions != null && Model.Suggestions.Any())
+    {
+        <h4>Önerilen Kitaplar</h4>
+        <div class="row">
+            @foreach (var s in Model.Suggestions)
+            {
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@s.ThumbnailUrl" class="card-img-top" alt="@s.Title" />
+                        <div class="card-body">
+                            <h6 class="card-title">@s.Title</h6>
+                            <p class="card-text"><small>@s.Author</small></p>
+                            <p class="text-muted"><small>@s.Reason</small></p>
+                            <span class="badge bg-info">Stok: @s.AvailableCopies</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

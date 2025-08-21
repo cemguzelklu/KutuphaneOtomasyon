@@ -711,6 +711,7 @@
                             <th>İsim</th>
                             <th>Email</th>
                             <th>Üye Tipi</th>
+                            <th>Detay</th>
                             <th class="text-center">İşlemler</th>
                         </tr>
                     </thead>
@@ -722,6 +723,11 @@
                                 <td>@member.Name</td>
                                 <td>@member.Email</td>
                                 <td>@member.MemberType</td>
+                                <td class="text-end">
+                                    <a asp-controller="Member" asp-action="Details" asp-route-id="@member.MemberId" class="btn btn-sm btn-primary">
+                                        Detay
+                                    </a>
+                                </td>
                                 <td class="text-center">
                                     <a asp-action="Update" asp-route-id="@member.MemberId" class="btn btn-warning btn-sm btn-rounded waves-effect waves-light mr-1">
                                         <i class="fa fa-edit"></i> Güncelle

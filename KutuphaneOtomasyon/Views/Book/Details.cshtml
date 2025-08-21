@@ -37,7 +37,23 @@
                             </div>
                         }
                     </div>
+                                        <!-- Sayaçlar -->
+                    <div class="d-flex flex-wrap gap-2 my-2 kd-stats-inline">
+    <span class="chip-pill is-count">
+        <i class="fas fa-bolt me-1"></i>
+        Toplam: @Model.TotalBorrowCount
+    </span>
 
+    <span class="chip-pill is-busy">
+        <i class="fas fa-exclamation-circle me-1"></i>
+        Geç: @Model.LateReturnCount
+    </span>
+
+    <span class="chip-pill @(available > 0 ? "is-available" : "is-busy")">
+        <i class="fas fa-layer-group me-1"></i>
+        Stok: @available/@Model.Book.TotalCopies
+    </span>
+</div>
                     <div class="d-flex justify-content-between small text-muted mb-1">
                         <span>Uygunluk</span>
                         <span>@available / @Model.Book.TotalCopies</span>
@@ -111,35 +127,15 @@
                             <div class="text-muted">@Model.Book.Author</div>
                         </div>
                         <div class="text-end">
-                            <span class="badge rounded-pill @((available > 0) ? "bg-success" : "bg-danger") px-3 py-2">
-                                <i class="fas @(available > 0 ? "fa-check" : "fa-times") me-1"></i>
-                                @(available > 0 ? "Uygun" : "Müsait değil")
-                            </span>
+                            <span class="chip-pill big @(available > 0 ? "is-available" : "is-busy")">
+    <span class="dot"></span>
+    @(available > 0 ? "Uygun" : "Müsait değil")
+</span>
                         </div>
 
                     </div>
 
-                    <!-- Sayaçlar -->
-                    <div class="row text-center g-2 my-3">
-                        <div class="col-4">
-                            <div class="stat small">
-                                <div class="muted">Toplam Ödünç</div>
-                                <div class="fs-5 fw-bold">@Model.TotalBorrowCount</div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="stat small">
-                                <div class="muted">Geç İade</div>
-                                <div class="fs-5 fw-bold text-danger">@Model.LateReturnCount</div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="stat small">
-                                <div class="muted">Stok</div>
-                                <div class="fs-5 fw-bold">@available/@Model.Book.TotalCopies</div>
-                            </div>
-                        </div>
-                    </div>
+                  
 
                     <!-- Sekmeler -->
                     <ul class="nav nav-tabs" role="tablist">
@@ -164,101 +160,143 @@
                         </div>
 
                         <!-- Şu An Kimde? -->
-                            @{
-                                var hasActive = Model.CurrentBorrow != null
-                                && Model.CurrentBorrower != null
-                                && !Model.CurrentBorrow.ReturnDate.HasValue;
+                           @{
+    var hasActive = Model.CurrentBorrow != null
+                    && Model.CurrentBorrower != null
+                    && !Model.CurrentBorrow.ReturnDate.HasValue;
 
-                                var due = Model.CurrentBorrow?.DueDate; // null olabilir
-                            }
-                            <div class="tab-pane fade" id="tab-aktuel">
-                                @if (hasActive)
-                                {
-                                    <div class="glass p-3">
-                                        <div class="list-group list-group-flush rounded-3 border small">
-                                            <div class="list-group-item d-flex flex-wrap align-items-center justify-content-between">
-                                                <div class="me-2">
-                                                    <div class="fw-semibold">@Model.CurrentBorrower!.Name</div>
-                                                    <div class="text-muted">
-                                                        Alış: @Model.CurrentBorrow!.BorrowDate.ToString("dd.MM.yyyy HH:mm")
-                                                        @if (due.HasValue)
-                                                        {
-                                                            <span class="ms-2">| Son teslim: @due.Value.ToString("dd.MM.yyyy")</span>
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    @if (due.HasValue)
-                                                    {
-                                                        var gun = (due.Value.Date - DateTime.Now.Date).Days;
-                                                        if (gun < 0)
-                                                        {
-                                                            <span class="badge rounded-pill bg-danger px-3 py-2">@Math.Abs(gun) gün gecikti</span>
-                                                        }
-                                                        else if (gun == 0)
-                                                        {
-                                                            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">Son gün</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="badge rounded-pill bg-success px-3 py-2">@gun gün kaldı</span>
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="badge rounded-pill bg-secondary px-3 py-2">Son teslim yok</span>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="text-muted small">Bu kitabı üzerinde bulunduran aktif üye yok.</div>
-                                }
-                            </div>
+    var due = Model.CurrentBorrow?.DueDate;
+    var nm  = Model.CurrentBorrower?.Name ?? "";
+    var initials = String.Join("", (nm.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                      .Take(2).Select(s => s[0]))).ToUpper(); // ör: "Ali Veli" -> "AV"
+}
+<div class="tab-pane fade" id="tab-aktuel">
+    <div class="kd-section-title">
+        <i class="fas fa-user-clock"></i> Şu An Kimde?
+        <span class="badge-soft">Anlık durum</span>
+    </div>
+
+    @if (hasActive)
+    {
+       
+            var gun = due.HasValue ? (due.Value.Date - DateTime.Now.Date).Days : (int?)null;
+            var stateClass = gun.HasValue
+                ? (gun.Value < 0 ? "danger" : (gun.Value == 0 ? "warn" : "")) : "warn";
+        
+        <div class="holder-card @stateClass">
+            <div class="holder-left">
+                <div class="avatar">@initials</div>
+                <div class="holder-meta">
+                    <div class="name">@Model.CurrentBorrower!.Name</div>
+                    <div class="sub">
+                        Alış: @Model.CurrentBorrow!.BorrowDate.ToString("dd.MM.yyyy HH:mm")
+                        @if (due.HasValue){<text> • Son teslim: @due.Value.ToString("dd.MM.yyyy")</text>}
+                    </div>
+                </div>
+            </div>
+
+            <div class="kd-actions">
+                @if (due.HasValue)
+                {
+                    var g = (due.Value.Date - DateTime.Now.Date).Days;
+                    if (g < 0)
+                    {
+                        <span class="badge-soft-status late">@Math.Abs(g) gün gecikti</span>
+                    }
+                    else if (g == 0)
+                    {
+                        <span class="badge-soft-status today">Son gün</span>
+                    }
+                    else
+                    {
+                        <span class="badge-soft-status left">@g gün kaldı</span>
+                    }
+                }
+                else
+                {
+                    <span class="badge-soft-status none">Son teslim yok</span>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-muted small">Bu kitabı üzerinde bulunduran aktif üye yok.</div>
+    }
+</div>
 
                         <!-- Ödünç Geçmişi -->
                         <div class="tab-pane fade" id="tab-gecmis">
-                            @if (Model.History != null && Model.History.Any())
-                            {
-                                 <div class="glass p-2">
-                                    <div class="table-wrap">
-                                <div class="table-responsive">
-                                    <table class="table table-sm align-middle">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Üye</th>
-                                                <th>Alış</th>
-                                                <th>İade</th>
-                                                <th>Süre (gün)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var b in Model.History)
-                                            {
-                                                var sure = (b.ReturnDate.HasValue ? (b.ReturnDate.Value.Date - b.BorrowDate.Date).Days : (int?)null);
-                                                <tr>
-                                                    <td>@b.Member?.Name</td>
-                                                    <td>@b.BorrowDate.ToString("dd.MM.yyyy HH:mm")</td>
-                                                    <td>@(b.ReturnDate.HasValue? b.ReturnDate.Value.ToString("dd.MM.yyyy") : "—")</td>
-                                                    <td>@(sure.HasValue? sure.Value: (object)"—")</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                                    </div>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="text-muted small">Geçmiş ödünç kaydı bulunamadı.</div>
-                            }
-                        </div>
-                    </div>
+    <div class="kd-section-title">
+        <i class="fas fa-history"></i> Ödünç Geçmişi
+        <span class="badge-soft">Son @((Model.History?.Count ?? 0)) kayıt</span>
+    </div>
 
+    @if (Model.History != null && Model.History.Any())
+    {
+        <div class="history-wrap">
+            <div class="table-responsive history-table-wrap">
+                <table class="table table-hover table-sm align-middle history">
+                    <thead>
+                        <tr>
+                            <th style="min-width:160px">Üye</th>
+                            <th style="min-width:150px">Alış</th>
+                            <th style="min-width:150px">İade</th>
+                            <th class="text-center" style="min-width:120px">Süre</th>
+                            <th class="text-end" style="min-width:140px">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in Model.History)
+                        {
+                            var sure = (b.ReturnDate.HasValue ? (b.ReturnDate.Value.Date - b.BorrowDate.Date).Days : (int?)null);
+                            bool returned = b.ReturnDate.HasValue;
+                            bool overdue  = !returned && b.DueDate.HasValue && b.DueDate.Value.Date < DateTime.Now.Date;
+                            bool lastDay  = !returned && b.DueDate.HasValue && b.DueDate.Value.Date == DateTime.Now.Date;
+
+                            <tr>
+                                <td class="fw-semibold text-truncate" title="@b.Member?.Name">
+                                    <i class="far fa-user me-1 text-secondary"></i>@b.Member?.Name
+                                </td>
+                                <td>@b.BorrowDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@(returned ? b.ReturnDate!.Value.ToString("dd.MM.yyyy") : "—")</td>
+                                <td class="text-center">@((sure.HasValue ? sure.Value.ToString() : "—"))</td>
+                                <td class="text-end">
+                                    @if (returned)
+                                    {
+                                        <span class="badge-soft-status return">İade edildi</span>
+                                    }
+                                    else if (overdue)
+                                    {
+                                        var g = (DateTime.Now.Date - (b.DueDate!.Value.Date)).Days;
+                                        <span class="badge-soft-status late">@g gün gecikti</span>
+                                    }
+                                    else if (lastDay)
+                                    {
+                                        <span class="badge-soft-status today">Son gün</span>
+                                    }
+                                    else if (b.DueDate.HasValue)
+                                    {
+                                        var gLeft = (b.DueDate!.Value.Date - DateTime.Now.Date).Days;
+                                        <span class="badge-soft-status left">@gLeft gün kaldı</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-soft-status none">Son teslim yok</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-muted small">Geçmiş ödünç kaydı bulunamadı.</div>
+    }
+</div>
                     <!-- Bu kitabı alanlar bunları da aldı -->
                     @* === ÖNERİLER (küçük kartlar + fallback) === *@
 @* === ÖNERİLER (2x2 sabit; önce primary, eksikse rastgele doldur) === *@
@@ -315,10 +353,10 @@
     </h6>
 
     <!-- 2 sütun, toplam en fazla 4 kart -->
-    <div class="row row-cols-2 g-2 g-md-3">
+    <div class="row g-2 g-md-3">
         @foreach (var x in target)
         {
-            <div class="col">
+            <div class="col-6">
                 <a asp-action="Details" asp-route-id="@x.BookId" class="rec-card text-decoration-none text-reset">
                     <div class="rec-cover">
                         @if (!string.IsNullOrWhiteSpace(x.ThumbnailUrl))
@@ -338,15 +376,17 @@
                         }
                     </div>
                     <div class="rec-meta">
-                        <span class="badge rounded-pill @(x.AvailableCopies > 0 ? "bg-success" : "bg-secondary")">
-                            @(x.AvailableCopies > 0 ? "Uygun" : "Meşgul")
-                        </span>
-                        @* primary’den geldiyse ve count varsa göster *@
-                        @if (hasPrimaryAny && x.Count > 0)
-                        {
-                            <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">@x.Count ×</span>
-                        }
-                    </div>
+    <span class="chip-pill @(x.AvailableCopies > 0 ? "is-available" : "is-busy")">
+        <i class="fas @(x.AvailableCopies > 0 ? "fa-check-circle" : "fa-clock") me-1"></i>
+        @(x.AvailableCopies > 0 ? "Uygun" : "Meşgul")
+    </span>
+    @if (hasPrimaryAny && x.Count > 0)
+    {
+        <span class="chip-pill is-count">
+            <i class="fas fa-bolt me-1"></i>@x.Count ×
+        </span>
+    }
+</div>
                 </a>
             </div>
         }
@@ -682,6 +722,172 @@
         .badge .fa-check, .badge .fa-times {
             vertical-align: -1px;
         }
+        .chip-pill{
+  --bg:#f8fafc;           /* zemin */
+  --fg:#334155;           /* metin */
+  --ring:rgba(2,6,23,.06);/* kenar */
+  --glow:rgba(2,132,199,.0);
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-weight:700; font-size:.75rem; line-height:1;
+  padding:.45rem .7rem; border-radius:999px;
+  background:var(--bg);
+  color:var(--fg);
+  border:1px solid var(--ring);
+  box-shadow:0 4px 14px var(--glow);
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  white-space:nowrap;
+}
+.chip-pill.big{ font-size:.8rem; padding:.5rem .85rem; }
+.chip-pill .dot{
+  width:.5rem; height:.5rem; border-radius:999px; display:inline-block;
+  background:currentColor; box-shadow:0 0 0 3px color-mix(in oklab, currentColor 20%, transparent);
+}
 
+/* Durum temaları */
+.chip-pill.is-available{
+  --bg:color-mix(in oklab, #22c55e 14%, white);
+  --fg:#166534;
+  --ring:rgba(34,197,94,.22);
+  --glow:rgba(34,197,94,.16);
+}
+.chip-pill.is-busy{
+  --bg:color-mix(in oklab, #f59e0b 12%, white);
+  --fg:#7c2d12;
+  --ring:rgba(245,158,11,.22);
+  --glow:rgba(245,158,11,.14);
+}
+.chip-pill.is-count{
+  --bg:color-mix(in oklab, #60a5fa 14%, white);
+  --fg:#1e3a8a;
+  --ring:rgba(59,130,246,.22);
+  --glow:rgba(59,130,246,.16);
+}
+.chip-pill.is-info{
+  --bg:color-mix(in oklab, #a78bfa 14%, white);
+  --fg:#4c1d95;
+  --ring:rgba(167,139,250,.22);
+  --glow:rgba(167,139,250,.16);
+}
+
+/* Hover mikro etki */
+.chip-pill:hover{ transform:translateY(-1px); box-shadow:0 10px 22px var(--glow); }
+
+/* Rec meta içindeki boşlukları ayarla */
+.rec-meta{ margin-top:.45rem; display:flex; gap:.4rem .5rem; flex-wrap:wrap; }
+/* === Kimde / Geçmiş: görsel yükseltmeler === */
+.kd-section-title{
+  display:flex;align-items:center;gap:.5rem;
+  font-weight:800; font-size:.95rem; letter-spacing:.2px;
+  color:#0f172a; margin-bottom:.75rem;
+}
+.kd-section-title .badge-soft{
+  background:linear-gradient(135deg,#eef2ff,#f5f3ff);
+  color:#3730a3; border:1px solid rgba(55,48,163,.15);
+  padding:.25rem .6rem; border-radius:999px; font-weight:700;
+}
+
+.holder-card{
+  border:1px solid rgba(17,24,39,.07);
+  border-left:4px solid #22c55e;        /* yeşil şerit */
+  border-radius:14px; padding:14px; background:#fff;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  box-shadow:0 10px 24px rgba(2,6,23,.06);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.holder-card.warn{ border-left-color:#f59e0b; }
+.holder-card.danger{ border-left-color:#ef4444; }
+.holder-card:hover{ transform:translateY(-2px); box-shadow:0 14px 32px rgba(2,6,23,.09); }
+
+.holder-left{ display:flex; align-items:center; gap:12px; min-width:0; }
+.avatar{
+  width:44px; height:44px; border-radius:999px; background:#eef2ff;
+  color:#3730a3; font-weight:800; display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(55,48,163,.15);
+  box-shadow:0 4px 12px rgba(55,48,163,.15);
+  flex:0 0 auto;
+}
+.holder-meta{ min-width:0; }
+.holder-meta .name{ font-weight:800; line-height:1.1; }
+.holder-meta .sub{ color:#64748b; font-size:.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.kd-actions{ display:flex; gap:.4rem; align-items:center; flex-wrap:wrap; }
+
+/* Geçmiş – timeline tablo hibrit */
+.history-wrap{
+  border:1px solid rgba(17,24,39,.06); background:#fff; border-radius:14px;
+  box-shadow:0 12px 30px rgba(16,24,40,.08); overflow:hidden;
+}
+.table.history{
+  margin:0; font-size:.9rem;
+}
+.table.history thead th{
+  background:linear-gradient(180deg,#f8fafc,#f1f5f9);
+  border-bottom:1px solid #e5e7eb; color:#0f172a; font-weight:800;
+}
+.table.history tbody tr{ transition:background .12s ease, transform .12s ease; }
+.table.history tbody tr:hover{ background:#f8fbff; transform:translateY(-1px); }
+
+.badge-soft-status{
+  border-radius:999px; padding:.25rem .6rem; font-weight:800; font-size:.75rem; white-space:nowrap;
+  border:1px solid transparent;
+}
+.badge-soft-status.left   { background:color-mix(in oklab,#22c55e 16%, #fff); color:#14532d; border-color:rgba(34,197,94,.22);}
+.badge-soft-status.today  { background:color-mix(in oklab,#f59e0b 18%, #fff); color:#7c2d12; border-color:rgba(245,158,11,.22);}
+.badge-soft-status.late   { background:color-mix(in oklab,#ef4444 16%, #fff); color:#7f1d1d; border-color:rgba(239,68,68,.22);}
+.badge-soft-status.none   { background:color-mix(in oklab,#a78bfa 16%, #fff); color:#4c1d95; border-color:rgba(167,139,250,.22);}
+.badge-soft-status.return { background:color-mix(in oklab,#60a5fa 16%, #fff); color:#1e3a8a; border-color:rgba(59,130,246,.22);}
+
+/* piller sabit ölçü (önceki talep ile uyumlu) */
+.chip-pill, .badge-soft-status { height:28px; min-width:120px; display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box; }
+/* Tab ve butonlarda tıklayınca çıkan siyah border'ı kaldır */
+.book-details .nav-tabs .nav-link:focus,
+.book-details .nav-tabs .nav-link:focus-visible,
+.book-details .btn:focus,
+.book-details .btn:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+/* === Önerilen / benzer kitap kartlarındaki kitap adları === */
+.rec-title,
+.book-details .card .small.fw-semibold {
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2937;   /* koyu gri */
+    line-height: 1.3;
+    letter-spacing: 0.2px;
+    transition: color 0.15s ease;
+}
+
+/* --- 1. Minimal koyulaşma --- */
+.rec-card:hover .rec-title,
+.book-details .card:hover .small.fw-semibold {
+    color: #111827; /* daha koyu gri */
+}
+.kd-stats-inline { margin-top:.5rem; margin-bottom:.75rem; }
+
+.kd-stats-inline .chip-pill{
+  height: 26px;            /* biraz daha kompakt */
+  min-width: auto;         /* sabit genişliği kaldır */
+  padding: .35rem .6rem;   /* yumuşak iç boşluk */
+  font-weight: 700;
+  font-size: .8rem;        /* küçük tip */
+  gap: .35rem;
+}
+
+.kd-stats-inline .chip-pill i{
+  font-size: .9em;         /* ikon küçük dursun */
+  opacity: .9;
+}
+
+/* Başlık satırı ile rozetler arası boşluğu sıkılaştırmak için opsiyonel */
+.book-details .card .d-flex.align-items-center.justify-content-between.gap-2{
+  row-gap: .25rem;
+}
+/* Sadece geçmiş tablosunun responsive div'inde iç scroll'u kapat */
+.history-table-wrap{
+  max-height:none !important;
+  overflow:visible !important;
+}
     </style>
 }
