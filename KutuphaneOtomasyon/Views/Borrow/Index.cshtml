@@ -812,6 +812,7 @@
                             <th>Alış Tarihi</th>
                             <th>İade Tarihi</th>
                             <th>Kalan Gün</th>
+                            <th>Sayı</th>
                             <th class="text-center">İşlemler</th>
                         </tr>
                     </thead>
@@ -939,57 +940,60 @@
     <script>
             let previousFilterValues = {};
             let selectedColumns = [];
-            let columnTypesCache = {}; // Her sütunun tipini (date, number, text) önbelleğe almak için , "Ayşe", "Fatma", "Zeynep", "Mustafa", "Emre", "Elif", "Cem", "Yılmaz", "Hakan"
-            let parsedDatesCache = []; // Sadece tarih sütunlarındaki dönüştürülmüş Date objelerini tutmak için , "Demir", "Çelik", "Şahin", "Arslan", "Güzel", "Sabun"
+            let columnTypesCache = {}; // Her sütunun tipini (date, number, text) önbelleğe almak için 
+            let parsedDatesCache = []; // Sadece tarih sütunlarındaki dönüştürülmüş Date objelerini tutmak için 
             let textCache = [];   // Hücrelerin HTML'siz düz metni
             let canonCache = [];  // TR-normalize edilmiş kanonik metin
+            let numericCache = [];
             $(document).ready(function () {
                 // Örnek veri seti oluşturucu
 
-                  function generateMockData(rowCount = 5000) {
-            const firstNames = ["Ahmet", "Mehmet"];
-            const lastNames = ["Yılmaz", "Kaya"];
-            const bookTitles = [
-                "Suç ve Ceza", "Sefiller", "1984",
-                "Hayvan Çiftliği", "Küçük Prens", "Dönüşüm",
-                "Satranç", "Beyaz Diş", "İnce Memed", "Anna Karenina",
-                "Anna Karenina2"
-            ];
+                        function generateMockData(rowCount = 5000) {
+          const firstNames = ["Ahmet","Mehmet","Ayşe","Fatma","Zeynep","Mustafa","Emre","Elif","Cem","Yılmaz","Hakan","İlkan","Volkan"];
+          const lastNames  = ["Yılmaz","Kaya","Demir","Çelik","Şahin","Arslan","Güzel","Sabun"];
+          const bookTitles = ["Suç ve Ceza","Sefiller","1984","Hayvan Çiftliği","Küçük Prens","Dönüşüm","Satranç","Beyaz Diş","İnce Memed","Anna Karenina","Anna Karenina2"];
 
-            const data = [];
-            const currentYear = new Date().getFullYear();
+          const data = [];
+          const currentYear = new Date().getFullYear();
 
-            for (let i = 0; i < rowCount; i++) {
-                // 1. Rastgele tarih oluştur (sayı ve karakterlerle)
-                const day = Math.floor(Math.random() * 28) + 1; // 1-28 arası gün
-                const month = Math.floor(Math.random() * 12) + 1; // 1-12 arası ay
-                const year = currentYear - Math.floor(Math.random() * 5); // Son 5 yıl
-                const hours = Math.floor(Math.random() * 24);
-                const minutes = Math.floor(Math.random() * 60);
-                const seconds = Math.floor(Math.random() * 60);
+          for (let i = 0; i < rowCount; i++) {
+            const day = Math.floor(Math.random() * 28) + 1;
+            const month = Math.floor(Math.random() * 12) + 1;
+            const year = currentYear - Math.floor(Math.random() * 5);
+            const hours = Math.floor(Math.random() * 24);
+            const minutes = Math.floor(Math.random() * 60);
+            const seconds = Math.floor(Math.random() * 60);
 
-                // 2. Tarihi string olarak formatla: "dd.MM.yyyy HH:mm:ss"
-                const borrowDateStr =
-                    `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year} ` +
-                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const borrowDateStr =
+              `${day.toString().padStart(2,'0')}.${month.toString().padStart(2,'0')}.${year} ` +
+              `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
 
-                // 3. İade tarihi (30% boş, 70% rastgele tarih)
-                const returnDateStr = Math.random() > 0.3
-                    ? `${Math.floor(Math.random() * 28) + 1}.${month}.${year}`
-                    : "30.12.2024";
+            const returnDateStr = Math.random() > 0.3
+              ? `${Math.floor(Math.random() * 28) + 1}.${month}.${year}`
+              : "30.12.2024";
 
-                data.push([
-                    `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
-                    bookTitles[Math.floor(Math.random() * bookTitles.length)],
-                    borrowDateStr, // "14.10.2024 09:33:10" formatında string
-                    returnDateStr,
-                    Math.random() > 0.3
-                        ? '<span class="badge bg-secondary text-white">İade Edildi</span>'
-                        : '<button class="btn btn-success btn-sm">İade Et</button>'
-                ]);
-            }
+            // ↙️ yeni: Sayı (negatif/ondalıklı da gelebilir)
+            const sayiVal = parseFloat(((Math.random() * 1200) - 200).toFixed(2));
 
-            return data;
+            // “Kalan Gün” şimdilik placeholder (istersen sonra chip’lerle süsleriz)
+            const kalanGunCell = "—";
+
+            const actionCell = Math.random() > 0.3
+              ? '<span class="badge bg-secondary text-white">İade Edildi</span>'
+              : '<button class="btn btn-success btn-sm">İade Et</button>';
+
+            // 7 kolon: Üye, Kitap, Alış, İade, Kalan Gün, Sayı, İşlemler
+            data.push([
+              `${firstNames[Math.floor(Math.random()*firstNames.length)]} ${lastNames[Math.floor(Math.random()*lastNames.length)]}`,
+              bookTitles[Math.floor(Math.random()*bookTitles.length)],
+              borrowDateStr,
+              returnDateStr,
+              kalanGunCell,
+              sayiVal,
+              actionCell
+            ]);
+          }
+          return data;
         }
                 // DataTable başlatma
                 const table = $('#borrowTable').DataTable({
@@ -1031,14 +1035,14 @@
                         { data: 1, title: "Kitap" },
                         { data: 2, title: "Alış Tarihi" },
                         { data: 3, title: "İade Tarihi" },
-                        {
-                            data: 4,
-                            title: "İşlemler",
-                            orderable: false,
-                            render: function (data) {
-                                return data;
-                            }
-                        }
+                             { data: 4, title: "Kalan Gün" },
+        { data: 5, title: "Sayı" },             // ← sayı kolonu
+        {
+          data: 6,
+          title: "İşlemler",
+          orderable: false,
+          render: function (data) { return data; }
+        }
                     ]
 
                 });
@@ -1048,19 +1052,17 @@
             });
 
 
-                          function stripHtml(x){
+                         function stripHtml(x){
           const html = String(x ?? '');
-
-          const spaced = html.replace(/>(\s*)</g, '><')
-                             .replace(/></g, '>\u2009<');
+          const spaced = html.replace(/>(\s*)</g, '><').replace(/></g, '>\u2009<');
           const div = document.createElement('div');
           div.innerHTML = spaced;
           return (div.textContent || '')
             .replace(/\u00A0/g, ' ')
+            .replace(/([a-zğüşiöç])([A-ZĞÜŞİÖÇ])/g, '$1 $2') // ← ek: a…z + Türkçe harf → BÜYÜK geçişine boşluk
             .replace(/\s+/g, ' ')
             .trim();
         }
-            
                 function cellToText(cell) {
             if (cell == null) return '';
 
@@ -1080,11 +1082,13 @@
 
             return stripHtml(cell);
         }
-        function normTR(s){
-          if(s==null) return '';
-          let t=s.toString().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
-          t=t.replace(/İ/g,'I').replace(/ı/g,'i');
-          return t.toLocaleLowerCase('tr');
+          function normTR(s){
+          if (s == null) return '';
+          let t = s.toString().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+          // Türkçe I ailesini tek tipleştir: İ, I, ı -> i
+          t = t.replace(/[İI]/g,'I').replace(/ı/g,'i');
+          t = t.toLowerCase(); // locale bağımsız
+          return t;
         }
                 function extractDataOrder(html){
           const m = String(html || '').match(/data-order=["']([^"']+)["']/i);
@@ -1218,23 +1222,26 @@
                              formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Max" value="${max}">`;
                              formHtml += `</div>`;
                          } else {
-                             const allDataForColumn = table.column(index).data().toArray();
-                            const sampleForSelect = allDataForColumn.slice(0, 200).map(cellToText);
-                             const uniqueValues = [...new Set(sampleForSelect)];
-                             const useSelect = uniqueValues.length > 0 && uniqueValues.length <= 10;
+                                                                 const colData = table.column(index).data().toArray();
+        const sampleIdx = stratifiedIndices(colData.length, 400);
+        const uniqueValues = new Set();
+        for (const ii of sampleIdx) uniqueValues.add(cellToText(colData[ii]));
 
-                             if (useSelect) {
-                                 formHtml += `<select class="filter-input" data-type="select" data-index="${index}">`;
-                                 formHtml += `<option value="">Tümü</option>`;
-                                 uniqueValues.forEach(val => {
-                                     const selected = (prev['select'] === val) ? 'selected' : '';
-                                     formHtml += `<option value="${val}" ${selected}>${val}</option>`;
-                                 });
-                                 formHtml += `</select>`;
-                             } else {
-                                 const val = prev['text'] || '';
-                                 formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
-                             }
+        // number kolonlarda asla select üretme
+        const useSelect = (columnTypesCache[index] !== 'number') && uniqueValues.size > 0 && uniqueValues.size <= 10;
+
+        if (useSelect) {
+          formHtml += `<select class="filter-input" data-type="select" data-index="${index}">
+                         <option value="">Tümü</option>`;
+          [...uniqueValues].forEach(val => {
+            const selected = (prev['select'] === val) ? 'selected' : '';
+            formHtml += `<option value="${val}" ${selected}>${val}</option>`;
+          });
+          formHtml += `</select>`;
+        } else {
+          const val = prev['text'] || '';
+          formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
+        }
                          }
                          formHtml += `</div>`;
                      } catch (e) {
@@ -1290,10 +1297,12 @@
                         if (!currentActiveFilters[index]) currentActiveFilters[index] = {};
                         if (type === 'range') {
                             const inputs = $(`input[data-type="range"][data-index="${index}"]`);
-                            currentActiveFilters[index][type] = [
-                                parseFloat(inputs.eq(0).val().replace(',', '.')) || -Infinity,
-                                parseFloat(inputs.eq(1).val().replace(',', '.')) || Infinity
-                            ];
+                           const vMin = parseLocaleNumber(inputs.eq(0).val());
+        const vMax = parseLocaleNumber(inputs.eq(1).val());
+        currentActiveFilters[index][type] = [
+          Number.isFinite(vMin) ? vMin : -Infinity,
+          Number.isFinite(vMax) ? vMax :  Infinity
+        ];
                         } else if (type === 'date-start' || type === 'date-end') {
                             if (!currentActiveFilters[index]['date']) currentActiveFilters[index]['date'] = { start: null, end: null };
                             if (type === 'date-start') currentActiveFilters[index]['date'].start = value;
@@ -1336,28 +1345,37 @@
             }
 
             // 2) Sayı aralığı
-            if (fset.range) {
-              const num = parseFloat(cellText.replace(',', '.')) || 0;
-              if (num < fset.range[0] || num > fset.range[1]) return false;
-              continue;
-            }
+                 // 2) Sayı aralığı
+        if (fset.range) {
+          const num = numericCache[dataIndex]?.[colIndex];
+          if (!Number.isFinite(num)) return false;      // sayı değilse ele
+          if (num < fset.range[0] || num > fset.range[1]) return false;
+          continue;
+        }
 
             // 3) SELECT filtresi (formda select kullanıldıysa)
-            if ('select' in fset) {                       // tip cache'e bakma; formdaki inputa bak
-              const sel = fset.select;
-              if (sel) {
-                const f = canon(sel);                     // "seymanur gokmen"
-                const p = escapeRegExp(f);
-                // yapışık tekrarları tek ifadeye indir
-                let hay = cellCanon.replace(new RegExp(`(?:${p})(?:\\s*${p})+`, 'g'), f)
-                                   .replace(/\s+/g, ' ')
-                                   .trim();
-                // kelime sınırıyla test et
-                const token = new RegExp(`(^|\\s)${p}(\\s|$)`);
-                if (!token.test(hay)) return false;
-              }
-              continue;
-            }
+               if ('select' in fset) {
+          const sel = fset.select;
+          if (sel) {
+            const f = canon(sel);                 // "İlkan Erdoğan" -> "ilkan erdogan"
+            const p = escapeRegExp(f);
+            let hay = cellCanon;                  // hücrenin kanonik hali
+
+            // Arka arkaya tekrarlı aynı isimleri, arada boşluk olsa da olmasa da teke indir
+            hay = hay.replace(new RegExp(`(?:${p})(?:\\s*${p})+`, 'g'), f);
+            hay = hay.replace(/\s+/g, ' ').trim();
+
+            const token = new RegExp(`(^|\\s)${p}(\\s|$)`);
+            const match = token.test(hay);
+
+            // DEBUG
+            // console.log({ eslesme: match, normalizeFiltre: f, orijinalHucre: textCache[dataIndex][colIndex], temizlenmisHucre: hay });
+
+            if (!match) return false;
+          }
+          continue;
+        }
+
 
             // 4) Serbest metin
             if (fset.text) {
@@ -1449,111 +1467,225 @@
         }
 
 
-                           function cacheColumnDataAndTypes(tableId) {
-        const table = $(`#${tableId}`).DataTable();
-        const allData = table.rows().data().toArray();
-        const columnsCount = table.columns().header().toArray().length;
+                               function cacheColumnDataAndTypes(tableId) {
+          const table = $(`#${tableId}`).DataTable();
+          const allData = table.rows().data().toArray();
+          const columnsCount = table.columns().header().toArray().length;
 
-        columnTypesCache = {};
-        parsedDatesCache = [];
+          columnTypesCache = {};
+          parsedDatesCache = [];
 
-        // 1) Başlıklardan ön etiketleme
-        table.columns().every(function (index) {
-          const colHeader = this.header();
-          const colName = $(colHeader).text().trim().toLowerCase();
-          if (colName.includes('tarih') || colName.includes('date')) {
-            columnTypesCache[index] = 'date';
-          }
-        });
+          // 1) HEADER ADINA GÖRE ÖN İŞARETLEME (tarih)
+          table.columns().every(function (index) {
+            const colHeader = this.header();
+            const colName = $(colHeader).text().trim().toLowerCase();
+            if (colName.includes('tarih') || colName.includes('date')) {
+              columnTypesCache[index] = 'date';
+            }
+          });
 
-        // 2) Veri analizi ile tip tespiti (DOM yok)
-        const sampleSize = Math.min(300, allData.length);
+          // 2) DOM'da td/data-order taraması → tarih kolonları
+          for (let i = 0; i < columnsCount; i++) {
+            if (columnTypesCache[i]) continue; // header zaten 'date' işaretlediyse atla
 
-        for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
-          if (columnTypesCache[colIndex]) continue;
+            let hasDomOrderDate = false;
 
-          const uniqueValues = new Set();
-          for (let rowIndex = 0; rowIndex < sampleSize; rowIndex++) {
-            const cell = allData[rowIndex][colIndex];
-            if (!cell) continue;
-            const t = cellToText(cell);
-            if (t) {
-              uniqueValues.add(t);
-              if (uniqueValues.size > 10) break;
+            $(table.column(i).nodes()).each(function () {
+              let v = this.getAttribute('data-order') || $(this).data('order');
+              if (!v) {
+                const inner = this.querySelector('[data-order]');
+                if (inner) v = inner.getAttribute('data-order') || $(inner).data('order');
+              }
+              if (v && isValidDate(v)) {
+                hasDomOrderDate = true;
+                return false; // erken çık
+              }
+            });
+
+            if (hasDomOrderDate) {
+              columnTypesCache[i] = 'date';
             }
           }
-          if (uniqueValues.size > 0 && uniqueValues.size <= 10) {
-            columnTypesCache[colIndex] = 'select';
-            continue;
-          }
 
-          let dateCount = 0, numberCount = 0, totalChecked = 0;
-          for (let rowIndex = 0; rowIndex < sampleSize; rowIndex++) {
-            const cell = allData[rowIndex][colIndex];
-            if (!cell) continue;
-            const txt = cellToText(cell);
-            if (!txt) continue;
-
-            totalChecked++;
-            if (isValidDate(txt)) dateCount++;
-            else if (!isNaN(parseFloat(txt.replace(',', '.')))) numberCount++;
-          }
-
-          if (totalChecked > 0) {
-            columnTypesCache[colIndex] =
-              (dateCount / totalChecked > 0.6) ? 'date' :
-              (numberCount / totalChecked > 0.75) ? 'number' : 'text';
-          } else {
-            columnTypesCache[colIndex] = 'text';
-          }
-        }
-
-        // 3) Tüm satırlar için tarih önbelleği (DOM yok, data-order regex ile)
-        for (let rowIndex = 0; rowIndex < allData.length; rowIndex++) {
-          parsedDatesCache[rowIndex] = {};
-          const row = allData[rowIndex];
-
+          // 3) KALAN KOLONLAR İÇİN TİP TAHMİNİ (stratified örnekleme)
           for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
-            if (columnTypesCache[colIndex] !== 'date') continue;
+            if (columnTypesCache[colIndex]) continue; // tarihleri atla
 
-            const cell = row[colIndex];
-            let d = null;
+            const colHeader = table.columns().header()[colIndex];
+            const headerName = $(colHeader).text().trim().toLowerCase();
 
-            // data-order varsa kullan
-            const rawOrder = extractDataOrder(cell);
-            if (rawOrder && isValidDate(rawOrder)) {
-              d = parseDate(rawOrder);
+            // Başlıktan güçlü sayı ipucu
+            const headerLooksNumber = /(miktar|tutar|fiyat|adet|ücret|bakiye|bor[çc]|kredi|stok|\bid\b|\bno\b|say[ıi]s[ıi])/i.test(headerName);
+
+            const colData = table.column(colIndex).data().toArray();
+            const idxs = stratifiedIndices(colData.length, 600);
+
+            let checked = 0, numberCount = 0, dateCount = 0;
+            const uniqForSelect = new Set();
+
+            for (const i of idxs) {
+              const cell = colData[i];
+              const txt  = cellToText(cell);
+              if (txt) uniqForSelect.add(txt);
+              checked++;
+
+              if (isValidDate(txt)) { dateCount++; continue; }
+
+              // Önce ortogonal (data-order/sort/value), yoksa görünen metinden yerel sayı ayrıştırma
+              let n = getNumericOrtho(table, i, colIndex);
+              if (!Number.isFinite(n)) n = parseLocaleNumber(txt);
+              if (Number.isFinite(n)) numberCount++;
             }
-            // yoksa düz metni parse et
-            if (!d) {
-              const txt = cellToText(cell);
-              d = parseDate(txt);
+
+            if (headerLooksNumber || (checked > 0 && numberCount / checked >= 0.75)) {
+              columnTypesCache[colIndex] = 'number';
+            } else if (checked > 0 && dateCount / checked >= 0.60) {
+              columnTypesCache[colIndex] = 'date';
+            } else {
+              // Yalnızca gerçek metin kolonlarında düşük benzersiz sayıda ise select
+              columnTypesCache[colIndex] = (uniqForSelect.size > 0 && uniqForSelect.size <= 10) ? 'select' : 'text';
             }
-            parsedDatesCache[rowIndex][colIndex] = d || null;
+          }
+
+                  // 3.5) SAYISAL CACHE OLUŞTUR
+        numericCache = new Array(allData.length);
+        for (let r = 0; r < allData.length; r++) {
+          numericCache[r] = {};
+          for (let c = 0; c < columnsCount; c++) {
+            if (columnTypesCache[c] !== 'number') continue;
+
+            let num = NaN;
+            const cell = allData[r][c];
+
+            // hızlı yol: zaten number ise direkt al
+            if (typeof cell === 'number') {
+              num = cell;
+            } else {
+              // ortogonal → sonra yerel parse (bir KEZ)
+              let v = getNumericOrtho(table, r, c);
+              if (!Number.isFinite(v)) v = parseLocaleNumber(cellToText(cell));
+              if (Number.isFinite(v)) num = v;
+            }
+            numericCache[r][c] = num;
           }
         }
+          // 4) parsedDatesCache: (1) DOM data-order → (2) orthogonal obj → (3) görünen metin
+          for (let rowIndex = 0; rowIndex < allData.length; rowIndex++) {
+            parsedDatesCache[rowIndex] = {};
+            const row = allData[rowIndex];
 
-        // 4) Tek seferlik metin/kanonik önbellek
-        buildTextAndCanonCaches(tableId);
+            for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
+              if (columnTypesCache[colIndex] !== 'date') continue;
 
-                   console.log("[DEBUG] Column Types:", columnTypesCache);
-                   console.log("[DEBUG] parsedDatesCache Sample:", parsedDatesCache.slice(0, 5));
+              const cell = row[colIndex];
+              let d = null;
 
-        }
+              // (1) DOM
+              let rawOrder = getOrderFromDom(table, rowIndex, colIndex);
+              if (rawOrder && isValidDate(rawOrder)) d = parseDate(String(rawOrder));
+
+              // (2) orthogonal object
+              if (!d && typeof cell === 'object' && cell) {
+                const ortho = cell.sort ?? cell.order ?? cell.value ?? null;
+                if (ortho && isValidDate(ortho)) d = parseDate(String(ortho));
+              }
+
+              // (3) görünen metin
+              if (!d) {
+                const txt = cellToText(cell);
+                d = parseDate(txt);
+              }
+              parsedDatesCache[rowIndex][colIndex] = d || null;
+            }
+          }
+
+          // Metin/canon cache’leri güncelle
+          buildTextAndCanonCaches(tableId);
+
+          console.log("[DEBUG] Column Types:", columnTypesCache);
+          console.log("[DEBUG] parsedDatesCache Sample:", parsedDatesCache.slice(0, 5));
+        { const api=$('#borrowTable').DataTable(), r=1, c=5; console.log('[DBG cell]',{row:r,col:c,name:$(api.columns().header()[c]).text().trim(),raw:api.rows().data().toArray()[r][c],text:textCache[r]?.[c],canon:canonCache[r]?.[c],num:numericCache[r]?.[c],date:parsedDatesCache[r]?.[c],order:getOrderFromDom(api,r,c)}); }
+                }
+
 
          function escapeRegExp(s){
                      return (s||'').toString().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
                  }
-                
+         function getOrderFromDom(table, r, c) {
+          const node = table.cell(r, c).node();
+          if (!node) return null;
 
-         function canon(s){
-           let t = cellToText(s ?? '');
-           t = t.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
-           t = normTR(t);
-           t = t.replace(/[^a-z0-9]+/gi,' ').replace(/\s+/g,' ').trim();
-           return t;
-         }
+          let v = node.getAttribute('data-order') || $(node).data('order');
+          if (!v) {
+            const inner = node.querySelector('[data-order]');
+            if (inner) v = inner.getAttribute('data-order') || $(inner).data('order');
+          }
+          return v ?? null;
+        }
+               const REBUILD_ON_DRAW = false;
+        if (REBUILD_ON_DRAW) {
+          $('#borrowTable').on('draw.dt', function () {
+            buildTextAndCanonCaches('borrowTable');
+          });
+        }
+          function canon(s){
+          let t = cellToText(s ?? '');
+          t = t.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+          t = normTR(t); // artık "İlkan" -> "ilkan", "Volkan" -> "volkan"
+          t = t.replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+          return t;
+        }
+               function stripSpacesLike(s){ return (s||'').replace(/[\u00A0\u202F\u2007\u2009]/g,' '); } // NBSP ve benzerleri
 
+        function parseLocaleNumber(raw){
+          if (raw == null) return NaN;
+          let t = cellToText(raw);
+          t = stripSpacesLike(t).replace(/\s+/g,'');       // boşlukları at
+          t = t.replace(/[%₺$€£]/g,'');                    // para/% sembolü
+          t = t.replace(/\(([^)]+)\)/, '-$1');             // (1.500) -> -1.500
+
+          // 1.234.567,89  -> 1234567.89
+          if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) { t = t.replace(/\./g,'').replace(',', '.'); }
+          // 1,234,567.89 -> 1234567.89
+          else if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)) { t = t.replace(/,/g,''); }
+          // sadece virgül ondalık ise
+          else if (t.indexOf(',') > -1 && t.indexOf('.') === -1) { t = t.replace(',', '.'); }
+
+          const n = Number(t);
+          return Number.isFinite(n) ? n : NaN;
+        }
+
+        function looksNumeric(raw){ return Number.isFinite(parseLocaleNumber(raw)); }
+
+        // Hücredeki ortogonal (data-order / sort / value) değeri öncele
+        function getNumericOrtho(api, r, c){
+          const node = api.cell(r, c).node();
+          let v = node?.getAttribute('data-order') || $(node).data('order') || null;
+          if (!v) {
+            const inner = node?.querySelector('[data-order]');
+            if (inner) v = inner.getAttribute('data-order') || $(inner).data('order');
+          }
+          if (looksNumeric(v)) return parseLocaleNumber(v);
+
+          const cell = api.rows().data().toArray()[r][c];
+          if (cell && typeof cell === 'object') {
+            const ortho = cell.sort ?? cell.order ?? cell.value;
+            if (looksNumeric(ortho)) return parseLocaleNumber(ortho);
+          }
+          return NaN;
+        }
+
+        // Tüm tabloya yayılmış örneklem (ilk sayfa yanlılığını kırar)
+        function stratifiedIndices(n, max=400){
+          if (n <= 0) return [];
+          const k = Math.min(max, n);
+          const step = Math.max(1, Math.floor(n / k));
+          const out = [];
+          for (let i=0; i<n && out.length<k; i+=step) out.push(i);
+          // sıralı bloklara karşı bir miktar rastgele örnek
+          for (let j=0; j<Math.min(50, Math.floor(k/4)); j++) out.push(Math.floor(Math.random()*n));
+          return [...new Set(out)];
+        }
         document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('customf-filter-modal');
             const closeBtn = document.querySelector('.customf-close');

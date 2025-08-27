@@ -964,6 +964,12 @@
     <script>
         let previousFilterValues = {};
         let selectedColumns = [];
+         let columnTypesCache = {}; // Her sütunun tipini (date, number, text) önbelleğe almak için
+            let parsedDatesCache = []; // Sadece tarih sütunlarındaki dönüştürülmüş Date objelerini tutmak için
+            let textCache = [];   // Hücrelerin HTML'siz düz metni
+            let canonCache = [];  // TR-normalize edilmiş kanonik metin
+            let numericCache = [];
+
         $(document).ready(function () {
             const table = $('#bookTable').DataTable({
                 responsive: true,
@@ -997,6 +1003,7 @@
                 ],
                 dom: 'Bfrtip'
             });
+            cacheColumnDataAndTypes("bookTable");
             $('#googleBooksModal').on('show.bs.modal', function() {
                 loadPopularBooks();
             });
@@ -1012,82 +1019,113 @@
             });
         });
 
-        function activateSelect2() {
-            // Select2'yi başlatmadan önce, eğer zaten başlatıldıysa yok etmeliyiz.
-            // Bu, modal her açıldığında Select2'nin tekrar tekrar başlatılmasını engeller.
+                        function stripHtml(x){
+          const html = String(x ?? '');
+          const spaced = html.replace(/>(\s*)</g, '><').replace(/></g, '>\u2009<');
+          const div = document.createElement('div');
+          div.innerHTML = spaced;
+          return (div.textContent || '')
+            .replace(/\u00A0/g, ' ')
+            .replace(/([a-zğüşiöç])([A-ZĞÜŞİÖÇ])/g, '$1 $2') // ← ek: a…z + Türkçe harf → BÜYÜK geçişine boşluk
+            .replace(/\s+/g, ' ')
+            .trim();
+        }
+                function cellToText(cell) {
+            if (cell == null) return '';
+
+
+            if (cell instanceof Date && !isNaN(cell)) return cell.toISOString();
+
+
+            if (typeof cell === 'object') {
+                if ('value' in cell) return cellToText(cell.value);
+                if ('text'  in cell) return cellToText(cell.text);
+                if ('name'  in cell) return cellToText(cell.name);
+                if ('title' in cell) return cellToText(cell.title);
+                if ('html'  in cell) return stripHtml(cell.html);
+                return stripHtml(cell);
+            }
+
+
+            return stripHtml(cell);
+        }
+          function normTR(s){
+          if (s == null) return '';
+          let t = s.toString().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+          // Türkçe I ailesini tek tipleştir: İ, I, ı -> i
+          t = t.replace(/[İI]/g,'I').replace(/ı/g,'i');
+          t = t.toLowerCase(); // locale bağımsız
+          return t;
+        }
+                function extractDataOrder(html){
+          const m = String(html || '').match(/data-order=["']([^"']+)["']/i);
+          return m ? m[1] : null;
+        }
+                function buildTextAndCanonCaches(tableId){
+          const api = $('#'+tableId).DataTable();
+          const all = api.rows().data().toArray();
+          const rowCount = all.length;
+          const colCount = api.columns().header().toArray().length;
+
+          textCache  = new Array(rowCount);
+          canonCache = new Array(rowCount);
+
+          for(let r=0; r<rowCount; r++){
+            textCache[r]  = new Array(colCount);
+            canonCache[r] = new Array(colCount);
+            for(let c=0; c<colCount; c++){
+              // 1 defa: mevcut cellToText (yavaş ama tek sefer)
+              const txt = cellToText(all[r][c]);
+              textCache[r][c]  = txt;
+              canonCache[r][c] = canon(txt);
+            }
+          }
+        }
+                function activateSelect2() {
             if ($('#columnSelector').data('select2')) {
                 $('#columnSelector').select2('destroy');
             }
-
-            // "Tümünü Seç" seçeneği, Select2 başlatılmadan önce DOM'a eklenmeli.
-            // Bu kontrol, seçeneğin zaten var olup olmadığını kontrol eder.
             if ($('#columnSelector option[value="select-all-option"]').length === 0) {
-                // En başa "Tümünü Seç" seçeneğini ekle
                 $('#columnSelector').prepend('<option value="select-all-option">Tümünü Seç</option>');
             }
-
             $('#columnSelector').select2({
                 placeholder: "Filtrelenecek sütunları seçin...",
                 width: '100%',
-                multiple: true, // Birden fazla seçim yapılmasına izin ver
+                multiple: true,
                 dropdownParent: $('#customf-filter-modal .customf-modal-content'),
-
-                // Dropdown listesindeki her öğenin nasıl render edileceğini özelleştirir
                 templateResult: function (data) {
-                    // Eğer bu öğe bizim özel "Tümünü Seç" öğemizse
                     if (data.id === 'select-all-option') {
                         return $('<span><i class="fas fa-check-double"></i> Tümünü Seç</span>');
                     }
-                    // Diğer seçenekleri varsayılan olarak render et
                     return data.text;
                 },
-
-                // Seçilen öğelerin Select2 kutusunda nasıl görüneceğini özelleştirir
                 templateSelection: function (data) {
-                    // Eğer "Tümünü Seç" seçeneği seçilirse, kutucukta gösterilecek metni değiştir
                     if (data.id === 'select-all-option') {
-                        // "Tümünü Seç" hariç diğer tüm seçenekleri al
                         const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
-                        // Şu anda seçili olan seçeneklerin sayısını al (null kontrolü ile)
                         const currentSelectedCount = $('#columnSelector').val() ? $('#columnSelector').val().length : 0;
-
-                        // Eğer tüm seçenekler seçiliyse, özel bir mesaj göster
                         if (currentSelectedCount === totalSelectableOptions) {
-                             return `Tümü Seçili (${totalSelectableOptions})`;
+                            return `Tümü Seçili (${totalSelectableOptions})`;
                         }
-                        // Aksi takdirde, seçilenlerin sayısını göster
                         return `(${currentSelectedCount}/${totalSelectableOptions}) Sütun Seçili`;
                     }
-                    // Diğer seçenekleri varsayılan olarak render et
                     return data.text;
                 }
             });
-
-            // Select2 dropdown içindeki "Tümünü Seç" seçeneği tıklandığında
             $('#columnSelector').on('select2:select', function (e) {
                 const selectedId = e.params.data.id;
                 if (selectedId === 'select-all-option') {
                     const $selector = $(this);
-                    // "Tümünü Seç" hariç tüm seçeneklerin değerlerini al
                     const allOptions = $selector.find('option').not('[value="select-all-option"]').map(function () {
                         return $(this).val();
                     }).get();
-
-                    // Tüm sütunları seçili hale getir
                     $selector.val(allOptions).trigger('change');
-                    // Select2 dropdown'ını kapat
                     $selector.select2('close');
                 }
             });
-
-            // Select2 dropdown içindeki bir seçeneğin seçimi kaldırıldığında (unselect)
             $('#columnSelector').on('select2:unselect', function (e) {
                 const unselectedId = e.params.data.id;
                 if (unselectedId === 'select-all-option') {
-                    // Eğer "Tümünü Seç" seçimi kaldırılırsa, tüm seçimleri kaldır
-                    // Bu durumda, sadece "Tümünü Seç" seçeneğini değil, tüm sütunların seçimini de kaldırmak isteyebiliriz.
-                    // Eğer sadece "Tümünü Seç"in kaldırılmasını istiyorsanız, bu kısmı değiştirebilirsiniz.
-                    $(this).val(null).trigger('change'); // Tüm seçimleri kaldırır
+                    $(this).val(null).trigger('change');
                 }
             });
         }
@@ -1097,93 +1135,101 @@
             const columns = table.columns().header().toArray();
             const selector = $('#columnSelector');
             selector.empty();
-
             columns.forEach((col, index) => {
                 const colName = $(col).text().trim();
                 if (colName && colName !== "İşlemler") {
-                    const selectedAttr = selectedColumns.includes(index) ? 'selected' : '';
+
+                    const selectedAttr = previousFilterValues.hasOwnProperty(index) ? 'selected' : '';
                     selector.append(`<option value="${index}" ${selectedAttr}>${colName}</option>`);
                 }
             });
-
             selector.trigger('change.select2');
+            const totalSelectableOptions = $('#columnSelector option').not('[value="select-all-option"]').length;
+            const currentSelectedCount = Object.keys(previousFilterValues).length;
+            if (currentSelectedCount > 0 && currentSelectedCount === totalSelectableOptions) {
+                selector.find('option[value="select-all-option"]').prop('selected', true);
+                selector.trigger('change.select2');
+            }
         }
 
-        function generateCustomfFilterForm(tableId) {
-            const table = $(`#${tableId}`).DataTable();
-            const columns = table.columns().header().toArray();
-            const allData = table.rows().data().toArray();
+         function generateCustomfFilterForm(tableId) {
+             try {
+                 const table = $(`#${tableId}`).DataTable();
+                 const columns = table.columns().header().toArray();
+                 const selectedIndexes = $('#columnSelector').val()?.map(Number) || [];
+                 let formHtml = "";
+                 selectedIndexes.forEach(index => {
+                     try {
+                         const col = columns[index];
+                         const colName = $(col).text().trim();
+                         if (!colName || colName === "İşlemler") return;
 
-            const previousValues = previousFilterValues;
-            const selectedIndexes = $('#columnSelector').val()?.map(Number) || [];
-            let formHtml = "";
+                         const columnType = columnTypesCache[index] || 'text';
 
-            selectedIndexes.forEach(index => {
-                const col = columns[index];
-                const colName = $(col).text().trim();
-                if (!colName || colName === "İşlemler") return;
+                         const prev = previousFilterValues[index] || {};
 
-                const values = allData.map(row => row[index]);
-                const isDate = values.every(v => isValidDate(v));
-                const isNumber = values.every(v => !isNaN(parseFloat(v.toString().replace(',', '.'))));
-                const prev = previousValues[index] || {};
+                         formHtml += `<div class="customf-input-group"><label>${colName}</label>`;
+                         if (columnType === 'date') {
+                             const startVal = (prev['date'] && prev['date'].start) ? prev['date'].start : '';
+                             const endVal = (prev['date'] && prev['date'].end) ? prev['date'].end : '';
+                             formHtml += `<div class="customf-inline-inputs">`;
+                             formHtml += `<input type="datetime-local" class="filter-input" data-type="date-start" data-index="${index}" value="${startVal}">`;
+                             formHtml += `<input type="datetime-local" class="filter-input" data-type="date-end" data-index="${index}" value="${endVal}">`;
+                             formHtml += `</div>`;
+                         console.log("[DEBUG] Tarih Input Değerleri:",
+                              "Sütun:", colName,
+                              "Start:", startVal,
+                              "End:", endVal
+                          );
+                         } else if (columnType === 'number') {
+                             const min = (prev['range'] && !isNaN(prev['range'][0])) ? prev['range'][0] : '';
+                             const max = (prev['range'] && !isNaN(prev['range'][1])) ? prev['range'][1] : '';
+                             formHtml += `<div class="customf-inline-inputs">`;
+                             formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Min" value="${min}">`;
+                             formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Max" value="${max}">`;
+                             formHtml += `</div>`;
+                         } else {
+                                                                 const colData = table.column(index).data().toArray();
+        const sampleIdx = stratifiedIndices(colData.length, 400);
+        const uniqueValues = new Set();
+        for (const ii of sampleIdx) uniqueValues.add(cellToText(colData[ii]));
 
-                formHtml += `<div class="customf-input-group"><label>${colName}</label>`;
+        // number kolonlarda asla select üretme
+        const useSelect = (columnTypesCache[index] !== 'number') && uniqueValues.size > 0 && uniqueValues.size <= 10;
 
-                const cleanedTexts = values
-                    .filter(v => v && v.toString().trim() !== "")
-                    .map(v => {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = v;
-                        return tempDiv.textContent || tempDiv.innerText || "";
-                    });
+        if (useSelect) {
+          formHtml += `<select class="filter-input" data-type="select" data-index="${index}">
+                         <option value="">Tümü</option>`;
+          [...uniqueValues].forEach(val => {
+            const selected = (prev['select'] === val) ? 'selected' : '';
+            formHtml += `<option value="${val}" ${selected}>${val}</option>`;
+          });
+          formHtml += `</select>`;
+        } else {
+          const val = prev['text'] || '';
+          formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
+        }
+                         }
+                         formHtml += `</div>`;
+                     } catch (e) {
+                         console.error(`Sütun işleme hatası (index ${index}):`, e);
+                     }
+                 });
+                 $('#customf-dynamic-filter-form').html(formHtml || getEmptyPlaceholder());
+             } catch (e) {
+                 console.error("Filtre formu oluşturma hatası:", e);
+                 $('#customf-dynamic-filter-form').html('<div class="alert alert-danger">Filtre oluşturulurken hata oluştu</div>');
+             }
+         }
 
-                const uniqueValues = [...new Set(cleanedTexts)];
-
-                if (uniqueValues.length > 0 && uniqueValues.length <= 10) {
-                    formHtml += `<select class="filter-input" data-type="select" data-index="${index}">`;
-                    formHtml += `<option value="">Tümü</option>`;
-                    uniqueValues.forEach(val => {
-                        const selected = prev['select'] === val ? 'selected' : '';
-                        formHtml += `<option value="${val}" ${selected}>${val}</option>`;
-                    });
-                    formHtml += `</select>`;
-                }
-                else if (isDate) {
-                    const startVal = (prev['date-start'] && prev['date-start'][0]) || '';
-                    const endVal = (prev['date-end'] && prev['date-end'][0]) || '';
-                    formHtml += `<div class="customf-inline-inputs">`;
-                    formHtml += `<input type="datetime-local" class="filter-input" data-type="date-start" data-index="${index}" value="${startVal}">`;
-                    formHtml += `<input type="datetime-local" class="filter-input" data-type="date-end" data-index="${index}" value="${endVal}">`;
-                    formHtml += `</div>`;
-                }
-                else if (isNumber) {
-                    const min = (prev['range'] && prev['range'][0]) || '';
-                    const max = (prev['range'] && prev['range'][1]) || '';
-                    formHtml += `<div class="customf-inline-inputs">`;
-                    formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Min" value="${min}">`;
-                    formHtml += `<input type="number" class="filter-input" data-type="range" data-index="${index}" placeholder="Max" value="${max}">`;
-                    formHtml += `</div>`;
-                }
-                else {
-                    const val = prev['text'] || '';
-                    formHtml += `<input type="text" class="filter-input" data-type="text" data-index="${index}" placeholder="Metin giriniz" value="${val}">`;
-                }
-
-                formHtml += `</div>`;
-            });
-
-            if (selectedIndexes.length === 0) {
-                formHtml = `
-                    <div class="empty-placeholder">
-                        <i class="fas fa-sliders-h"></i><br>
-                        <b>Filtrelemek istediğiniz sütunları seçin.</b>
-                        <div style="font-size:13px; margin-top: 6px;">Yukarıdaki listeden bir veya daha fazla sütun seçin.</div>
-                    </div>
-                `;
-            }
-
-            $('#customf-dynamic-filter-form').html(formHtml);
+        function getEmptyPlaceholder() {
+            return `
+                        <div class="empty-placeholder">
+                            <i class="fas fa-sliders-h"></i><br>
+                            <b>Filtrelemek istediğiniz sütunları seçin.</b>
+                            <div style="font-size:13px; margin-top: 6px;">Yukarıdaki listeden bir veya daha fazla sütun seçin.</div>
+                        </div>
+                    `;
         }
 
         $('#customf-clear-filter').on('click', function () {
@@ -1191,109 +1237,420 @@
             previousFilterValues = {};
             generateCustomfFilterForm("bookTable");
             $.fn.dataTable.ext.search = [];
-            updateFilterBadge();
             $('#bookTable').DataTable().draw();
         });
 
         $(document).on('change', '#columnSelector', function () {
-            selectedColumns = $(this).val()?.map(Number) || [];
-            generateCustomfFilterForm("bookTable");
+            setTimeout(() => {
+                generateCustomfFilterForm("bookTable");
+            }, 100);
         });
 
         $('#customf-apply-filter').on('click', function () {
-            const table = $('#bookTable').DataTable();
-            selectedColumns = $('#columnSelector').val()?.map(Number) || [];
-            previousFilterValues = {};
+                console.log("[DEBUG] Uygulanan Filtreler:", previousFilterValues);
+            try {
+                const table = $('#bookTable').DataTable();
+                selectedColumns = $('#columnSelector').val()?.map(Number) || [];
 
-            $('.filter-input').each(function () {
-                const type = $(this).data('type');
-                const index = $(this).data('index');
-                if (!previousFilterValues[index]) previousFilterValues[index] = {};
-                if (type === 'range' || type === 'date-start' || type === 'date-end') {
-                    if (!previousFilterValues[index][type]) previousFilterValues[index][type] = [];
-                    previousFilterValues[index][type].push($(this).val());
-                } else {
-                    previousFilterValues[index][type] = $(this).val();
-                }
-            });
 
-            $.fn.dataTable.ext.search = [];
-
-            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                let pass = true;
+                const currentActiveFilters = {};
 
                 $('.filter-input').each(function () {
                     const type = $(this).data('type');
                     const index = parseInt($(this).data('index'));
                     const value = $(this).val().trim();
-                    const cell = data[index];
 
-                    if (!value) return;
-
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = cell;
-                    const cellText = tempDiv.textContent || tempDiv.innerText || "";
-
-                    if (type === 'select') {
-                        if (cellText.trim() !== value) pass = false;
-                    }
-                    else if (type === 'text') {
-                        if (!cellText.toLowerCase().includes(value.toLowerCase())) pass = false;
-                    }
-                    else if (type === 'range') {
-                        const inputs = $(`input[data-type="range"][data-index="${index}"]`);
-                        const min = parseFloat(inputs.eq(0).val().replace(',', '.')) || -Infinity;
-                        const max = parseFloat(inputs.eq(1).val().replace(',', '.')) || Infinity;
-                        const num = parseFloat(cellText.replace(',', '.')) || 0;
-                        if (num < min || num > max) pass = false;
-                    }
-                    else if (type === 'date-start' || type === 'date-end') {
-                        const startVal = $(`input[data-type="date-start"][data-index="${index}"]`).val();
-                        const endVal = $(`input[data-type="date-end"][data-index="${index}"]`).val();
-                        const date = parseDate(cellText);
-                        const startDate = startVal ? new Date(startVal) : null;
-                        const endDate = endVal ? new Date(endVal) : null;
-
-                        if (!date || (startDate && date < startDate) || (endDate && date > endDate)) {
-                            pass = false;
+                    if (value) {
+                        if (!currentActiveFilters[index]) currentActiveFilters[index] = {};
+                        if (type === 'range') {
+                            const inputs = $(`input[data-type="range"][data-index="${index}"]`);
+                           const vMin = parseLocaleNumber(inputs.eq(0).val());
+        const vMax = parseLocaleNumber(inputs.eq(1).val());
+        currentActiveFilters[index][type] = [
+          Number.isFinite(vMin) ? vMin : -Infinity,
+          Number.isFinite(vMax) ? vMax :  Infinity
+        ];
+                        } else if (type === 'date-start' || type === 'date-end') {
+                            if (!currentActiveFilters[index]['date']) currentActiveFilters[index]['date'] = { start: null, end: null };
+                            if (type === 'date-start') currentActiveFilters[index]['date'].start = value;
+                            if (type === 'date-end') currentActiveFilters[index]['date'].end = value;
+                        } else {
+                            currentActiveFilters[index][type] = value;
                         }
                     }
                 });
 
-                return pass;
-            });
-           updateFilterBadge();
-            table.draw();
-            $('#customf-filter-modal').hide();
+                previousFilterValues = {};
+                for (const index in currentActiveFilters) {
+                    if (currentActiveFilters.hasOwnProperty(index)) {
+                        previousFilterValues[index] = currentActiveFilters[index];
+                    }
+                }
 
+
+                $.fn.dataTable.ext.search = [];
+
+                          $.fn.dataTable.ext.search = [];
+        $.fn.dataTable.ext.search.push(function (settings, rowData, dataIndex) {
+          for (const index in previousFilterValues) {
+            if (!previousFilterValues.hasOwnProperty(index)) continue;
+
+            const colIndex = parseInt(index, 10);
+            const fset     = previousFilterValues[index];   // o sütun için aktif filtreler
+            const cellText  = textCache[dataIndex]?.[colIndex]  ?? '';
+            const cellCanon = canonCache[dataIndex]?.[colIndex] ?? '';
+
+            // 1) Tarih
+            if (fset.date) {
+              const start = fset.date.start ? new Date(fset.date.start) : null;
+              const end   = fset.date.end   ? new Date(fset.date.end)   : null;
+              const cellDate = parsedDatesCache[dataIndex]?.[colIndex] ?? null;
+              if (!cellDate && (start || end)) return false;
+              if (cellDate && start && cellDate.getTime() < start.getTime()) return false;
+              if (cellDate && end   && cellDate.getTime() > end.getTime())   return false;
+              continue;
+            }
+
+            // 2) Sayı aralığı
+              if (fset.range) {
+          const num = numericCache[dataIndex]?.[colIndex];
+          if (!Number.isFinite(num)) return false;      // sayı değilse ele
+          if (num < fset.range[0] || num > fset.range[1]) return false;
+          continue;
+        }
+
+            // 3) SELECT filtresi (formda select kullanıldıysa)
+               if ('select' in fset) {
+          const sel = fset.select;
+          if (sel) {
+            const f = canon(sel);                 // "İlkan Erdoğan" -> "ilkan erdogan"
+            const p = escapeRegExp(f);
+            let hay = cellCanon;                  // hücrenin kanonik hali
+
+            // Arka arkaya tekrarlı aynı isimleri, arada boşluk olsa da olmasa da teke indir
+            hay = hay.replace(new RegExp(`(?:${p})(?:\\s*${p})+`, 'g'), f);
+            hay = hay.replace(/\s+/g, ' ').trim();
+
+            const token = new RegExp(`(^|\\s)${p}(\\s|$)`);
+            const match = token.test(hay);
+
+            // DEBUG
+            // console.log({ eslesme: match, normalizeFiltre: f, orijinalHucre: textCache[dataIndex][colIndex], temizlenmisHucre: hay });
+
+            if (!match) return false;
+          }
+          continue;
+        }
+
+
+            // 4) Serbest metin
+            if (fset.text) {
+              const f = canon(fset.text);
+              if (!cellCanon.includes(f)) return false;
+              continue;
+            }
+          }
+          return true;
         });
 
-        function isValidDate(dateStr) {
-            const parsed = parseDate(dateStr);
-            return parsed instanceof Date && !isNaN(parsed.getTime());
-        }
 
-        function parseDate(dateStr) {
-            if (!dateStr || typeof dateStr !== 'string') return null;
-
-            const turkishDateRegex = /^\d{1,2}\.\d{1,2}\.\d{4}$/;
-            const turkishDateTimeRegex = /^\d{1,2}\.\d{1,2}\.\d{4}\s+\d{1,2}:\d{2}(:\d{2})?$/;
-
-            if (turkishDateRegex.test(dateStr)) {
-                const [day, month, year] = dateStr.split('.').map(Number);
-                return new Date(year, month - 1, day);
+                table.draw();
+                $('#customf-filter-modal').hide();
+            } catch (e) {
+                console.error("Filtre uygulama hatası:", e);
             }
 
-            if (turkishDateTimeRegex.test(dateStr)) {
-                const [datePart, timePart] = dateStr.split(' ');
-                const [day, month, year] = datePart.split('.').map(Number);
-                const [hour, minute, second = 0] = timePart.split(':').map(Number);
-                return new Date(year, month - 1, day, hour, minute, second);
+                           console.log("[DEBUG] Filter applied. Remaining rows:",
+            $('#bookTable').DataTable().rows({ filter: 'applied' }).count()
+        );
+
+        });
+                function isValidDate(val) {
+
+            if (val instanceof Date && !isNaN(val)) return true;
+
+
+            if (val == null || val === '') return false;
+
+
+            if (typeof val !== 'string') val = cellToText(val);
+
+
+            if (/^\d{4}-\d{2}-\d{2}([T\s].*)?$/.test(val)) {
+                return !isNaN(new Date(val));
             }
 
-            const iso = new Date(dateStr);
-            return isNaN(iso.getTime()) ? null : iso;
+
+            const aspMatch = String(val).match(/\/Date\((\d+)\)\//);
+            if (aspMatch) {
+                return !isNaN(new Date(parseInt(aspMatch[1], 10)));
+            }
+
+
+            const trPatterns = [
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/,
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/,
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/
+            ];
+            for (const pattern of trPatterns) {
+                if (pattern.test(val)) return true;
+            }
+
+            return false;
         }
+
+                       function parseDate(val) {
+            if (val instanceof Date && !isNaN(val)) return val;
+            if (val == null) return null;
+            if (typeof val !== 'string') val = cellToText(val);
+            if (!val) return null;
+
+
+            if (/^\d{4}-\d{2}-\d{2}([T\s].*)?$/.test(val)) {
+                const d = new Date(val);
+                return isNaN(d) ? null : d;
+            }
+
+
+            const aspMatch = val.match(/\/Date\((\d+)\)\//);
+            if (aspMatch) return new Date(parseInt(aspMatch[1], 10));
+
+
+            const trFormats = [
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/, fn: m => new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5], +m[6]) },
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/,          fn: m => new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5]) },
+                { regex: /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,                              fn: m => new Date(+m[3], +m[2]-1, +m[1]) }
+            ];
+            for (const { regex, fn } of trFormats) {
+                const match = val.match(regex);
+                if (match) {
+                    const d = fn(match);
+                    return isNaN(d) ? null : d;
+                }
+            }
+
+            return null;
+        }
+
+
+                                    function cacheColumnDataAndTypes(tableId) {
+          const table = $(`#${tableId}`).DataTable();
+          const allData = table.rows().data().toArray();
+          const columnsCount = table.columns().header().toArray().length;
+
+          columnTypesCache = {};
+          parsedDatesCache = [];
+
+          // 1) HEADER ADINA GÖRE ÖN İŞARETLEME (tarih)
+          table.columns().every(function (index) {
+            const colHeader = this.header();
+            const colName = $(colHeader).text().trim().toLowerCase();
+            if (colName.includes('tarih') || colName.includes('date')) {
+              columnTypesCache[index] = 'date';
+            }
+          });
+
+          // 2) DOM'da td/data-order taraması → tarih kolonları
+          for (let i = 0; i < columnsCount; i++) {
+            if (columnTypesCache[i]) continue; // header zaten 'date' işaretlediyse atla
+
+            let hasDomOrderDate = false;
+
+            $(table.column(i).nodes()).each(function () {
+              let v = this.getAttribute('data-order') || $(this).data('order');
+              if (!v) {
+                const inner = this.querySelector('[data-order]');
+                if (inner) v = inner.getAttribute('data-order') || $(inner).data('order');
+              }
+              if (v && isValidDate(v)) {
+                hasDomOrderDate = true;
+                return false; // erken çık
+              }
+            });
+
+            if (hasDomOrderDate) {
+              columnTypesCache[i] = 'date';
+            }
+          }
+
+          // 3) KALAN KOLONLAR İÇİN TİP TAHMİNİ (stratified örnekleme)
+          for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
+            if (columnTypesCache[colIndex]) continue; // tarihleri atla
+
+            const colHeader = table.columns().header()[colIndex];
+            const headerName = $(colHeader).text().trim().toLowerCase();
+
+            // Başlıktan güçlü sayı ipucu
+            const headerLooksNumber = /(miktar|tutar|fiyat|adet|ücret|bakiye|bor[çc]|kredi|stok|\bid\b|\bno\b|say[ıi]s[ıi])/i.test(headerName);
+
+            const colData = table.column(colIndex).data().toArray();
+            const idxs = stratifiedIndices(colData.length, 600);
+
+            let checked = 0, numberCount = 0, dateCount = 0;
+            const uniqForSelect = new Set();
+
+            for (const i of idxs) {
+              const cell = colData[i];
+              const txt  = cellToText(cell);
+              if (txt) uniqForSelect.add(txt);
+              checked++;
+
+              if (isValidDate(txt)) { dateCount++; continue; }
+
+              // Önce ortogonal (data-order/sort/value), yoksa görünen metinden yerel sayı ayrıştırma
+              let n = getNumericOrtho(table, i, colIndex);
+              if (!Number.isFinite(n)) n = parseLocaleNumber(txt);
+              if (Number.isFinite(n)) numberCount++;
+            }
+
+            if (headerLooksNumber || (checked > 0 && numberCount / checked >= 0.75)) {
+              columnTypesCache[colIndex] = 'number';
+            } else if (checked > 0 && dateCount / checked >= 0.60) {
+              columnTypesCache[colIndex] = 'date';
+            } else {
+              // Yalnızca gerçek metin kolonlarında düşük benzersiz sayıda ise select
+              columnTypesCache[colIndex] = (uniqForSelect.size > 0 && uniqForSelect.size <= 10) ? 'select' : 'text';
+            }
+          }
+                  numericCache = new Array(allData.length);
+        for (let r = 0; r < allData.length; r++) {
+          numericCache[r] = {};
+          for (let c = 0; c < columnsCount; c++) {
+            if (columnTypesCache[c] !== 'number') continue;
+
+            let num = NaN;
+            const cell = allData[r][c];
+
+            // hızlı yol: zaten number ise direkt al
+            if (typeof cell === 'number') {
+              num = cell;
+            } else {
+              // ortogonal → sonra yerel parse (bir KEZ)
+              let v = getNumericOrtho(table, r, c);
+              if (!Number.isFinite(v)) v = parseLocaleNumber(cellToText(cell));
+              if (Number.isFinite(v)) num = v;
+            }
+            numericCache[r][c] = num;
+          }
+        }
+          // 4) parsedDatesCache: (1) DOM data-order → (2) orthogonal obj → (3) görünen metin
+          for (let rowIndex = 0; rowIndex < allData.length; rowIndex++) {
+            parsedDatesCache[rowIndex] = {};
+            const row = allData[rowIndex];
+
+            for (let colIndex = 0; colIndex < columnsCount; colIndex++) {
+              if (columnTypesCache[colIndex] !== 'date') continue;
+
+              const cell = row[colIndex];
+              let d = null;
+
+              // (1) DOM
+              let rawOrder = getOrderFromDom(table, rowIndex, colIndex);
+              if (rawOrder && isValidDate(rawOrder)) d = parseDate(String(rawOrder));
+
+              // (2) orthogonal object
+              if (!d && typeof cell === 'object' && cell) {
+                const ortho = cell.sort ?? cell.order ?? cell.value ?? null;
+                if (ortho && isValidDate(ortho)) d = parseDate(String(ortho));
+              }
+
+              // (3) görünen metin
+              if (!d) {
+                const txt = cellToText(cell);
+                d = parseDate(txt);
+              }
+              parsedDatesCache[rowIndex][colIndex] = d || null;
+            }
+          }
+
+          // Metin/canon cache’leri güncelle
+          buildTextAndCanonCaches(tableId);
+
+          console.log("[DEBUG] Column Types:", columnTypesCache);
+          console.log("[DEBUG] parsedDatesCache Sample:", parsedDatesCache.slice(0, 5));
+        { const api=$('#bookTable').DataTable(); console.table(Array.from({length:5},(_,r)=>{const o={row:r}; api.columns().header().toArray().forEach((h,i)=>{ if(columnTypesCache[i]==='number') o[$(h).text().trim()]=numericCache[r]?.[i]??null;}); return o;})); }
+
+        }
+
+         function escapeRegExp(s){
+                     return (s||'').toString().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+                 }
+         function getOrderFromDom(table, r, c) {
+          const node = table.cell(r, c).node();
+          if (!node) return null;
+
+          let v = node.getAttribute('data-order') || $(node).data('order');
+          if (!v) {
+            const inner = node.querySelector('[data-order]');
+            if (inner) v = inner.getAttribute('data-order') || $(inner).data('order');
+          }
+          return v ?? null;
+        }
+                $('#bookTable').on('draw.dt', function () {
+          buildTextAndCanonCaches('bookTable');
+        });
+          function canon(s){
+          let t = cellToText(s ?? '');
+          t = t.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+          t = normTR(t); // artık "İlkan" -> "ilkan", "Volkan" -> "volkan"
+          t = t.replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+          return t;
+        }
+               function stripSpacesLike(s){ return (s||'').replace(/[\u00A0\u202F\u2007\u2009]/g,' '); } // NBSP ve benzerleri
+
+        function parseLocaleNumber(raw){
+          if (raw == null) return NaN;
+          let t = cellToText(raw);
+          t = stripSpacesLike(t).replace(/\s+/g,'');       // boşlukları at
+          t = t.replace(/[%₺$€£]/g,'');                    // para/% sembolü
+          t = t.replace(/\(([^)]+)\)/, '-$1');             // (1.500) -> -1.500
+
+          // 1.234.567,89  -> 1234567.89
+          if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) { t = t.replace(/\./g,'').replace(',', '.'); }
+          // 1,234,567.89 -> 1234567.89
+          else if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)) { t = t.replace(/,/g,''); }
+          // sadece virgül ondalık ise
+          else if (t.indexOf(',') > -1 && t.indexOf('.') === -1) { t = t.replace(',', '.'); }
+
+          const n = Number(t);
+          return Number.isFinite(n) ? n : NaN;
+        }
+
+        function looksNumeric(raw){ return Number.isFinite(parseLocaleNumber(raw)); }
+
+        // Hücredeki ortogonal (data-order / sort / value) değeri öncele
+        function getNumericOrtho(api, r, c){
+          const node = api.cell(r, c).node();
+          let v = node?.getAttribute('data-order') || $(node).data('order') || null;
+          if (!v) {
+            const inner = node?.querySelector('[data-order]');
+            if (inner) v = inner.getAttribute('data-order') || $(inner).data('order');
+          }
+          if (looksNumeric(v)) return parseLocaleNumber(v);
+
+          const cell = api.rows().data().toArray()[r][c];
+          if (cell && typeof cell === 'object') {
+            const ortho = cell.sort ?? cell.order ?? cell.value;
+            if (looksNumeric(ortho)) return parseLocaleNumber(ortho);
+          }
+          return NaN;
+        }
+
+        // Tüm tabloya yayılmış örneklem (ilk sayfa yanlılığını kırar)
+        function stratifiedIndices(n, max=400){
+          if (n <= 0) return [];
+          const k = Math.min(max, n);
+          const step = Math.max(1, Math.floor(n / k));
+          const out = [];
+          for (let i=0; i<n && out.length<k; i+=step) out.push(i);
+          // sıralı bloklara karşı bir miktar rastgele örnek
+          for (let j=0; j<Math.min(50, Math.floor(k/4)); j++) out.push(Math.floor(Math.random()*n));
+          return [...new Set(out)];
+        }
+
+
+
+
 
          // Popüler kitapları yükle
         function loadPopularBooks() {
