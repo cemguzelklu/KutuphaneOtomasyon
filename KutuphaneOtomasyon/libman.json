@@ -1,0 +1,21 @@
+{
+  "version": "3.0",
+  "defaultProvider": "jsdelivr",
+  "defaultDestination": "wwwroot/lib",
+  "libraries": [
+    {
+      "library": "html5-qrcode@latest",
+      "destination": "wwwroot/lib/html5-qrcode",
+      "files": [
+        "es2015/html5-qrcode.min.js"
+      ]
+    },
+    {
+      "library": "datatables.net-plugins@1.13.6",
+      "destination": "wwwroot/lib/datatables-plugins",
+      "files": [
+        "i18n/tr.json"
+      ]
+    }
+  ]
+}

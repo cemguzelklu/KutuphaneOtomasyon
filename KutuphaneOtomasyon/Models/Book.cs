@@ -15,7 +15,9 @@ namespace KutuphaneOtomasyon.Models
 
 
         // ISBN ekleyelim (API'den gelecek)
+        [MaxLength(13)]
         public string? ISBN { get; set; }
+        [MaxLength(13)]
         public string? CleanISBN { get; set; } // Yeni eklenen alan
 
         [Range(1, int.MaxValue, ErrorMessage = "Toplam kopya sayısı 1 veya daha fazla olmalıdır.")]

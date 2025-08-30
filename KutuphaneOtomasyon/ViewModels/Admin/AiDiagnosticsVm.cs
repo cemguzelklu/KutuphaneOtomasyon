@@ -1,7 +1,8 @@
 ﻿namespace KutuphaneOtomasyon.ViewModels.Admin
 {
-    using System.Collections.Generic;
+    using KutuphaneOtomasyon.Models;
     using KutuphaneOtomasyon.ViewModels.Members;
+    using System.Collections.Generic;
 
     public class AiDiagnosticsVm
     {
@@ -14,5 +15,6 @@
 
         public int? TestMemberId { get; set; }
         public List<AiSuggestionVm>? TestAiResults { get; set; }
+        public IEnumerable<AiRecommendationHistory>? SavedRecommendations { get; set; }
     }
 }

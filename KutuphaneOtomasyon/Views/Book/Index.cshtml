@@ -7,10 +7,6 @@
 <style>
     /* ========= PALET ========= */
     :root {
-        --lib-900: #1A2A80; /* ana */
-        --lib-700: #3B38A0; /* hover */
-        --lib-500: #7A85C1;
-        --lib-300: #B2B0E8;
         --ok: #16a34a;
         --ok-bg: rgba(22,163,74,.08);
         --warn: #f59e0b;
@@ -1036,6 +1032,92 @@
         }
     /* ikon sağda */
        
+    /* ===== KOYU MAVİ → #0b1220 (uniform) ===== */
+    :root {
+        --lib-900: #0b1220;
+        --lib-700: #0b1220;
+        --lib-500: #0b1220;
+        --lib-300: #0b1220;
+    }
+
+    /* Gradyan kullanılan tüm koyu-mavi alanları tek renge sabitle */
+    .btn-cta,
+    #googleBooksModal .modal-header,
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button,
+    #bookTable thead.bg-info,
+    #bookTable_wrapper .dataTables_paginate .paginate_button.current,
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item.active > a.page-link,
+    .container-fluid > .row.mb-4 #searchGoogleBooksBtn,
+    .container-fluid > .row.mb-4 a.btn.btn-success,
+    #bookTable td:nth-child(8) a.btn-info:hover {
+        background: #0b1220 !important;
+        background-image: none !important;
+        border-color: #0b1220 !important;
+        color: #fff !important;
+        box-shadow: 0 8px 20px rgba(11,18,32,.25) !important; /* eski mavi gölgelerin yerine */
+    }
+
+        /* Tablo başlığı kesin dursun */
+        #bookTable thead.bg-info th {
+            background: #0b1220 !important;
+            border-color: #0b1220 !important;
+            color: #fff !important;
+        }
+
+    /* Koyu mavi hover efektlerini de dönüştür */
+    #bookTable_wrapper .dataTables_paginate .paginate_button:hover,
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item > a.page-link:hover {
+        background: rgba(11,18,32,.12) !important; /* was rgba(78,115,223,.12) */
+        border-color: rgba(11,18,32,.25) !important; /* was rgba(78,115,223,.25) */
+        color: #0b1220 !important; /* was #224abe */
+        box-shadow: 0 2px 8px rgba(11,18,32,.15) !important;
+    }
+
+    /* DT butonlarının hover/focus’ta da aynı kalması */
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover,
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy:focus,
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy:active,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:focus,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:active {
+        background: #0b1220 !important;
+        box-shadow: 0 8px 20px rgba(11,18,32,.25) !important;
+    }
+
+    /* Başlıklar, istatistik başlıkları */
+    h4.card-title,
+    .stats-title {
+        color: #0b1220 !important;
+    }
+
+    /* Bootstrap “outline-primary” de koyu-mavi idi → #0b1220 */
+    .btn-outline-primary {
+        color: #0b1220 !important;
+        border-color: #0b1220 !important;
+    }
+
+        .btn-outline-primary:hover,
+        .btn-outline-primary:focus {
+            background: #0b1220 !important;
+            border-color: #0b1220 !important;
+            color: #fff !important;
+        }
+
+    /* (İsteğe bağlı) mavi temelli box-shadow’ları 0b1220 tabanına yaklaştır */
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+        box-shadow: 0 8px 20px rgba(11,18,32,.25) !important;
+    }
+
+    #bookTable_wrapper .dataTables_paginate .paginate_button.current,
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item.active > a.page-link {
+        box-shadow: 0 8px 18px rgba(11,18,32,.25) !important;
+    }
+
+    .swal2-container {
+        z-index: 2147483647 !important;
+    }
 
 </style>
 
@@ -1056,11 +1138,23 @@
                 <a class="btn btn-success btn-rounded waves-effect waves-light" asp-action="Create">
                     <i class="fa fa-plus mr-1"></i> Yeni Kitap Ekle
                 </a>
+                <partial name="_IsbnScannerPartial" />
             </div>
         </div>
     </div>
 
-
+    <button class="btn btn-outline-primary ml-2" onclick="openPhoneScan()">
+        📱 Telefondan Tara
+    </button>
+    <div id="phoneScanModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content p-3 text-center">
+                <h5 class="mb-2">Telefondan Tara</h5>
+                <div id="scanQr" class="d-flex justify-content-center"></div>
+                <small class="text-muted d-block mt-2">Telefon kameranızla bu kodu okutun.</small>
+            </div>
+        </div>
+    </div>
 
     <!-- Google Books Arama Modalı -->
     <div id="googleBooksModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
@@ -1089,7 +1183,14 @@
                             </div>
                         </div>
                     </form>
-
+                    <div class="form-inline mb-3">
+                        <label class="mr-2">Arama Kapsamı:</label>
+                        <select id="lookup-scope" class="form-control">
+                            <option value="both" selected>Yerel + Google</option>
+                            <option value="local">Sadece Yerel</option>
+                            <option value="google">Sadece Google</option>
+                        </select>
+                    </div>
                     <!-- Popüler Kitaplar -->
                     <div id="popularBooks" class="row">
                         <!-- İçerik dinamik olarak yüklenecek -->
@@ -1238,6 +1339,7 @@
     <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+   
 
     <script>
         let previousFilterValues = {};
@@ -1247,6 +1349,8 @@
             let textCache = [];   // Hücrelerin HTML'siz düz metni
             let canonCache = [];  // TR-normalize edilmiş kanonik metin
             let numericCache = [];
+          let openFromScanner = false; // ISBN modalından açıldığını işaretlemek için
+          let pendingIsbn = null;
 
         $(document).ready(function () {
             const table = $('#bookTable').DataTable({
@@ -1255,7 +1359,7 @@
                 lengthChange: true,
                 order: [],
                 language: {
-                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
+                    url: "/lib/datatables-plugins/i18n/tr.json"
                 },
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
                 pageLength: 10,
@@ -1279,14 +1383,14 @@
                         }
                     }
                 ],
-                dom: 'Bfrtip'
+                dom: "<'lib-topbar d-flex align-items-center justify-content-between flex-wrap gap-2'Bf>rtip"
             });
             cacheColumnDataAndTypes("bookTable");
-                  
-       
-            $('#googleBooksModal').on('show.bs.modal', function() {
-                loadPopularBooks();
-            });
+
+
+                   $('#googleBooksModal').on('show.bs.modal', function() {
+          if (!openFromScanner) loadPopularBooks();
+        });
              $('#googleBooksSearchForm').submit(function(e) {
                 e.preventDefault();
                 const query = $(this).find('input[name="query"]').val();
@@ -2136,7 +2240,7 @@
                 text: "Bu işlemi geri alamazsınız!",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#3085d6",
+                confirmButtonColor: "#0b1220",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Evet, Sil!",
                 cancelButtonText: "İptal"
@@ -2198,7 +2302,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         (function(){
-          const BRAND={c900:'#1A2A80', c700:'#3B38A0', c500:'#7A85C1', c300:'#B2B0E8'};
+          const BRAND={c900:'#0b1220', c700:'#0b1220', c500:'#0b1220', c300:'#0b1220'};
           let chAvail=null, chCats=null;
 
           function withDT(cb){
@@ -2273,6 +2377,7 @@
                (function(){
           const PREFIX = 'lib_toggle_';
 
+
           function setIcon(el, isOn){
             const on  = el.dataset.on  || '';
             const off = el.dataset.off || '';
@@ -2342,5 +2447,365 @@
           }
         })();
     </script>
+
+    <script>
+        // --- GENEL DURUM ---
+        let _scanBusy = false;
+        let html5Scanner = null;     // Html5QrcodeScanner örneği
+        let quaggaRunning = false;   // Quagga çalışıyor mu?
+
+        // --- YARDIMCILAR ---
+        function normalizeIsbn13(s) {
+          const digits = (s||'').replace(/\D/g,'');
+          if (digits.length !== 13) return null;
+          if (!/^97[89]/.test(digits)) return null;
+          let sum = 0;
+          for (let i=0;i<12;i++) sum += (i%2?3:1) * (digits.charCodeAt(i)-48);
+          const check = (10 - (sum % 10)) % 10;
+          return check === (digits.charCodeAt(12)-48) ? digits : null;
+        }
+
+        async function stopScanEngine() {
+          // Html5Qrcode kapat
+          if (html5Scanner) {
+            try { await html5Scanner.clear(); } catch(e) { console.warn('html5 clear failed', e); }
+            html5Scanner = null;
+          }
+          // Quagga kapat
+          if (window.Quagga && quaggaRunning) {
+            try {
+              Quagga.offDetected(onQuaggaDetected);
+              Quagga.stop();
+            } catch(e) { console.warn('quagga stop failed', e); }
+            quaggaRunning = false;
+          }
+        }
+
+        async function handleDecodedIsbn(isbn) {
+          if (!isbn || _scanBusy) return;
+          _scanBusy = true;
+          openFromScanner = true;
+
+          await stopScanEngine();
+
+          // ISBN modalı Bootstrap değil → kendi kapatma fonksiyonunuzu kullanın
+          if ($('#isbnModal').is(':visible')) {
+            await closeIsbnModal();
+          }
+
+          // Google Books modalını aç ve aramayı hemen TETİKLE
+          let started = false;
+          const doSearch = () => {
+            if (started) return; // çifte çalışmayı engelle
+            started = true;
+
+            const $q = $('#googleBooksSearchForm input[name="query"]');
+            $q.val(isbn);
+
+            $('#popularBooks').empty();
+            $('#searchResults')
+              .empty()
+              .html('<div class="col-12 text-center"><i class="fas fa-spinner fa-spin"></i> Sorgulanıyor...</div>');
+            $('#errorMessage').addClass('d-none').text('');
+
+            const scope = ($('#lookup-scope').val() || 'both');
+
+            $.get('@Url.Action("LookupIsbn", "Book")', { isbn, scope })
+              .done(function (data) {
+                $('#searchResults').empty();
+
+                // Yerel kayıt
+                if (data && data.local) {
+                  const b = data.local;
+                  $('#searchResults').append(`
+                    <div class="col-12">
+                      <div class="card mb-3 border-success">
+                        <div class="card-body d-flex">
+                          <img src="${b.thumbnailUrl || '/images/book.png'}" style="width:90px;height:auto" class="mr-3"/>
+                          <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-1">
+                              <span class="badge badge-success mr-2">Kütüphane Kaydı</span>
+                              <strong>${b.title}</strong>
+                            </div>
+                            <div><b>Yazar:</b> ${b.author} &nbsp; <b>ISBN:</b> ${b.isbn ?? ''}</div>
+                            <div><b>Kategori:</b> ${b.category} &nbsp; <b>Yayınevi:</b> ${b.publisher ?? 'Bilinmiyor'}</div>
+                            <div class="mt-1"><b>Stok:</b> ${b.available}/${b.total}</div>
+                            <div class="mt-2">
+                              <a href="/Book/Details/${b.id}" class="btn btn-sm btn-info">
+                                <i class="fas fa-info-circle"></i> Detay
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>`);
+                }
+
+                // Google sonucu
+                if (data && data.google) {
+                  $('#searchResults').append(renderBookCard({
+                    id: data.google.id,
+                    title: data.google.title,
+                    author: data.google.author,
+                    publisher: data.google.publisher,
+                    isbn: data.google.isbn13 || data.google.isbn10 || '',
+                    publishedDate: data.google.publishedDate || 'Bilinmiyor',
+                    thumbnailUrl: data.google.thumbnailUrl || '/images/book.png',
+                    category: data.google.category || 'Genel',
+                    description: data.google.description || ''
+                  }));
+                }
+
+                if (!data || (!data.local && !data.google)) {
+                  $('#searchResults').html('<div class="col-12 text-center">Sonuç bulunamadı.</div>');
+                }
+              })
+              .fail(function () {
+                $('#searchResults').empty();
+                $('#errorMessage').removeClass('d-none').text('Sorgu sırasında bir hata oluştu.');
+              })
+              .always(function () {
+                _scanBusy = false;
+                openFromScanner = false;
+              });
+          };
+
+          // Bootstrap varsa shown.bs.modal yakala
+          $('#googleBooksModal').one('shown.bs.modal', doSearch).modal('show');
+
+          // Emniyet: etkinlik gelmezse kısa bir gecikmeyle yine tetikle
+          setTimeout(function(){
+            if ($('#googleBooksModal').hasClass('show')) doSearch();
+          }, 400);
+        }
+
+
+          function startHtml5Qrcode() {
+          $('#isbnReader').empty();
+
+          html5Scanner = new Html5QrcodeScanner("isbnReader", {
+            fps: 15,
+            // Görüntü genişliğinin %95’i, yüksekliğin ~%45’i kadar tarama penceresi
+            qrbox: function(viewportWidth, viewportHeight){
+              return { width: Math.floor(viewportWidth*0.95), height: Math.floor(viewportHeight*0.45) };
+            },
+            rememberLastUsedCamera: true,
+            supportedScanTypes: [
+              Html5QrcodeScanType.SCAN_TYPE_CAMERA,
+              Html5QrcodeScanType.SCAN_TYPE_FILE
+            ],
+            formatsToSupport: [ Html5QrcodeSupportedFormats.EAN_13 ],
+            experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+            showTorchButtonIfSupported: true,
+            showZoomSliderIfSupported: true,
+            videoConstraints: {
+              facingMode: { ideal: "environment" },
+              width: { ideal: 1920 },
+              focusMode: "continuous",
+              advanced: [{ focusMode: "continuous" }]
+            }
+          }, false);
+
+          html5Scanner.render(
+            function onSuccess(text) {
+              const isbn = normalizeIsbn13(text);
+              if (isbn) handleDecodedIsbn(isbn);
+            },
+            function onFailure(_) { /* sessiz geç */ }
+          );
+          markAllCanvasWillReadFrequently('#isbnReader');
+        }
+
+
+               function startQuagga() {
+          $('#isbnReader').empty();
+          const targetEl = document.getElementById('isbnReader');
+
+          Quagga.init({
+            inputStream: {
+              name: "Live",
+              type: "LiveStream",
+              target: targetEl,
+              constraints: {
+                facingMode: "environment",
+                width:  { ideal: 1920 },
+                height: { ideal: 1080 }
+              }
+            },
+            locator: { patchSize: "x-large", halfSample: true },
+            numOfWorkers: Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 2) - 1)),
+            frequency: 12,
+            locate: true,
+            decoder: { readers: ["ean_reader"] }
+          }, function (err) {
+            if (err) { console.error(err); return; }
+            Quagga.start();
+            quaggaRunning = true;
+
+            // Canvas performans uyarısını azalt
+            markAllCanvasWillReadFrequently(targetEl);
+
+            // Görsel geri bildirim (kutular)
+            Quagga.onProcessed(function (res) {
+              const ctx = Quagga.canvas?.ctx?.overlay;
+              const cvs = Quagga.canvas?.dom?.overlay;
+              if (!ctx || !cvs) return;
+              ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+              if (res?.boxes) {
+                res.boxes.filter(b => b !== res.box).forEach(b => {
+                  Quagga.ImageDebug.drawPath(b, { x: 0, y: 1 }, ctx, { color: "#9e9e9e", lineWidth: 1 });
+                });
+              }
+              if (res?.box) {
+                Quagga.ImageDebug.drawPath(res.box, { x: 0, y: 1 }, ctx, { color: "#00c853", lineWidth: 2 });
+              }
+            });
+          });
+
+          Quagga.onDetected(onQuaggaDetected);
+        }
+
+
+
+        function onQuaggaDetected(result) {
+          const code = result?.codeResult?.code;
+          const isbn = normalizeIsbn13(code);
+          if (isbn) handleDecodedIsbn(isbn);
+        }
+
+              let _isbnOpenerEl = null;   // modalı açan buton
+        async function openIsbnModal(){
+          _isbnOpenerEl = document.activeElement;
+
+          const $m = $('#isbnModal');
+          $m.addClass('show').css('display','block').attr('aria-hidden','false');
+
+          // Modal görünür olduktan hemen sonra taramayı başlat
+          setTimeout(async () => {
+            await stopScanEngine();
+
+            // BarcodeDetector varsa ve GERÇEKTEN EAN-13 destekliyorsa html5-qrcode, yoksa Quagga
+            let useBD = false;
+            if ('BarcodeDetector' in window && typeof BarcodeDetector.getSupportedFormats === 'function') {
+              try {
+                const fmts = await BarcodeDetector.getSupportedFormats();
+                const hasEAN13 = fmts.map(f => String(f).toLowerCase())
+                                     .some(f => f === 'ean_13' || f === 'ean-13' || f === 'ean13');
+                useBD = hasEAN13;
+              } catch(_) { /* yoksay */ }
+            }
+            if (useBD) startHtml5Qrcode(); else startQuagga();
+
+            // Odak kapat butonuna
+            document.getElementById('btnIsbnClose')?.focus({preventScroll:true});
+          }, 0);
+        }
+
+        async function closeIsbnModal(){
+          // KAPATMADAN ÖNCE odağı modal dışına al → a11y uyarısı çözülür
+          const fallback = document.getElementById('btnIsbnScan') || document.body;
+          if ($('#isbnModal').find(':focus').length) {
+            (_isbnOpenerEl || fallback).focus({preventScroll:true});
+          }
+
+          await stopScanEngine();
+
+          $('#isbnModal')
+            .removeClass('show')
+            .css('display','none')
+            .attr('aria-hidden','true');
+        }
+
+        $('#btnIsbnScan').on('click', openIsbnModal);
+        $('#btnIsbnClose').on('click', closeIsbnModal);
+        $('#isbnModal').on('click', e => { if (e.target === e.currentTarget) closeIsbnModal(); });
+        $('#isbnModal').on('keydown', e => { if (e.key === 'Escape') closeIsbnModal(); });
+                // Tüm canvaslar için willReadFrequently uygula (uyarıyı azaltır)
+        function markAllCanvasWillReadFrequently(root){
+          const rootEl = (typeof root==='string') ? document.querySelector(root) : root;
+          try {
+            (rootEl || document).querySelectorAll('canvas').forEach(cv=>{
+              try { cv.getContext('2d', { willReadFrequently: true }); } catch(_) {}
+            });
+          } catch(_) {}
+        }
+
+        // Dosyadan barkod oku (tek seferlik)
+        async function decodeIsbnFromFile(file){
+          if(!file) return;
+          try { await stopScanEngine(); } catch(_) {}
+
+          const reader = new FileReader();
+          reader.onload = function(e){
+            const src = e.target.result;
+            Quagga.decodeSingle({
+              src,
+              inputStream: { size: 1920, singleChannel: false },
+              locator: { patchSize: 'large', halfSample: false },
+              decoder: { readers: ['ean_reader'] },
+              locate: true
+            }, function(res){
+              const code = res?.codeResult?.code;
+              const isbn = normalizeIsbn13(code);
+              if (isbn) {
+                handleDecodedIsbn(isbn);
+              } else {
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Bulunamadı',
+                  text: 'Görselde EAN-13 barkod tespit edilemedi. Barkodu daha net/kırpılmış yüklemeyi deneyin.',
+                   zIndex: 50000
+                });
+              }
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // Kalıcı butonun change olayı
+        $(document).on('change', '#isbnFile', function(e){
+          const f = e.target.files?.[0];
+          decodeIsbnFromFile(f);
+          e.target.value = ''; // aynı dosyayı tekrar seçebilmek için temizle
+        });
+
+    </script>
+    <script>
+        async function openPhoneScan(){
+          // 1) oturum token'i
+          const token = crypto.getRandomValues(new Uint32Array(2)).join('');
+
+          // 2) telefonun açacağı URL (QR içine gömülecek)
+          // Geliştirmede: telefon 'localhost'a erişemez. 5. adımı oku.
+          const phoneUrl = `${location.origin}/Book/ScanPhone?token=${token}`;
+
+          // 3) QR üret + modal aç
+          $('#scanQr').empty();
+          new QRCode(document.getElementById('scanQr'), { text: phoneUrl, width: 220, height: 220 });
+          $('#phoneScanModal').modal('show');
+
+          // 4) SignalR bağlan, bu token için gruba gir
+          const conn = new signalR.HubConnectionBuilder()
+              .withUrl('/hubs/scan')
+              .withAutomaticReconnect()
+              .build();
+
+          await conn.start();
+          await conn.invoke('Join', token);
+
+          // 5) telefondan ISBN gelince mevcut akışını tetikle
+          conn.on('isbn', async (isbn)=>{
+            try {
+              // zaten sende var: Google modalını açıp LookupIsbn çağırıyor, vs.
+              await handleDecodedIsbn(isbn);
+            } finally {
+              $('#phoneScanModal').modal('hide');
+              conn.stop();
+            }
+          });
+        }
+    </script>
+
 
 }

@@ -1,4 +1,6 @@
 using KutuphaneOtomasyon.Data;
+using KutuphaneOtomasyon.Services;
+using KutuphaneOtomasyon.Services.Clients;
 using KutuphaneOtomasyon.Services.AI;
 using KutuphaneOtomasyon.Services.Chat;
 using KutuphaneOtomasyon.Services.Hosted;
@@ -25,6 +27,13 @@ Console.WriteLine($"[CFG] OpenAI BaseUrl={oa["BaseUrl"]}, Model={oa["Model"]}, A
 // Db
 builder.Services.AddDbContext<LibraryContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services
+    .AddControllersWithViews()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        o.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
 
 // **NAMED CLIENT**: "fast-http"
 builder.Services.AddHttpClient("fast-http", client =>
@@ -49,12 +58,20 @@ builder.Services.AddHttpClient("fast-http", client =>
 builder.Services.AddHostedService<WarmupAiHostedService>();
 // MVC & servisler
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 builder.Services.AddSession();
 builder.Services.AddScoped<IAiLogService, AiLogService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IRiskScoringService, RiskScoringService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddHttpClient<IBookMetaFetcher, BookMetaFetcher>();
 builder.Services.AddScoped<IAiAssistant, OpenAiAssistant>();
+builder.Services.AddHttpClient<KutuphaneOtomasyon.Services.Clients.IGoogleBooksClient, KutuphaneOtomasyon.Services.Clients.GoogleBooksClient>();
+builder.Services.AddHttpClient<KutuphaneOtomasyon.Services.Clients.IOpenLibraryClient, KutuphaneOtomasyon.Services.Clients.OpenLibraryClient>();
+builder.Services.AddScoped<KutuphaneOtomasyon.Services.IBookLookupService, KutuphaneOtomasyon.Services.BookLookupService>();
+builder.Services.AddHttpClient<IGoogleBooksClient, GoogleBooksClient>();
+builder.Services.AddScoped<IBookLookupService, BookLookupService>();
+builder.Services.AddScoped<IBookMetaFetcher, BookMetaFetcher>();
 builder.Services.AddScoped<OpenAiChatService>();
 builder.Services.AddScoped<LocalChatService>();
 builder.Services.AddScoped<IChatService>(sp =>
@@ -85,5 +102,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<YourApp.Hubs.ScanHub>("/hubs/scan");
 
 app.Run();

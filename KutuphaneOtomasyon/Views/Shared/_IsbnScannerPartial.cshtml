@@ -1,0 +1,108 @@
+﻿@* Sadece HTML/CSS *@
+<style>
+    /* Modal kaplaması */
+    .isbn-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0,0,0,.4);
+        backdrop-filter: blur(2px)
+    }
+
+    .isbn-card {
+        background: #fff;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 520px;
+        margin: 5% auto;
+        box-shadow: 0 25px 50px rgba(0,0,0,.1);
+        overflow: visible
+    }
+
+    .isbn-head {
+        padding: 14px 16px;
+        font-weight: 600;
+        border-bottom: 1px solid #eee
+    }
+
+    .isbn-body {
+        padding: 8px 12px;
+        overflow: visible !important
+    }
+
+    .isbn-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        padding: 12px;
+        border-top: 1px solid #eee
+    }
+
+    /* Scanner alanı */
+    #isbnReader {
+        width: 100%;
+        min-height: 360px !important;
+        aspect-ratio: auto !important
+    }
+
+    /* Html5Qrcode elemanları kesilmesin */
+    #isbnModal .html5-qrcode-container {
+        overflow: visible !important;
+        padding: 0 !important
+    }
+
+    #isbnModal video, #isbnModal canvas, #isbnModal .html5-qrcode-video {
+        width: 100% !important;
+        max-height: 260px !important;
+        object-fit: cover;
+    }
+
+    /* “Kamera / Dosya” sekmesi ve file input’u görünür kalsın */
+    #isbnReader__scan_type_select,
+    #isbnReader input[type="file"] {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    .swal2-container {
+        z-index: 2147483647 !important;
+    }
+</style>
+
+
+<button id="btnIsbnScan" type="button" class="btn btn-primary">
+    <i class="fas fa-camera"></i> ISBN Tara
+</button>
+
+<div id="isbnModal"
+     class="isbn-modal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="isbnTitle"
+     aria-hidden="true"
+     tabindex="-1">
+    <div class="isbn-card">
+        <div class="isbn-head" id="isbnTitle">ISBN Barkod Tara</div>
+        <div class="isbn-body">
+            <!-- Html5QrcodeScanner kendi UI'sini buraya basar (kamera + dosyadan yükleme) -->
+            <div id="isbnReader" style="width:100%;min-height:280px"></div>
+            <div class="mt-2">
+                <label class="btn btn-outline-secondary btn-sm mb-0">
+                    <input id="isbnFile" type="file" accept="image/*" hidden />
+                    <i class="fas fa-file-upload"></i> Dosyadan Barkod Yükle
+                </label>
+                <small class="text-muted ml-2">JPG/PNG, EAN-13 desteklenir.</small>
+            </div>
+            <small class="text-muted d-block mt-2">
+                Kamera izin vermezse, tarayıcı arayüzündeki “file” seçeneğiyle barkod görselini yükleyebilirsin.
+            </small>
+            <small class="text-muted d-block mt-2">
+                Kamera yoksa, üstteki sekmeden “Dosyadan Yükle”’yi seçebilirsin.
+            </small>
+        </div>
+        <div class="isbn-actions">
+            <button id="btnIsbnClose" type="button" class="btn btn-light">Kapat</button>
+        </div>
+    </div>
+</div>

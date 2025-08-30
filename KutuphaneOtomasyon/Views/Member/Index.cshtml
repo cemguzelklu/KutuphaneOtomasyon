@@ -7,10 +7,11 @@
 <style>
     /* ========= PALET ========= */
     :root {
-        --lib-900: #1A2A80;
-        --lib-700: #3B38A0;
+        --lib-900: #0b1220; /* koyu mavi → #0b1220 */
+        --lib-700: #0b1220; /* koyu mavi → #0b1220 */
         --lib-500: #7A85C1;
         --lib-300: #B2B0E8;
+
     }
 
     /* DataTables varsayılan arama kutusu */
@@ -52,13 +53,13 @@
         color: #fff !important;
         border: none !important;
         border-radius: 10px !important;
-        box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
+        box-shadow: 0 8px 18px rgba(11,18,32,.25) !important;
         font-weight: 600;
     }
 
         .container-fluid > .row.mb-4 a.btn.btn-success:hover {
             transform: translateY(-1px);
-            box-shadow: 0 12px 26px rgba(26,42,128,.35) !important;
+            box-shadow: 0 12px 26px rgba(11,18,32,.35) !important;
         }
 
     /* ========= Genel buton animasyonu ========= */
@@ -165,7 +166,7 @@
             padding: 10px 14px !important;
             font-weight: 600 !important;
             line-height: 1 !important;
-            box-shadow: 0 8px 20px rgba(26,42,128,.25) !important;
+            box-shadow: 0 8px 20px rgba(11,18,32,.25) !important;
             transition: transform .12s ease,box-shadow .12s ease,filter .18s ease;
         }
 
@@ -184,7 +185,7 @@
                 color: #fff !important;
                 transform: none !important;
                 filter: none !important;
-                box-shadow: 0 8px 20px rgba(26,42,128,.25) !important;
+                box-shadow: 0 8px 20px rgba(11,18,32,.25) !important;
                 outline: none !important;
             }
 
@@ -207,10 +208,10 @@
     }
 
         .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: rgba(78,115,223,.12) !important;
-            border-color: rgba(78,115,223,.25) !important;
-            color: #224abe !important;
-            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+            background: rgba(11,18,32,.12) !important;
+            border-color: rgba(11,18,32,.25) !important;
+            color: #0b1220 !important;
+            box-shadow: 0 2px 8px rgba(11,18,32,.15);
         }
 
         .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
@@ -223,7 +224,7 @@
         background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
         color: #fff !important;
         border-color: transparent !important;
-        box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
+        box-shadow: 0 8px 18px rgba(11,18,32,.25) !important;
     }
 
     /* ========= Tablo başlığı ========= */
@@ -488,7 +489,7 @@
             background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
             color: #fff !important;
             border-color: transparent !important;
-            box-shadow: 0 10px 22px rgba(26,42,128,.28) !important;
+            box-shadow: 0 10px 22px rgba(11,18,32,.28) !important;
             transform: translateY(-1px);
         }
 
@@ -556,7 +557,7 @@
 
         .smart-input input:focus {
             border-color: var(--lib-900);
-            box-shadow: 0 0 0 3px rgba(26,42,128,.12);
+            box-shadow: 0 0 0 3px rgba(11,18,32,.12);
         }
     /* ===== Üye Listesi (memberTable) — koyu mavi sayfalama ===== */
 
@@ -571,10 +572,10 @@
     }
 
         #memberTable_wrapper .dataTables_paginate .paginate_button:hover {
-            background: rgba(78,115,223,.12) !important;
-            border-color: rgba(78,115,223,.25) !important;
-            color: #224abe !important;
-            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+            background: rgba(11,18,32,.12) !important;
+            border-color: rgba(11,18,32,.25) !important;
+            color: #0b1220 !important;
+            box-shadow: 0 2px 8px rgba(11,18,32,.15);
         }
 
         #memberTable_wrapper .dataTables_paginate .paginate_button.current,
@@ -584,7 +585,7 @@
             background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
             color: #fff !important;
             border-color: transparent !important;
-            box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
+            box-shadow: 0 8px 18px rgba(11,18,32,.25) !important;
         }
 
             #memberTable_wrapper .dataTables_paginate .paginate_button.current *,
@@ -603,10 +604,10 @@
     }
 
         #memberTable_wrapper .dataTables_paginate ul.pagination li.page-item > a.page-link:hover {
-            background: rgba(78,115,223,.12) !important;
-            border-color: rgba(78,115,223,.25) !important;
-            color: #224abe !important;
-            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+            background: rgba(11,18,32,.12) !important;
+            border-color: rgba(11,18,32,.25) !important;
+            color: #0b1220 !important;
+            box-shadow: 0 2px 8px rgba(11,18,32,.15);
         }
 
     #memberTable_wrapper .dataTables_paginate ul.pagination li.page-item.active > a.page-link,
@@ -615,7 +616,7 @@
         background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
         color: #fff !important;
         border-color: transparent !important;
-        box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
+        box-shadow: 0 8px 18px rgba(11,18,32,.25) !important;
     }
 
     #memberTable_wrapper .dataTables_paginate ul.pagination li.page-item.disabled > a.page-link {
@@ -631,7 +632,7 @@
     }
     /* aktif olmayan tıklamada metin */
     #memberTable_wrapper .dataTables_paginate ul.pagination li.page-item > a.page-link:active {
-        color: #224abe !important;
+        color: #0b1220 !important;
     }
 
     #memberTable_wrapper .dataTables_paginate ul.pagination li.page-item.active > a.page-link:active {
@@ -647,8 +648,8 @@
             order: 2; /* ikonu sağa al */
             margin-left: 8px;
             margin-right: 0;
-            color: #1A2A80; /* istersen #3B38A0 / #7A85C1 yap */
-            text-shadow: 0 0 6px rgba(26,42,128,.25);
+            color: #0b1220; /* istersen #0b1220 / #7A85C1 yap */
+            text-shadow: 0 0 6px rgba(11,18,32,.25);
             transition: transform .35s cubic-bezier(.2,.7,.2,1);
             animation: memberPulse 2.6s ease-in-out infinite;
         }
@@ -661,12 +662,12 @@
 
     {
         transform: translateY(0) scale(1);
-        filter: drop-shadow(0 0 0 rgba(26,42,128,0));
+        filter: drop-shadow(0 0 0 rgba(11,18,32,0));
     }
 
     50% {
         transform: translateY(-1px) scale(1.06);
-        filter: drop-shadow(0 0 6px rgba(26,42,128,.35));
+        filter: drop-shadow(0 0 6px rgba(11,18,32,.35));
     }
 
     }
@@ -1315,7 +1316,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         (function(){
-          const BRAND={c900:'#1A2A80', c700:'#3B38A0', c500:'#7A85C1', c300:'#B2B0E8'};
+          const BRAND={c900:'#0b1220', c700:'#0b1220', c500:'#7A85C1', c300:'#B2B0E8'};
           let chTypes=null, chMonths=null;
 
           function withDT(cb){
@@ -1387,19 +1388,61 @@
             const nodes = dt.rows({ search:'applied' }).nodes().to$();
 
             // Donut: Üye Tipi
-            const typeMap={};
-            nodes.each(function(){
-              const t = $(this).find('td').eq(3).text().trim();
-              if (t) typeMap[t]=(typeMap[t]||0)+1;
+                // Donut: Üye Tipi  (RENKLERİ AYRIK YAPTIK + SIRAYI SABİTLEDİK)
+        const typeMap = {};
+        nodes.each(function () {
+          const t = $(this).find('td').eq(3).text().trim();
+          if (t) typeMap[t] = (typeMap[t] || 0) + 1;
+        });
+
+        const el1 = document.getElementById('memStatTypes');
+        if (el1) {
+          // Sırayı sabitle: alfabetik → renkler her draw'da kaymasın
+          const labels = Object.keys(typeMap).sort();
+          const vals = labels.map(l => typeMap[l]);
+
+          // Kitap sayfası paleti: yeşil, sarı, kırmızı + net yedekler
+          const DONUT_COLORS = [
+            '#16a34a', // yeşil
+            '#f59e0b', // sarı
+            '#ef4444', // kırmızı
+            '#0ea5e9', // mavi
+            '#8b5cf6', // mor
+            '#14b8a6', // teal
+            '#f43f5e', // rose
+            '#a3e635'  // lime
+          ];
+          const colors = labels.map((_, i) => DONUT_COLORS[i % DONUT_COLORS.length]);
+
+          const data = {
+            labels,
+            datasets: [{
+              data: vals,
+              backgroundColor: colors,
+              borderColor: '#fff',   // dilimler net ayrılsın
+              borderWidth: 2,
+              hoverOffset: 6
+            }]
+          };
+
+          if (chTypes) { chTypes.data = data; chTypes.update(); }
+          else {
+            chTypes = new Chart(el1, {
+              type: 'doughnut',
+              data,
+              options: {
+                cutout: '62%',
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: { usePointStyle: true, boxWidth: 10 }
+                  }
+                }
+              }
             });
-            const el1=document.getElementById('memStatTypes');
-            if (el1){
-              const labels=Object.keys(typeMap), vals=Object.values(typeMap);
-              const colors=[BRAND.c900,BRAND.c700,BRAND.c500,BRAND.c300,'#16a34a','#f59e0b','#ef4444'];
-              const data={labels,datasets:[{data:vals,backgroundColor:colors.slice(0,vals.length),borderWidth:0}]};
-              if (chTypes){ chTypes.data=data; chTypes.update(); }
-              else{ chTypes=new Chart(el1,{type:'doughnut',data,options:{plugins:{legend:{position:'bottom'}},cutout:'62%'}}); }
-            }
+          }
+        }
+
 
             // Line: Son 12 ayda yeni üye
             const months = last12Months();

@@ -1,0 +1,62 @@
+﻿@{
+    Layout = null; // sade bir sayfa olsun
+    var token = (string)ViewBag.Token;
+}
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ISBN Tara</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 16px
+        }</style>
+</head>
+<body>
+    <h3>ISBN Tara (Telefon)</h3>
+    <div id="phoneReader" style="max-width:100%;"></div>
+    <div id="status" class="mt-2"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script>
+        const token = "@token";
+
+        function normalizeIsbn13(s){
+          const d=(s||'').replace(/\D/g,''); if(d.length!==13||!/^97[89]/.test(d))return null;
+          let sum=0; for(let i=0;i<12;i++) sum += (i%2?3:1)*(d.charCodeAt(i)-48);
+          return ((10-(sum%10))%10)===(d.charCodeAt(12)-48)? d : null;
+        }
+
+        (async function start(){
+          const conn = new signalR.HubConnectionBuilder().withUrl('/hubs/scan').withAutomaticReconnect().build();
+          await conn.start();
+
+          const reader = new Html5Qrcode("phoneReader");
+          const cfg = {
+            fps: 15,
+            qrbox: vw => ({ width: Math.floor(vw*0.95), height: Math.floor(vw*0.40) }),
+            formatsToSupport: [ Html5QrcodeSupportedFormats.EAN_13 ],
+            experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+            showTorchButtonIfSupported: true,
+            showZoomSliderIfSupported: true
+          };
+          const cam = { facingMode: { ideal: "environment" } };
+
+          reader.start(cam, cfg,
+            async (text)=>{
+              const isbn = normalizeIsbn13(text);
+              if (!isbn) return;
+              await reader.stop();
+              document.getElementById('status').textContent = "Gönderildi: " + isbn;
+              conn.invoke('SendIsbn', token, isbn);
+            },
+            ()=>{} // decode failure: sessiz geç
+          ).catch(err=>{
+            document.getElementById('status').textContent = "Kamera açılamadı: " + err;
+          });
+        })();
+    </script>
+</body>
+</html>

@@ -13,7 +13,7 @@ namespace KutuphaneOtomasyon.Controllers
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
-            if (username == adminUsername && password == adminPassword)
+           if (username == adminUsername && password == adminPassword)
             {
                 HttpContext.Session.SetString("IsAdmin", "true");
                 return RedirectToAction("Index","Home");

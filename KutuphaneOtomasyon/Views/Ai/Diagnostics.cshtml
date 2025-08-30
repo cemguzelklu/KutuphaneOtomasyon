@@ -90,19 +90,19 @@
 
     /* ——— Aksiyon butonları ——— */
     .btn-cta, .copy-btn {
-        background: linear-gradient(135deg,#4e73df,#224abe);
+        background: linear-gradient(135deg,#0b1220,#0b1220);
         color: #fff;
         border: none;
         border-radius: 10px;
         font-weight: 700;
         padding: 8px 12px;
-        box-shadow: 0 8px 20px rgba(78,115,223,.25);
+        box-shadow: 0 8px 20px rgba(11,18,32,.25);
         transition: transform .12s ease, box-shadow .12s ease;
     }
 
         .btn-cta:hover, .copy-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 12px 26px rgba(78,115,223,.35);
+            box-shadow: 0 12px 26px rgba(11,18,32,.35);
         }
 
         .btn-cta:active, .copy-btn:active {
@@ -217,7 +217,7 @@
         top: 0;
         left: 0;
         height: 3px;
-        background: #2563eb;
+        background: #0b1220;
         width: 0%;
         z-index: 2000;
         transition: width .2s ease;
@@ -249,7 +249,7 @@
         width: 28px;
         height: 28px;
         border: 3px solid #e9ecef;
-        border-top-color: #2563eb;
+        border-top-color: #0b1220;
         border-radius: 50%;
         animation: spin .9s linear infinite;
         margin: 0 auto 10px;
@@ -290,33 +290,322 @@
     }
 
     }
+    /* ===== Purple polish + real buttons + tidy wrapper ===== */
+    :root {
+        --vio-900: #4c1d95; /* koyu mor */
+        --vio-700: #6d28d9; /* ana mor */
+        --vio-500: #8b5cf6; /* orta mor */
+        --vio-300: #ede9fe; /* çok açık mor */
+        --vio-ring: rgba(139,92,246,.35);
+    }
+
+    /* Toparlayan kapsayıcı */
+    .ai-section {
+        background: #fff;
+        border: 1px solid rgba(109,40,217,.12);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 12px 34px rgba(76,29,149,.06);
+    }
+
+    /* Başlık + badge */
+    .ai-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .ai-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .ai-title i {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg,var(--vio-700),var(--vio-500));
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(109,40,217,.32);
+        }
+
+    .ai-header h4 {
+        margin: 0;
+        font-weight: 800;
+        color: #111;
+        position: relative;
+    }
+
+        .ai-header h4::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -6px;
+            width: 78px;
+            height: 4px;
+            border-radius: 9999px;
+            background: linear-gradient(90deg,var(--vio-700),var(--vio-500));
+        }
+
+    /* Statü rozeti */
+    .ai-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 9999px;
+        font-weight: 800;
+        font-size: .78rem;
+        border: 1px solid rgba(109,40,217,.22);
+        box-shadow: 0 6px 16px rgba(109,40,217,.18);
+    }
+
+        .ai-badge .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 9999px;
+            display: inline-block;
+            box-shadow: 0 0 0 3px rgba(139,92,246,.18);
+        }
+
+        .ai-badge.is-on {
+            background: linear-gradient(135deg,var(--vio-500),var(--vio-700));
+            color: #fff;
+        }
+
+            .ai-badge.is-on .dot {
+                background: #22c55e;
+                box-shadow: 0 0 0 3px rgba(34,197,94,.22);
+            }
+
+        .ai-badge.is-off {
+            background: linear-gradient(135deg,#e5e7eb,#cbd5e1);
+            color: #334155;
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 16px rgba(2,6,23,.08);
+        }
+
+            .ai-badge.is-off .dot {
+                background: #ef4444;
+                box-shadow: 0 0 0 3px rgba(239,68,68,.22);
+            }
+
+    /* Tabs → mor */
+    .ai-page .nav-tabs {
+        border-bottom: none;
+    }
+
+        .ai-page .nav-tabs .nav-link {
+            border: none;
+            font-weight: 700;
+            padding: 12px 18px;
+            border-radius: 10px;
+            color: #334155;
+            transition: background .15s ease, color .15s ease;
+        }
+
+            .ai-page .nav-tabs .nav-link:hover {
+                background: var(--vio-300) !important;
+                color: var(--vio-700) !important;
+            }
+
+            .ai-page .nav-tabs .nav-link.active {
+                color: var(--vio-700) !important;
+                background: var(--vio-300) !important;
+            }
+
+    /* Hero alanını morlaştır */
+    .ai-page .ai-hero {
+        background: linear-gradient(135deg,var(--vio-300),#f8fafc) !important;
+        box-shadow: 0 8px 24px rgba(76,29,149,.08);
+    }
+
+    .ai-hero .form-control:focus {
+        border-color: var(--vio-700) !important;
+        box-shadow: 0 0 0 .2rem var(--vio-ring) !important;
+    }
+
+    /* ✅ “Gerçek buton” hissi (mor gölgeli) */
+    .ai-page .btn-cta,
+    .ai-page .copy-btn {
+        background: linear-gradient(135deg,var(--vio-900),var(--vio-700)) !important;
+        border: 1px solid rgba(109,40,217,.55) !important;
+        color: #fff !important;
+        border-radius: 12px !important;
+        padding: 10px 16px !important;
+        box-shadow: 0 10px 22px rgba(109,40,217,.28), 0 2px 0 rgba(255,255,255,.15) inset !important;
+        transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    }
+
+        .ai-page .btn-cta:hover,
+        .ai-page .copy-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(109,40,217,.36), 0 2px 0 rgba(255,255,255,.18) inset !important;
+        }
+
+        .ai-page .btn-cta:active,
+        .ai-page .copy-btn:active {
+            transform: translateY(0) scale(.99);
+            box-shadow: 0 8px 18px rgba(109,40,217,.25) inset !important;
+        }
+
+        .ai-page .btn-cta:focus-visible,
+        .ai-page .copy-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--vio-ring), 0 10px 22px rgba(109,40,217,.28) !important;
+        }
+
+    /* Alt panel butonları */
+    .ai-page .btn-outline-primary {
+        color: var(--vio-700) !important;
+        border-color: var(--vio-700) !important;
+    }
+
+        .ai-page .btn-outline-primary:hover {
+            background: var(--vio-700) !important;
+            color: #fff !important;
+            border-color: var(--vio-700) !important;
+        }
+
+    .ai-page .btn-outline-secondary:hover {
+        border-color: rgba(109,40,217,.35) !important;
+        box-shadow: 0 6px 16px rgba(109,40,217,.18);
+    }
+
+    /* “Gerekçeyi göster” linkine butonmsu his */
+    .ai-page .toggle-reason.btn-link {
+        color: var(--vio-700) !important;
+        padding: .25rem .5rem;
+        border-radius: 8px;
+    }
+
+        .ai-page .toggle-reason.btn-link:hover {
+            background: var(--vio-300) !important;
+            color: var(--vio-900) !important;
+            text-decoration: none;
+        }
+
+    /* Card header’da mor vurgular */
+    .ai-page .ai-card .card-header {
+       
+        border-bottom: 1px solid rgba(139,92,246,.18) !important;
+    }
+    /* --- Geçmiş Öneriler görseli --- */
+.ai-history .history-badge{
+  width:38px;height:38px;border-radius:12px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--vio-700),var(--vio-500));color:#fff;
+  box-shadow:0 10px 22px rgba(109,40,217,.28);
+}
+.ai-history .history-title{ font-weight:800; }
+
+.history-actions{ display:flex; align-items:center; gap:8px; }
+.btn-ghost{
+  border:1px solid rgba(109,40,217,.25); background:#fff; color:var(--vio-700);
+  padding:8px 12px; border-radius:10px; font-weight:700;
+  box-shadow:0 4px 12px rgba(109,40,217,.10);
+  transition:transform .12s, box-shadow .12s, background .12s, color .12s;
+}
+.btn-ghost:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(109,40,217,.18); }
+.btn-ghost.danger{ border-color:rgba(239,68,68,.35); color:#b91c1c; }
+
+.history-stats{ display:flex; gap:8px; flex-wrap:wrap; }
+.history-stats .pill{
+  display:inline-flex; align-items:center; gap:6px; padding:6px 10px;
+  border-radius:9999px; background:var(--vio-300); color:#4c1d95; font-weight:700;
+}
+
+/* Liste satırı */
+.history-list .history-item{
+  display:flex; gap:12px; align-items:center;
+  border:1px solid rgba(139,92,246,.16);
+  padding:10px 12px; border-radius:12px; margin-bottom:8px;
+  transition:transform .12s, box-shadow .12s, border-color .12s;
+}
+.history-list .history-item:hover{
+  transform:translateY(-1px); box-shadow:0 10px 22px rgba(109,40,217,.10);
+  border-color:rgba(139,92,246,.28);
+}
+.history-item .cover{
+  width:40px;height:40px;border-radius:10px; background:var(--vio-700); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-weight:900;
+  box-shadow:0 8px 18px rgba(109,40,217,.25);
+}
+.history-item .meta .t{ font-weight:800; }
+.history-item .meta .a{ color:#64748b; font-size:.92rem; }
+.history-item .meta .m{ display:flex; gap:6px; flex-wrap:wrap; margin-top:2px; }
+.history-item .chip{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:.80rem; padding:4px 8px; border-radius:9999px;
+  background:#f1f5f9; border:1px solid #e2e8f0; color:#334155;
+}
+
+/* Test sonuç satırında sağdaki ops alanı */
+.result-item{ align-items:flex-start; }
+.result-item .result-ops{ margin-left:auto; }
+
+/* Header'da ikon–metin aralığı */
+.ai-history .history-header-left { display:flex; align-items:center; }
+.ai-history .history-header-left .history-badge { margin-right:12px; flex:0 0 38px; }
+.ai-history .history-header-left .history-title-wrap { margin-left:2px; }
+
+/* Pagination (mor tema) */
+.ai-history .pagination { margin: 0; }
+.ai-history .page-link {
+  border:1px solid rgba(109,40,217,.25);
+  color: var(--vio-700);
+}
+.ai-history .page-link:hover {
+  background: var(--vio-300);
+  color: var(--vio-900);
+}
+.ai-history .page-item.active .page-link {
+  background: var(--vio-700);
+  border-color: var(--vio-700);
+  color:#fff;
+}
+.ai-history .page-item.disabled .page-link {
+  color:#94a3b8;
+  background:#f8fafc;
+}
+
 </style>
-
 <div class="ai-page">
-    <h4 class="mb-3">
-        🤖 AI Tanılama
-        <span class="pill badge @(Model.Enabled ? "badge-success" : "badge-secondary") ml-2">
-            @(Model.Enabled ? "AI Açık" : "AI Kapalı")
-        </span>
-    </h4>
 
-    <div class="ai-kpi mb-3">
-        <div class="kpi"><div class="k">Sağlayıcı</div><div class="v">@Model.Provider</div></div>
-        @if (!string.IsNullOrWhiteSpace(Model.Model))
-        {
-            <div class="kpi"><div class="k">Model</div><div class="v">@Model.Model</div></div>
-        }
-        @if (Model.LastLatencyMs.HasValue)
-        {
-            <div class="kpi"><div class="k">Son Gecikme</div><div class="v">@Model.LastLatencyMs ms</div></div>
-        }
+    <!-- ✅ Yeni başlık -->
+    <div class="ai-header mb-3">
+        <div class="ai-title">
+            <i class="fas fa-robot"></i>
+            <h4>AI Tanılama</h4>
+        </div>
+        <span class="ai-badge @(Model.Enabled ? "is-on" : "is-off")">
+            <span class="dot"></span> @(Model.Enabled ? "AI Açık" : "AI Kapalı")
+        </span>
     </div>
 
-    <ul class="nav nav-tabs mb-3" role="tablist">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tab-overview" role="tab">Genel Durum</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-logs" role="tab">İzleme (Prompt/Response)</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-test" role="tab">Öneri Testi</a></li>
-    </ul>
+    <!-- ✅ Her şeyi toplayan kapsayıcı -->
+    <div class="ai-section">
+        <div class="ai-kpi mb-3">
+            <div class="kpi"><div class="k">Sağlayıcı</div><div class="v">@Model.Provider</div></div>
+            @if (!string.IsNullOrWhiteSpace(Model.Model))
+            {
+                <div class="kpi"><div class="k">Model</div><div class="v">@Model.Model</div></div>
+            }
+            @if (Model.LastLatencyMs.HasValue)
+            {
+                <div class="kpi"><div class="k">Son Gecikme</div><div class="v">@Model.LastLatencyMs ms</div></div>
+            }
+        </div>
+
+        <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tab-overview" role="tab">Genel Durum</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-logs" role="tab">İzleme (Prompt/Response)</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-test" role="tab">Öneri Testi</a></li>
+        </ul>
 
     <div class="tab-content">
         <!-- GENEL DURUM -->
@@ -417,20 +706,30 @@
                                         {
                                             idx++;
                                             <div class="result-item">
-                                                <div class="rank-badge">@idx</div>
-                                                <div class="result-body">
-                                                    <div class="title">@b.Title</div>
-                                                    @if (!string.IsNullOrWhiteSpace(b.Author))
-                                                    {
-                                                        <div class="author">@b.Author</div>
-                                                    }
-                                                    @if (!string.IsNullOrWhiteSpace(b.Reason))
-                                                    {
-                                                        <button type="button" class="btn btn-sm btn-link p-0 toggle-reason">Gerekçeyi göster</button>
-                                                        <div class="reason">@b.Reason</div>
-                                                    }
-                                                </div>
-                                            </div>
+  <div class="rank-badge">@idx</div>
+  <div class="result-body">
+    <div class="title">@b.Title</div>
+    @if (!string.IsNullOrWhiteSpace(b.Author)) { <div class="author">@b.Author</div> }
+    @if (!string.IsNullOrWhiteSpace(b.Reason)) {
+      <button type="button" class="btn btn-sm btn-link p-0 toggle-reason">Gerekçeyi göster</button>
+      <div class="reason">@b.Reason</div>
+    }
+  </div>
+
+  <!-- ✅ yeni: tek kaydet butonu -->
+  <div class="result-ops">
+    <button type="button"
+            class="btn btn-ghost btnSaveOne"
+            data-member="@(Model.TestMemberId?.ToString() ?? "")"
+            data-rank="@idx"
+            data-title="@b.Title"
+            data-author="@b.Author"
+            data-reason="@b.Reason">
+      <i class="far fa-bookmark"></i> Kaydet
+    </button>
+  </div>
+</div>
+
                                             if (idx < Model.TestAiResults.Count())
                                             {
 
@@ -459,6 +758,10 @@
                                         <button id="btnRerun" class="btn-cta btn-sm">
                                             <i class="fas fa-sync mr-1"></i> Yeniden Çalıştır
                                         </button>
+                                        <button id="btnSaveAll" class="btn-cta btn-sm">
+  <i class="fas fa-bookmark"></i> Tümünü Kaydet
+</button>
+
                                     </div>
                                 </div>
                             </div>
@@ -473,6 +776,73 @@
                 </div>
             </div>
         </div>
+            <!-- 📚 Geçmiş Öneriler -->
+        <div class="card ai-card ai-history mt-3">
+  <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
+    <div class="history-header-left">
+      <div class="history-badge"><i class="fas fa-bookmark"></i></div>
+      <div class="history-title-wrap">
+        <div class="history-title">Geçmiş Öneriler</div>
+        <small class="text-muted">Son kaydedilen öneriler (kullanıcı & zamana göre)</small>
+      </div>
+    </div>
+
+    <div class="history-actions">
+      <div class="input-group input-group-sm mr-2">
+        <div class="input-group-prepend"><span class="input-group-text">Üye</span></div>
+        <input id="histMember" type="number" class="form-control" placeholder="örn: @Model.TestMemberId" value="@(Model.TestMemberId?.ToString() ?? "")">
+      </div>
+      <button id="btnHistoryRefresh" class="btn btn-ghost">
+        <i class="fas fa-sync"></i> Yenile
+      </button>
+      <button id="btnHistoryClear" class="btn btn-ghost danger">
+        <i class="fas fa-trash-alt"></i> Temizle
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div id="aiHistoryStats" class="history-stats mb-3 d-none">
+      <div class="pill"><i class="fas fa-hashtag"></i> <span id="histCount">0</span> kayıt</div>
+      <div class="pill"><i class="fas fa-book"></i> <span id="histUnique">0</span> benzersiz kitap</div>
+      <div class="pill"><i class="far fa-clock"></i> Son kayıt: <span id="histLast">—</span></div>
+    </div>
+
+    <div id="aiHistoryList" class="history-list">
+                        @if (Model.SavedRecommendations?.Any() == true)
+                        {
+                            foreach (var r in Model.SavedRecommendations)
+                            {
+                                <div class="history-item" data-id="@r.Id">
+                                    <div class="cover">@((r.Title ?? "?").Substring(0, 1).ToUpper())</div>
+                                    <div class="meta">
+                                        <div class="t">@r.Title</div>
+                                        @if (!string.IsNullOrWhiteSpace(r.Author))
+                                        {
+                                            <div class="a">@r.Author</div>
+                                        }
+                                        <div class="m">
+                                            <span class="chip"><i class="fas fa-user"></i> @(r.MemberId?.ToString() ?? "-")</span>
+                                            <span class="chip"><i class="far fa-calendar"></i> @r.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                                        </div>
+                                    </div>
+                                    <div class="ops">
+                                        <button class="btn btn-ghost danger btnHistoryDelete" title="Sil"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="empty-state">Henüz kayıt yok. Aşağıdaki test sonuçlarından kaydetmeyi dene.</div>
+                        }
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-2">
+  <small id="aiHistoryRange" class="text-muted"></small>
+  <nav id="aiHistoryPager" class="mt-2 d-flex justify-content-end"></nav>
+</div>
+                </div>
+            </div>
 
     </div>
 </div>
@@ -517,11 +887,17 @@
           });
 
           // — Toggle all reasons (alt panel) —
-          $(document).on('click', '#btnToggleAll', function(){
-            var anyHidden = $('.reason:hidden').length > 0;
-            $('.reason');
-            $('.toggle-reason').text(anyHidden ? 'Gerekçeyi gizle' : 'Gerekçeyi göster');
-          });
+$(document).on('click', '#btnToggleAll', function(){
+  var anyHidden = $('.reason:hidden').length > 0;
+  if (anyHidden) {
+    $('.reason').stop(true, true).slideDown(130);
+    $('.toggle-reason').text('Gerekçeyi gizle');
+  } else {
+    $('.reason').stop(true, true).slideUp(130);
+    $('.toggle-reason').text('Gerekçeyi göster');
+  }
+});
+
 
           // — CSV export —
           $(document).on('click', '#btnExportCsv', function(){
@@ -586,7 +962,221 @@
             // Bu sayfada link zaten .active olduğundan sağa taşıyıcı sınıfı ver
             $aiLink.addClass('ai-react-right');
           })();
+          // ==== API URL'leri (kendi controller/route'una göre uyarlayabilirsin) ====
+// ==== API URL'leri ====
+const SAVE_URL    = '@Url.Action("SaveRecommendations","Ai")';
+const HISTORY_URL = '@Url.Action("History","Ai")';
+const CLEAR_URL   = '@Url.Action("ClearHistory","Ai")';
+const DELETE_URL  = '@Url.Action("DeleteHistoryItem","Ai")';
+
+// Pagination state
+// ==== Pagination state ====
+let histPage = 1;
+let histSize = 5; // sayfa başına kayıt (5 yerine 10'a çektim, dilediğin gibi değiştir)
+
+// ---- Pager çizimi (aynı kalabilir; küçük iyileştirmelerle) ----
+function renderPager(totalPages, page){
+  if (!totalPages || totalPages <= 1) {
+    $('#aiHistoryPager').empty();
+    return;
+  }
+  let start = Math.max(1, page - 2);
+  let end   = Math.min(totalPages, page + 2);
+
+  let html = '<ul class="pagination pagination-sm">';
+  html += `<li class="page-item ${page<=1?'disabled':''}">
+            <a href="#" class="page-link" data-page="1" title="İlk">&laquo;</a>
+           </li>`;
+  html += `<li class="page-item ${page<=1?'disabled':''}">
+            <a href="#" class="page-link" data-page="${page-1}" title="Önceki">&lsaquo;</a>
+           </li>`;
+
+  if (start > 1){
+    html += `<li class="page-item"><a href="#" class="page-link" data-page="1">1</a></li>`;
+    if (start > 2) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+  }
+
+  for (let p = start; p <= end; p++){
+    html += `<li class="page-item ${p===page?'active':''}">
+               <a href="#" class="page-link" data-page="${p}">${p}</a>
+             </li>`;
+  }
+
+  if (end < totalPages){
+    if (end < totalPages-1) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+    html += `<li class="page-item"><a href="#" class="page-link" data-page="${totalPages}">${totalPages}</a></li>`;
+  }
+
+  html += `<li class="page-item ${page>=totalPages?'disabled':''}">
+            <a href="#" class="page-link" data-page="${page+1}" title="Sonraki">&rsaquo;</a>
+           </li>`;
+  html += `<li class="page-item ${page>=totalPages?'disabled':''}">
+            <a href="#" class="page-link" data-page="${totalPages}" title="Son">&raquo;</a>
+           </li>`;
+  html += '</ul>';
+
+  $('#aiHistoryPager').html(html);
+}
+
+// ---- Geçmişi yükle + istatistikler tüm tablo için ----
+function loadHistory(){
+  const memberId = ($('#histMember').val()||'').trim();
+  $.get(HISTORY_URL, { memberId, page: histPage, pageSize: histSize })
+    .done(function(res){
+      const $list = $('#aiHistoryList').empty();
+
+      // Sayfa boş kaldıysa ve toplam > 0 ise bir önceki sayfaya dön
+      if (res && res.items && res.items.length === 0 && res.total > 0 && histPage > 1){
+        histPage--;
+        return loadHistory();
+      }
+
+      // Kayıt yoksa
+      if(!res || !res.items || res.items.length===0){
+        $list.html('<div class="empty-state">Henüz kayıt yok.</div>');
+        $('#aiHistoryStats').addClass('d-none');
+        $('#aiHistoryPager').empty();
+        $('#aiHistoryRange').text('');
+        return;
+      }
+
+      // Tüm tablo istatistikleri
+      $('#aiHistoryStats').removeClass('d-none');
+      $('#histCount').text(res.total ?? res.stats?.count ?? 0);
+      $('#histUnique').text(res.stats?.unique ?? 0);
+      $('#histLast').text(res.stats?.last ?? '-');
+
+      // Liste
+      res.items.forEach(r=>{
+        const letter = (r.title||'?').substring(0,1).toUpperCase();
+        $list.append(`
+          <div class="history-item" data-id="${r.id}">
+            <div class="cover">${letter}</div>
+            <div class="meta">
+              <div class="t">${r.title||''}</div>
+              ${r.author?`<div class="a">${r.author}</div>`:''}
+              <div class="m">
+                <span class="chip"><i class="fas fa-user"></i> ${r.memberId??'-'}</span>
+                <span class="chip"><i class="far fa-calendar"></i> ${r.createdAt||''}</span>
+              </div>
+            </div>
+            <div class="ops">
+              <button class="btn btn-ghost danger btnHistoryDelete" data-id="${r.id}" title="Sil">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>`);
+      });
+
+      // Aralık etiketi (x–y / toplam)
+      const start = (res.page - 1) * res.pageSize + 1;
+      const end   = (res.page - 1) * res.pageSize + res.items.length;
+      $('#aiHistoryRange').text(`${start}–${end} / ${res.total}`);
+
+      // Pager
+      renderPager(res.totalPages, res.page);
+    });
+}
+
+
+// Tekil kaydet
+$(document).on('click','.btnSaveOne', function(){
+  const $b = $(this);
+  $b.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Kaydediliyor');
+
+  const item = {
+    memberId: Number($b.data('member')) || null,
+    rank:     Number($b.data('rank'))   || null,
+    title:    ($b.data('title')  || '').toString(),
+    author:   ($b.data('author') || '').toString() || null,
+    reason:   ($b.data('reason') || '').toString() || null
+    // bookId / score göndermek istersen: data-book, data-score ekleyip burada okuyabilirsin
+  };
+
+  postJSON('@Url.Action("SaveRecommendations","Ai")', { items:[item] })
+    .done(function(){
+      $b.html('<i class="fas fa-bookmark"></i> Kaydedildi');
+      loadHistory();
+    })
+    .fail(function(xhr){
+      console.error('Kaydet hatası', xhr);
+      $b.prop('disabled', false).html('<i class="far fa-bookmark"></i> Kaydet');
+      alert('Kaydetme sırasında hata oluştu.');
+    });
+});
+
+// Toplu kaydet (ekranda görünen tüm sonuçlar)
+$(document).on('click','#btnSaveAll', function(){
+  const $btn = $(this);
+  $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Kaydediliyor');
+
+  const memberId = Number($('#aiTestForm input[name="memberId"]').val()) || null;
+  const items = [];
+  $('.result-item').each(function(i){
+    const $row = $(this);
+    items.push({
+      memberId,
+      rank: i+1,
+      title:  $row.find('.title').text().trim(),
+      author: $row.find('.author').text().trim() || null,
+      reason: $row.find('.reason').text().trim() || null
+    });
+  });
+  if(items.length === 0){
+    $btn.prop('disabled', false).html('<i class="fas fa-bookmark"></i> Tümünü Kaydet');
+    return;
+  }
+
+  postJSON('@Url.Action("SaveRecommendations","Ai")', { items })
+    .done(function(){
+      $btn.html('<i class="fas fa-check"></i> Kaydedildi');
+      loadHistory();
+      setTimeout(()=> $btn.prop('disabled', false).html('<i class="fas fa-bookmark"></i> Tümünü Kaydet'), 800);
+    })
+    .fail(function(xhr){
+      console.error('Toplu kaydet hatası', xhr);
+      $btn.prop('disabled', false).html('<i class="fas fa-bookmark"></i> Tümünü Kaydet');
+      alert('Toplu kaydetme sırasında hata oluştu.');
+    });
+});
+
+
+// Pager tıklamaları
+$(document).on('click', '#aiHistoryPager .page-link', function(e){
+  e.preventDefault();
+  const p = Number($(this).data('page'));
+  if (!p || p < 1) return;
+  histPage = p;
+  loadHistory();
+});
+
+// Filtre/yenile -> ilk sayfaya dön
+$(document).on('click','#btnHistoryRefresh', function(){
+  histPage = 1; loadHistory();
+});
+$('#histMember').on('keydown', function(e){
+  if(e.key === 'Enter'){ e.preventDefault(); histPage = 1; loadHistory(); }
+});
+
+// Sil / Temizle sonrası aynı sayfayı yeniden yükle
+$(document).on('click','.btnHistoryDelete', function(){
+  const id = $(this).data('id');
+  postJSON('@Url.Action("DeleteHistoryItem","Ai")', { id }).done(loadHistory);
+});
+$(document).on('click','#btnHistoryClear', function(){
+  if(!confirm('Tüm geçmiş öneriler silinsin mi?')) return;
+  const memberId = ($('#histMember').val()||'').trim();
+  postJSON('@Url.Action("ClearHistory","Ai")', { memberId: memberId||null }).done(function(){
+    histPage = 1; loadHistory();
+  });
+});
+
+// İlk yükleme
+loadHistory();
+
 
         })(); // IIFE end
+
+
     </script>
 }

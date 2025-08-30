@@ -4,6 +4,7 @@ using KutuphaneOtomasyon.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KutuphaneOtomasyon.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    partial class LibraryContextModelSnapshot : ModelSnapshot
+    [Migration("20250830105226_Create_AiRecommendationHistories")]
+    partial class Create_AiRecommendationHistories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -119,9 +122,7 @@ namespace KutuphaneOtomasyon.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("SYSUTCDATETIME()");
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("MemberId")
                         .HasColumnType("int");
@@ -133,7 +134,7 @@ namespace KutuphaneOtomasyon.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Score")
-                        .HasColumnType("decimal(9,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Source")
                         .HasMaxLength(32)

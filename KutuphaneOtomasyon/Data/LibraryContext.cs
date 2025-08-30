@@ -13,6 +13,7 @@ namespace KutuphaneOtomasyon.Data
         public DbSet<Member> Members { get; set; }
         public DbSet<Borrow> Borrows { get; set; }
         public DbSet<AiLog> AiLogs { get; set; } = null!;
+        public DbSet<AiRecommendationHistory> AiRecommendationHistories { get; set; } = default!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,7 +36,31 @@ namespace KutuphaneOtomasyon.Data
                 entity.Property(x => x.Endpoint).HasMaxLength(64);
                 entity.Property(x => x.ErrorType).HasMaxLength(64);
                 entity.Property(x => x.ErrorCode).HasMaxLength(64);
+
+               
             });
+            modelBuilder.Entity<AiRecommendationHistory>(e =>
+            {
+                e.ToTable("AiRecommendationHistories");
+                e.Property(x => x.Title).HasMaxLength(256).IsRequired();
+                e.Property(x => x.Author).HasMaxLength(128);
+                e.Property(x => x.Source).HasMaxLength(32);
+                e.Property(x => x.Score).HasColumnType("decimal(9,4)");
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+                e.HasIndex(x => x.CreatedAt);
+                e.HasIndex(x => x.MemberId);
+            });
+            modelBuilder.Entity<Book>()
+        .HasIndex(b => b.ISBN)
+        .HasDatabaseName("IX_Books_ISBN");
+
+            modelBuilder.Entity<Book>()
+                .HasIndex(b => b.CleanISBN)
+                .HasDatabaseName("IX_Books_CleanISBN");
+
+            modelBuilder.Entity<Book>()
+                .HasIndex(b => new { b.Title, b.Author })
+                .HasDatabaseName("IX_Books_Title_Author");
         }
     }
     
