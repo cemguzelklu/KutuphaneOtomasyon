@@ -5,20 +5,32 @@
 }
 
 <style>
+    /* ========= PALET ========= */
+    :root {
+        --lib-900: #1A2A80; /* ana */
+        --lib-700: #3B38A0; /* hover */
+        --lib-500: #7A85C1;
+        --lib-300: #B2B0E8;
+        --ok: #16a34a;
+        --ok-bg: rgba(22,163,74,.08);
+        --warn: #f59e0b;
+        --warn-bg: rgba(245,158,11,.10);
+        --bad: #ef4444;
+        --bad-bg: rgba(239,68,68,.10);
+    }
 
+    /* ========= FILTRELEME MODALI (GENEL) ========= */
     .customf-modal {
         display: none;
         position: fixed;
         z-index: 9999;
-        left: 0;
-        top: 0;
+        inset: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0,0,0,.4);
         backdrop-filter: blur(2px);
         overflow: hidden;
     }
-
 
     .customf-modal-content {
         background: #fff;
@@ -26,13 +38,25 @@
         width: 90%;
         max-width: 480px;
         margin: 5% auto;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-        font-family: 'Segoe UI', sans-serif;
+        box-shadow: 0 25px 50px rgba(0,0,0,.1);
+        font-family: 'Segoe UI',sans-serif;
         display: flex;
         flex-direction: column;
         max-height: 90vh;
         overflow: hidden;
         padding: 0;
+    }
+
+    .customf-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 32px 12px;
+        border-bottom: 1px solid #eee;
+        background: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .customf-modal-title {
@@ -44,41 +68,31 @@
         .customf-modal-title i {
             font-size: 20px;
             color: #52616B;
-            background-color: #fafafa;
+            background: #fafafa;
             padding: 8px;
             border-radius: 50%;
-            box-shadow: 0 0 4px rgba(0,0,0,0.1);
+            box-shadow: 0 0 4px rgba(0,0,0,.1);
         }
 
-    .customf-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 24px 32px 12px 32px;
-        border-bottom: 1px solid #eee;
-        background-color: #fff;
-        position: sticky;
-        top: 0;
-        z-index: 10;
+    .customf-modal-header h5 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+        color: #333;
     }
 
-        .customf-modal-header h5 {
-            font-size: 22px;
-            margin: 0;
-            font-weight: 600;
-            color: #333;
-        }
-
-    /* Dropdown kutusunun bulunduğu alan */
     .customf-modal-dropdown {
-        padding: 16px 32px 0 32px;
+        padding: 16px 32px 30px;
         background: #fafafa;
         border-bottom: 1px solid #eee;
         position: sticky;
-        top: 58px; /* header yüksekliği kadar */
+        top: 58px;
         z-index: 9;
-        padding-bottom: 30px;
     }
+
+        .customf-modal-dropdown .customf-input-group {
+            margin-bottom: 0;
+        }
 
     .customf-modal-body {
         padding: 24px 32px;
@@ -86,26 +100,10 @@
         flex: 1;
     }
 
-    .customf-modal-dropdown .customf-input-group {
-        margin-bottom: 0;
-    }
-
     .customf-modal-footer {
-        padding: 16px 32px 24px 32px;
+        padding: 16px 32px 24px;
         border-top: 1px solid #eee;
         background: #fff;
-    }
-
-    @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
 
     .customf-close {
@@ -114,28 +112,22 @@
         font-weight: 600;
         color: #bbb;
         cursor: pointer;
-        transition: color 0.2s ease-in-out;
-        background-color: #f2f2f2;
+        background: #f2f2f2;
         border-radius: 40%;
         padding: 1px 9px;
-        transition: all 0.3s ease;
+        transition: all .3s ease;
     }
 
         .customf-close:hover {
-            background-color: #e0e0e0;
+            background: #e0e0e0;
             color: #000;
         }
-        /* Çarpı simgesi ikonla beraber düzgün görünsün */
+
         .customf-close i {
             pointer-events: none;
         }
 
-    .customf-modal-content h5 {
-        font-size: 22px;
-        color: #333;
-        font-weight: 600;
-    }
-
+    /* ========= FORM ELEMANLARI ========= */
     .customf-input-group {
         display: flex;
         flex-direction: column;
@@ -156,178 +148,17 @@
             border-radius: 10px;
             font-size: 15px;
             background: #fff;
-            transition: all 0.25s ease-in-out;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            transition: all .25s ease-in-out;
+            box-shadow: 0 1px 4px rgba(0,0,0,.05);
         }
 
             .customf-input-group input:focus,
             .customf-input-group select:focus {
                 border-color: #C9D6DF;
                 background: #fefefe;
-                box-shadow: 0 0 0 3px rgba(201, 214, 223, 1);
+                box-shadow: 0 0 0 3px rgba(201,214,223,1);
                 outline: none;
             }
-
-    .customf-button-group {
-        display: flex;
-        gap: 12px;
-        margin-top: 20px;
-    }
-
-        .customf-button-group .customf-btn {
-            flex: unset;
-            text-align: center;
-        }
-
-    .customf-btn {
-        color: #fff;
-        font-size: 16px;
-        padding: 12px;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.1s ease;
-    }
-
-    .customf-filter-btn {
-        width: 75%;
-        background: linear-gradient(135deg,#C9D6DF, #52616B);
-    }
-
-        .customf-filter-btn:hover {
-            background: linear-gradient(135deg, #52616B,#C9D6DF);
-        }
-
-    .customf-clear-btn {
-        color: #000;
-        width: 25%;
-        background: linear-gradient(135deg, #ffffff, #C9D6DF);
-    }
-
-        .customf-clear-btn:hover {
-            background: linear-gradient(135deg, #C9D6DF,#ffffff );
-        }
-
-        .customf-clear-btn:focus,
-        .customf-filter-btn:focus {
-            outline: none !important;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-            border: none !important;
-        }
-    /* Select2 Seçim Görünümü */
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #F0F5F9 !important;
-        color: #333 ;
-        border: none !important;
-        font-weight: 600 ;
-        padding: 10px 12px; /* Dikey ve yatay boşluğu artırarak etiketi büyüt */
-        font-size: 1.05em; /* Yazı boyutunu biraz daha büyüt */
-        margin-top: 4px; /* Üstten boşluğu biraz artır (birden fazla satırda daha iyi görünür) */
-        margin-right: 6px; /* Sağdan boşluğu koru */
-        /* Seçili öğe içindeki "x" butonunun dikey hizalanması için */
-        display: flex;
-        align-items: center;
-        gap: 5px; /* Metin ile "x" arasında boşluk */
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: #666 ;
-        font-size: 1.1em;
-    }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-            color: #000 ;
-        }
-
-    .select2-container--default .select2-selection--multiple {
-        min-height: 42px !important;
-        height: auto !important;
-        overflow-y: auto;
-        max-height: 120px;
-        padding-bottom: 6px;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        background-color: #fff !important;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        padding: 6px;
-        line-height: normal;
-    }
-
-    .select2-container--default .select2-selection--multiple::-webkit-scrollbar {
-        display: none;
-    }
-
-    /* Dropdown Açılır Liste Seçenekleri */
-    .select2-container--default .select2-results__option {
-        padding: 10px 14px;
-        font-size: 15px;
-        color: #333;
-        background-color: #fff;
-        transition: background 0.2s ease-in-out;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    /* Hover efekti: Mor tema */
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background: linear-gradient(135deg, #ffffff, #F0F5F9) !important;
-        color: #fff !important;
-        font-weight: 600;
-        border-radius: 6px;
-        outline: none !important;
-
-    }
-
-    /* Seçili olan öğe */
-    .select2-container--default .select2-results__option[aria-selected="true"] {
-        background-color: #F0F5F9 !important;
-        color: #222 !important;
-        font-weight: 500;
-        outline: none !important;
-    }
-
-    /* Dropdown kutusu */
-    .select2-container--default .select2-dropdown {
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    /* Dropdown arama kutusu */
-    .select2-container--default .select2-search--dropdown .select2-search__field {
-        padding: 8px 12px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 14px;
-        margin-bottom: 8px;
-    }
-
-    /* Mavi odak çizgilerini kaldır */
-    .select2-container--default .select2-selection--multiple:focus,
-    .select2-container--default .select2-selection--single:focus,
-    .select2-container--default .select2-dropdown:focus,
-    .select2-container--default .select2-selection:focus-visible {
-        outline: none !important;
-        border-color: #F0F5F9 !important;
-        box-shadow: none !important;
-    }
-
-    .empty-placeholder {
-        text-align: center;
-        padding: 30px 20px;
-        color: #666;
-        font-size: 16px;
-        background: #fafafa;
-        border-radius: 12px;
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
-    }
-
-        .empty-placeholder i {
-            font-size: 32px;
-            color: #ccc;
-        }
 
     .customf-inline-inputs {
         display: flex;
@@ -347,15 +178,250 @@
     .customf-input-group input[type="number"]:last-child {
         margin-right: 0;
     }
-    /* Google Books Modal Stilleri */
+
+    .empty-placeholder {
+        text-align: center;
+        padding: 30px 20px;
+        color: #666;
+        font-size: 16px;
+        background: #fafafa;
+        border-radius: 12px;
+        box-shadow: inset 0 0 10px rgba(0,0,0,.03);
+    }
+
+        .empty-placeholder i {
+            font-size: 32px;
+            color: #ccc;
+        }
+
+    /* ========= MODAL İÇİ BUTONLAR ========= */
+    .customf-button-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+        .customf-button-group .customf-btn {
+            flex: unset;
+            text-align: center;
+        }
+
+    .customf-btn {
+        color: #fff;
+        font-size: 16px;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .1s ease;
+    }
+
+    .customf-filter-btn {
+        width: 75%;
+        background: linear-gradient(135deg,#C9D6DF,#52616B);
+    }
+
+        .customf-filter-btn:hover {
+            background: linear-gradient(135deg,#52616B,#C9D6DF);
+        }
+
+    .customf-clear-btn {
+        color: #000;
+        width: 25%;
+        background: linear-gradient(135deg,#ffffff,#C9D6DF);
+    }
+
+        .customf-clear-btn:hover {
+            background: linear-gradient(135deg,#C9D6DF,#ffffff);
+        }
+
+        .customf-clear-btn:focus, .customf-filter-btn:focus {
+            outline: none !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,.1);
+            border: none !important;
+        }
+
+    /* ========= SELECT2 (GENEL NÖTR) ========= */
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background: #F0F5F9 !important;
+        color: #333;
+        border: none !important;
+        font-weight: 600;
+        padding: 10px 12px;
+        font-size: 1.05em;
+        margin-top: 4px;
+        margin-right: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #666;
+        font-size: 1.1em;
+    }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #000;
+        }
+
+    .select2-container--default .select2-selection--multiple {
+        min-height: 42px !important;
+        height: auto !important;
+        overflow-y: auto;
+        max-height: 120px;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        background: #fff !important;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 6px;
+        line-height: normal;
+    }
+
+        .select2-container--default .select2-selection--multiple::-webkit-scrollbar {
+            display: none;
+        }
+
+    .select2-container--default .select2-results__option {
+        padding: 10px 14px;
+        font-size: 15px;
+        color: #333;
+        background: #fff;
+        transition: background .2s ease-in-out;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg,#ffffff,#F0F5F9) !important;
+        color: #fff !important;
+        font-weight: 600;
+        border-radius: 6px;
+        outline: none !important;
+    }
+
+    .select2-container--default .select2-results__option[aria-selected="true"] {
+        background: #F0F5F9 !important;
+        color: #222 !important;
+        font-weight: 500;
+        outline: none !important;
+    }
+
+    .select2-container--default .select2-dropdown {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.1);
+        font-family: 'Segoe UI',sans-serif;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .select2-container--default .select2-selection--multiple:focus,
+    .select2-container--default .select2-selection--single:focus,
+    .select2-container--default .select2-dropdown:focus,
+    .select2-container--default .select2-selection:focus-visible {
+        outline: none !important;
+        border-color: #F0F5F9 !important;
+        box-shadow: none !important;
+    }
+
+    /* ========= FILTRELEME MODALI — NÖTR OVERRIDES (MOR YOK) ========= */
+    #customf-filter-modal .customf-modal-content {
+        background: #fff;
+    }
+
+    #customf-filter-modal .customf-modal-header {
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    #customf-filter-modal .customf-modal-dropdown {
+        background: #f7f8fa;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    #customf-filter-modal .customf-modal-body {
+        background: #fff;
+    }
+
+    #customf-filter-modal .customf-modal-footer {
+        background: #fff;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    #customf-filter-modal .customf-modal-title i {
+        color: #52616B;
+        background: #f3f4f6;
+    }
+
+    #customf-filter-modal .select2-container--default .select2-selection--multiple {
+        background: #fff !important;
+        border: 1px solid #ccd2da !important;
+        border-radius: 10px !important;
+    }
+
+        #customf-filter-modal .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background: #eef2f7 !important;
+            color: #334155 !important;
+            border: none !important;
+        }
+
+    #customf-filter-modal .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: #e6efff !important;
+        color: #1f2937 !important;
+        border-radius: 6px;
+    }
+
+    #customf-filter-modal .select2-container--default .select2-results__option[aria-selected="true"] {
+        background: #f3f6fb !important;
+        color: #1f2937 !important;
+    }
+
+    #customf-filter-modal .select2-container--default .select2-dropdown {
+        border: 1px solid #ccd2da;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    #customf-filter-modal .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #ccd2da;
+        border-radius: 8px;
+    }
+
+    #customf-filter-modal .customf-filter-btn {
+        background: linear-gradient(135deg,#cfd8e3,#64748b) !important;
+    }
+
+        #customf-filter-modal .customf-filter-btn:hover {
+            background: linear-gradient(135deg,#64748b,#cfd8e3) !important;
+        }
+
+    #customf-filter-modal .customf-clear-btn {
+        color: #111 !important;
+        background: linear-gradient(135deg,#ffffff,#cfd8e3) !important;
+    }
+
+        #customf-filter-modal .customf-clear-btn:hover {
+            background: linear-gradient(135deg,#cfd8e3,#ffffff) !important;
+        }
+
+    /* ========= GOOGLE BOOKS MODAL ========= */
     #googleBooksModal .modal-dialog {
         max-width: 95%;
-        width: 1200px; /* Genişliği artırdık */
+        width: 1200px;
         margin: 1.75rem auto;
     }
 
     #googleBooksModal .modal-content {
-        min-height: 80vh; /* Yüksekliği artırdık */
+        min-height: 80vh;
     }
 
     #googleBooksModal .modal-body {
@@ -364,24 +430,57 @@
         padding: 20px;
     }
 
-    /* Kitap kartları için düzenlemeler */
+    #googleBooksModal .modal-header {
+        background: linear-gradient(135deg,#4e73df,#224abe) !important;
+        color: #fff !important;
+        border-bottom: none !important;
+    }
+
+        #googleBooksModal .modal-header .modal-title {
+            color: #fff !important;
+        }
+
+    #googleBooksModal .close {
+        outline: none !important;
+        box-shadow: none !important;
+        color: #fff;
+        opacity: .9;
+        transition: opacity .2s ease, transform .15s ease;
+    }
+
+        #googleBooksModal .close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+    #googleBooksModal .modal-footer {
+        border-top: 2px solid rgba(0,0,0,.1);
+        background: #f9f9f9;
+        font-size: .9rem;
+    }
+
     .book-card {
         margin-bottom: 25px;
-        transition: all 0.3s ease;
+        transition: all .3s ease;
         height: 100%;
+        cursor: pointer;
     }
 
         .book-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 20px rgba(0,0,0,.15);
+        }
+
+        .book-card .btn, .book-card form, .book-card a {
+            cursor: default;
         }
 
     .book-cover-container {
-        height: 300px; /* Kapak yüksekliğini artırdık */
+        height: 300px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #f8f9fa;
+        background: #f8f9fa;
         overflow: hidden;
         border-radius: 5px 5px 0 0;
     }
@@ -389,14 +488,14 @@
     .book-cover {
         max-height: 100%;
         width: auto;
-        object-fit: contain; /* Resmin oranlarını koruyarak sığdırır */
+        object-fit: contain;
     }
 
     .book-details {
         padding: 20px;
-        background: white;
+        background: #fff;
         border-radius: 0 0 5px 5px;
-        height: calc(100% - 300px); /* Kapak yüksekliğine göre ayar */
+        height: calc(100% - 300px);
         display: flex;
         flex-direction: column;
     }
@@ -414,155 +513,84 @@
     }
 
     .book-meta {
-        font-size: 0.9rem;
+        font-size: .9rem;
         color: #555;
         margin-bottom: 5px;
     }
 
-    /* Responsive düzenlemeler */
-    @@media (max-width: 1200px) {
-        #googleBooksModal .modal-dialog
-
-    {
-        width: 95%;
-    }
-
-    .book-cover-container {
-        height: 250px;
-    }
-
-    }
-
-    @@media (max-width: 768px) {
-        .book-cover-container
-
-    {
-        height: 200px;
-    }
-
-    .book-title {
-        font-size: 1.1rem;
-    }
-
-    }
-
-    .loading-spinner {
-        font-size: 3rem;
-        color: #007bff;
-        animation: spin 1s linear infinite;
-    }
-
-    @@keyframes spin {
-        0% {
-            transform: rotate(0deg);
+    @@media (max-width:1200px) {
+        #googleBooksModal .modal-dialog {
+            width: 95%;
         }
 
-        100% {
-            transform: rotate(360deg);
+        .book-cover-container {
+            height: 250px;
         }
     }
 
+    @@media (max-width:768px) {
+        .book-cover-container {
+            height: 200px;
+        }
+
+        .book-title {
+            font-size: 1.1rem;
+        }
+    }
+
+    #bookDetailView .detail-cover {
+        max-height: 520px;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+    }
+
+    /* ========= GENEL BUTON & CTA ========= */
     .btn {
         transition: transform .12s ease, box-shadow .12s ease;
     }
 
         .btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 12px 26px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 26px rgba(0,0,0,.15);
         }
 
         .btn:active {
             transform: translateY(0);
-            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+            box-shadow: 0 6px 14px rgba(0,0,0,.12);
         }
 
     .btn-cta {
-        background: linear-gradient(135deg, #4e73df, #224abe);
+        background: linear-gradient(135deg,#4e73df,#224abe);
         border: none;
         color: #fff;
         border-radius: 10px;
         font-weight: 600;
-        box-shadow: 0 8px 20px rgba(78,115,223,0.25);
+        box-shadow: 0 8px 20px rgba(78,115,223,.25);
         transition: transform .12s ease, box-shadow .12s ease;
     }
 
         .btn-cta:hover {
             transform: translateY(-1px);
-            box-shadow: 0 12px 26px rgba(78,115,223,0.35);
+            box-shadow: 0 12px 26px rgba(78,115,223,.35);
         }
 
         .btn-cta:active {
             transform: translateY(0);
-            box-shadow: 0 6px 14px rgba(78,115,223,0.25);
+            box-shadow: 0 6px 14px rgba(78,115,223,.25);
         }
 
-    #googleBooksModal .modal-header {
-        background: linear-gradient(135deg, #4e73df, #224abe) !important;
-        color: #fff !important;
-        border-bottom: none !important;
-    }
-
-        #googleBooksModal .modal-header .modal-title {
+        .btn-cta:focus, .btn-cta:active, .btn-cta:focus:active {
+            background: linear-gradient(135deg,#4e73df,#224abe) !important;
             color: #fff !important;
-        }
-
-    #googleBooksModal .close {
-        color: #fff !important;
-        opacity: 1 !important;
-    }
-
-    #googleBooksModal .modal-footer {
-        border-top: 2px solid rgba(0,0,0,0.1);
-        background-color: #f9f9f9;
-        font-size: 0.9rem;
-    }
-
-    /* Google Books modal close butonu */
-    #googleBooksModal .close {
-        outline: none !important;
-        box-shadow: none !important;
-        color: #fff; /* beyaz ikon */
-        opacity: 0.9; /* hafif şeffaf */
-        transition: opacity 0.2s ease, transform 0.15s ease;
-    }
-
-        #googleBooksModal .close:hover {
-            opacity: 1; /* tam beyaz */
-            transform: rotate(90deg); /* hover’da ufak animasyon */
-        }
-
-        #googleBooksModal .close:focus {
             outline: none !important;
-            box-shadow: none !important;
+            box-shadow: 0 0 0 0 transparent !important;
         }
 
-    .btn-cta:focus,
-    .btn-cta:active,
-    .btn-cta:focus:active {
-        background: linear-gradient(135deg, #4e73df, #224abe) !important;
-        color: #fff !important;
-        outline: none !important;
-        box-shadow: 0 0 0 0 transparent !important; /* beyaz glow'u kaldır */
-    }
-
-    .book-card {
-        cursor: pointer;
-    }
-
-        .book-card .btn, .book-card form, .book-card a {
-            cursor: default;
-        }
-
-    #bookDetailView .detail-cover {
-        max-height: 520px; /* 420 → 520 (istersen 560-600 yap) */
-        max-width: 100%;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-        display: block;
-        margin: 0 auto; /* ortalama */
-    }
-
+    /* ========= KART & TABLO KAPLAMA ========= */
     .dt-elevated {
         border: 0;
         border-radius: 16px;
@@ -579,7 +607,6 @@
             box-shadow: 0 3px 6px rgba(0,0,0,.06), 0 12px 26px rgba(27,31,35,.10), 0 28px 60px rgba(27,31,35,.12);
         }
 
-        /* Kartın altında yumuşak “hale” */
         .dt-elevated::after {
             content: "";
             position: absolute;
@@ -590,7 +617,6 @@
             pointer-events: none;
         }
 
-    /* Tablo görünümü */
     .dt-pretty {
         border-radius: 12px;
         overflow: hidden;
@@ -601,15 +627,13 @@
             position: sticky;
             top: 0;
             z-index: 2;
-            background: inherit !important; /* THEAD'in arkaplanını aynen al */
-            background-color: inherit !important;
-            color: inherit !important; /* text-white devralsın */
+            background: inherit !important;
+            color: inherit !important;
             box-shadow: 0 1px 0 rgba(0,0,0,.06);
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
         }
 
-        /* Güvenlik için: thead'e bg-info verilmişse yazılar beyaz kalsın */
         .dt-pretty thead.bg-info th {
             color: #fff !important;
         }
@@ -628,7 +652,12 @@
                 box-shadow: 0 6px 14px rgba(30,41,59,.06);
             }
 
-    /* Üst bar (arama, buttons) ufak yükselti */
+    .dt-float {
+        transform: translateZ(0);
+        perspective: 1200px;
+    }
+
+    /* ========= DATATABLES ÜST BUTONLAR ========= */
     .dataTables_wrapper .dt-buttons .btn,
     .dataTables_wrapper .dataTables_filter input {
         border-radius: 10px !important;
@@ -636,102 +665,73 @@
         box-shadow: 0 2px 8px rgba(0,0,0,.06);
     }
 
-    /* Perspectif hissi (opsiyonel ama hoş) */
-    .dt-float {
-        transform: translateZ(0);
-        perspective: 1200px;
-    }
-    /* Datatables butonları: görünüm + animasyon */
-    .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
-    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
-        position: relative;
-        overflow: hidden; /* hover parıltısı için */
-        background: linear-gradient(135deg, #4e73df, #224abe);
-        color: #fff !important;
-        border: none !important;
-        border-radius: 10px !important;
-        padding: 10px 14px !important;
-        font-weight: 600 !important;
-        line-height: 1 !important;
-        box-shadow: 0 8px 20px rgba(78,115,223,0.25);
-        transition: transform .12s ease, box-shadow .12s ease, filter .18s ease;
-    }
-
-        /* İkon ile metin arası boşluk */
-        .dataTables_wrapper .dt-buttons .dt-button.btn-copy i,
-        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button i {
-            margin-right: 6px;
-        }
-
-        /* Hover/active durumları */
-        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover,
-        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 26px rgba(78,115,223,0.35);
-        }
-
-        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:active,
-        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:active {
-            transform: translateY(0);
-            box-shadow: 0 6px 14px rgba(78,115,223,0.25);
-        }
-
-        /* Hover’da hafif “parıltı” geçişi */
-        .dataTables_wrapper .dt-buttons .dt-button.btn-copy::after,
-        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.20) 20%, transparent 40%);
-            transform: translateX(-120%);
-            transition: transform .55s ease;
-            border-radius: inherit;
-            pointer-events: none;
-        }
-
-        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover::after,
-        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover::after {
-            transform: translateX(120%);
-        }
-
-    /* Mavi odak halkasını/outline'ı KALDIR */
-    .dataTables_wrapper .dt-buttons .dt-button:focus,
-    .dataTables_wrapper .dt-buttons .dt-button:focus-visible,
-    .dataTables_wrapper .dt-buttons .dt-button:active:focus {
-        outline: none !important;
-        box-shadow: none !important;
-    }
-
-    /* Bazı tarayıcılar için iç odak kenarlığı */
-    .dataTables_wrapper .dt-buttons .dt-button::-moz-focus-inner {
-        border: 0;
-    }
-
-    /* Datatables buton grubu taşmasın diye */
     .dataTables_wrapper .dt-buttons {
         display: flex;
         gap: 8px;
-        overflow: visible; /* rozet ve parıltı taşarsa kesilmesin */
+        overflow: visible;
     }
 
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
         .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
-            padding-right: 28px !important; /* rozet için sağdan yer */
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg,var(--lib-900),var(--lib-700));
+            color: #fff !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 10px 14px !important;
+            font-weight: 600 !important;
+            line-height: 1 !important;
+            box-shadow: 0 8px 20px rgba(26,42,128,.25) !important;
+            transition: transform .12s ease, box-shadow .12s ease, filter .18s ease;
         }
 
-    .enhanced-search-box button:hover,
-    .enhanced-search-box button:focus {
-        background-color: #007bff !important; /* normal rengi koru */
-        color: #fff !important;
-    }
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy i,
+            .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button i {
+                margin-right: 6px;
+            }
 
-    /* DataTables butonları (Filtre / Copy) */
-    .dataTables_wrapper .dt-buttons .dt-button:hover,
-    .dataTables_wrapper .dt-buttons .dt-button:focus {
-        background: linear-gradient(135deg, #4e73df, #224abe) !important;
-        color: #fff !important;
-        filter: none !important;
-    }
-    /* Pagination: temel görünüm */
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover,
+            .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 12px 26px rgba(26,42,128,.35) !important;
+            }
+
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy:active,
+            .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:active {
+                transform: translateY(0);
+                box-shadow: 0 6px 14px rgba(26,42,128,.25) !important;
+            }
+
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy::after,
+            .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(120deg,transparent 0%,rgba(255,255,255,.20) 20%,transparent 40%);
+                transform: translateX(-120%);
+                transition: transform .55s ease;
+                border-radius: inherit;
+                pointer-events: none;
+            }
+
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover::after,
+            .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover::after {
+                transform: translateX(120%);
+            }
+
+        .dataTables_wrapper .dt-buttons .dt-button:focus,
+        .dataTables_wrapper .dt-buttons .dt-button:focus-visible,
+        .dataTables_wrapper .dt-buttons .dt-button:active:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+            padding-right: 28px !important;
+        }
+
+    /* ========= SAYFALAMA ========= */
     .dataTables_wrapper .dataTables_paginate .paginate_button {
         border: 1px solid transparent !important;
         border-radius: 8px !important;
@@ -741,24 +741,21 @@
         color: inherit !important;
     }
 
-        /* Varsayılan hover’daki siyah kutuyu iptal et ve yumuşak bir hover ver */
         .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: rgba(78,115,223,.12) !important; /* hafif mavi */
+            background: rgba(78,115,223,.12) !important;
             border-color: rgba(78,115,223,.25) !important;
             color: #224abe !important;
             box-shadow: 0 2px 8px rgba(78,115,223,.15);
         }
 
-        /* Aktif sayfa (current) */
         .dataTables_wrapper .dataTables_paginate .paginate_button.current,
         .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-            background: linear-gradient(135deg, #4e73df, #224abe) !important;
+            background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
             color: #fff !important;
             border-color: transparent !important;
-            box-shadow: 0 8px 18px rgba(78,115,223,.25) !important;
+            box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
         }
 
-        /* Disabled (önceki/sonraki pasif) */
         .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
         .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
             background: transparent !important;
@@ -767,13 +764,281 @@
             box-shadow: none !important;
         }
 
-        /* Focus halka kaldır */
         .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
             outline: none !important;
             box-shadow: none !important;
         }
 
+    /* ========= TABLO BAŞLIK RENGİ ========= */
+    #bookTable thead.bg-info {
+        background: var(--lib-900) !important;
+        border-color: var(--lib-900) !important;
+    }
+
+    #bookTable_wrapper .dataTables_paginate .paginate_button.current,
+    #bookTable_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
+        color: #fff !important;
+        border-color: transparent !important;
+    }
+
+    /* ========= HEADER DÜZENİ ========= */
+    .container-fluid > .row.mb-4 > .col-md-12.d-flex {
+        justify-content: space-between !important;
+        gap: 12px;
+    }
+
+    .container-fluid > .row.mb-4 h4.card-title {
+        display: flex !important;
+        align-items: center;
+        gap: .6rem;
+        margin: 0 !important;
+        font-weight: 800;
+        font-size: 1.6rem;
+        letter-spacing: .2px;
+        color: #111;
+        position: relative;
+    }
+
+        .container-fluid > .row.mb-4 h4.card-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -6px;
+            width: 64px;
+            height: 4px;
+            border-radius: 9999px;
+            background: linear-gradient(90deg,#16a34a,#f59e0b,#ef4444);
+        }
+    /* Header butonları (Google Books & Yeni Kitap) */
+    .container-fluid > .row.mb-4 #searchGoogleBooksBtn,
+    .container-fluid > .row.mb-4 a.btn.btn-success {
+        background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
+        color: #fff !important;
+        border: none !important;
+        border-radius: 10px !important;
+        box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
+        font-weight: 600;
+    }
+
+        .container-fluid > .row.mb-4 #searchGoogleBooksBtn:hover,
+        .container-fluid > .row.mb-4 a.btn.btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(26,42,128,.35) !important;
+        }
+
+    h4.card-title {
+        color: var(--lib-900);
+    }
+
+    /* ========= İSTATİSTİK KARTI ========= */
+    .stats-card {
+        border: 1px solid var(--lib-300);
+        border-radius: 16px;
+    }
+
+    .stats-title {
+        color: var(--lib-900);
+        font-weight: 700;
+    }
+
+    /* ========= DURUM ROZETLERİ (YUMUŞAK/ŞEFFAF) ========= */
+    #bookTable td:first-child .badge {
+        border-radius: 9999px !important;
+        padding: 6px 12px !important;
+        font-weight: 700 !important;
+        border: 1.2px solid transparent !important;
+        line-height: 1;
+        box-shadow: 0 4px 10px rgba(0,0,0,.05) !important;
+    }
+
+        #bookTable td:first-child .badge.bg-success {
+            color: var(--ok) !important;
+            background: linear-gradient(180deg, rgba(22,163,74,.12), rgba(22,163,74,.05)) !important;
+            border-color: rgba(22,163,74,.35) !important;
+            box-shadow: 0 6px 14px rgba(22,163,74,.10) !important;
+        }
+
+        #bookTable td:first-child .badge.bg-warning {
+            color: var(--warn) !important;
+            background: linear-gradient(180deg, rgba(245,158,11,.12), rgba(245,158,11,.05)) !important;
+            border-color: rgba(245,158,11,.35) !important;
+            box-shadow: 0 6px 14px rgba(245,158,11,.10) !important;
+        }
+
+        #bookTable td:first-child .badge.bg-danger {
+            color: var(--bad) !important;
+            background: linear-gradient(180deg, rgba(239,68,68,.12), rgba(239,68,68,.05)) !important;
+            border-color: rgba(239,68,68,.35) !important;
+            box-shadow: 0 6px 14px rgba(239,68,68,.10) !important;
+        }
+
+    /* ========= DETAY BUTONU (nötr → hover’da mavi) ========= */
+    #bookTable td:nth-child(8) a.btn-info {
+        border-radius: 9999px !important;
+        background: #fff !important;
+        color: #334155 !important;
+        border: 1.5px solid #cbd5e1 !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,.05) !important;
+        font-weight: 700 !important;
+        padding: 6px 12px !important;
+        transition: all .15s ease !important;
+    }
+
+        #bookTable td:nth-child(8) a.btn-info:hover {
+            background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+            box-shadow: 0 10px 22px rgba(26,42,128,.28) !important;
+            transform: translateY(-1px);
+        }
+    /* === Copy & Filtrele butonları: hover/focus'ta renk DEĞİŞME MESİN === */
+    .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
+    .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button {
+        background: linear-gradient(135deg, var(--lib-900), var(--lib-700)) !important;
+        color: #fff !important;
+        border: none !important;
+    }
+
+        /* Hover/focus/active durumlarını sabitle */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover,
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:focus,
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy:active,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:hover,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:focus,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button:active {
+            background: linear-gradient(135deg, var(--lib-900), var(--lib-700)) !important;
+            color: #fff !important;
+            transform: none !important;
+            box-shadow: 0 8px 20px rgba(26,42,128,.25) !important; /* istersen kaldırabilirsin */
+            filter: none !important;
+            outline: none !important;
+        }
+
+        /* Parlama (beyaz şerit) efektini kapat */
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy::after,
+        .dataTables_wrapper .dt-buttons .dt-button.customf-filter-button::after {
+            content: none !important;
+        }
+
+    /* DataTables'ın genel hover'ını da etkisizleştir (güvenlik ağı) */
+    .dataTables_wrapper .dt-buttons .dt-button:hover {
+        background: inherit !important;
+        color: inherit !important;
+    }
+
+    /* Disabled durumda da renk sabit kalsın (opsiyonel) */
+    .dataTables_wrapper .dt-buttons .dt-button.disabled,
+    .dataTables_wrapper .dt-buttons .dt-button:disabled {
+        opacity: .6 !important;
+        background: linear-gradient(135deg, var(--lib-900), var(--lib-700)) !important;
+        color: #fff !important;
+    }
+    /* ===== Kitap Listesi (bookTable) — koyu mavi sayfalama ===== */
+
+    /* Standart DataTables (a.paginate_button) */
+    #bookTable_wrapper .dataTables_paginate .paginate_button {
+        border: 1px solid transparent !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        margin: 0 2px !important;
+        background: transparent !important;
+        color: inherit !important;
+    }
+
+        #bookTable_wrapper .dataTables_paginate .paginate_button:hover {
+            background: rgba(78,115,223,.12) !important;
+            border-color: rgba(78,115,223,.25) !important;
+            color: #224abe !important;
+            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+        }
+
+        #bookTable_wrapper .dataTables_paginate .paginate_button.current,
+        #bookTable_wrapper .dataTables_paginate .paginate_button.current:hover,
+        #bookTable_wrapper .dataTables_paginate .paginate_button.current:focus,
+        #bookTable_wrapper .dataTables_paginate .paginate_button.current:active {
+            background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+            box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
+        }
+
+            #bookTable_wrapper .dataTables_paginate .paginate_button.current *,
+            #bookTable_wrapper .dataTables_paginate .paginate_button.current > * {
+                color: #fff !important;
+            }
+
+    /* Bootstrap’lı DataTables (ul.pagination > li.page-item > a.page-link) */
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item > a.page-link {
+        border-radius: 8px !important;
+        border-color: transparent !important;
+        background: transparent !important;
+        color: inherit !important;
+        padding: 6px 12px !important;
+        margin: 0 2px !important;
+    }
+
+        #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item > a.page-link:hover {
+            background: rgba(78,115,223,.12) !important;
+            border-color: rgba(78,115,223,.25) !important;
+            color: #224abe !important;
+            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+        }
+
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item.active > a.page-link,
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item.active > a.page-link:hover,
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item.active > a.page-link:focus {
+        background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
+        color: #fff !important;
+        border-color: transparent !important;
+        box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
+    }
+
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item.disabled > a.page-link {
+        background: transparent !important;
+        border-color: transparent !important;
+        color: #999 !important;
+        box-shadow: none !important;
+    }
+
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item > a.page-link:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    /* tıklayınca metin rengi */
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item > a.page-link:active {
+        color: #224abe !important;
+    }
+
+    #bookTable_wrapper .dataTables_paginate ul.pagination li.page-item.active > a.page-link:active {
+        color: #fff !important;
+    }
+    /* linki esnek yap ve boşluk ver */
+    .sidebar-nav .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .sidebar-link.icon-right {
+        display: flex;
+        align-items: center;
+    }
+
+        .sidebar-link.icon-right .hide-menu {
+            order: 1;
+        }
+        /* metin solda */
+        .sidebar-link.icon-right i {
+            order: 2;
+            margin-left: 8px;
+            margin-right: 0;
+        }
+    /* ikon sağda */
+       
+
 </style>
+
 
 
 
@@ -948,6 +1213,19 @@
 
 
 
+<!-- BAĞIMSIZ: Tablo altı küçük istatistik -->
+<div class="card stats-card mt-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="stats-title mb-0">Kitap İstatistikleri</h5>
+            <small class="text-muted">Tablodaki görünür kayıtlara göre</small>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 mb-3"><canvas id="libStatAvailability" height="160"></canvas></div>
+            <div class="col-lg-8"><canvas id="libStatCategories" height="160"></canvas></div>
+        </div>
+    </div>
+</div>
 
 <form id="tokenForm">
     @Html.AntiForgeryToken()
@@ -1004,6 +1282,8 @@
                 dom: 'Bfrtip'
             });
             cacheColumnDataAndTypes("bookTable");
+                  
+       
             $('#googleBooksModal').on('show.bs.modal', function() {
                 loadPopularBooks();
             });
@@ -1912,5 +2192,155 @@
             );
           }
         }
+
+
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        (function(){
+          const BRAND={c900:'#1A2A80', c700:'#3B38A0', c500:'#7A85C1', c300:'#B2B0E8'};
+          let chAvail=null, chCats=null;
+
+          function withDT(cb){
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#bookTable'))
+              return cb($('#bookTable').DataTable());
+            const t=setInterval(function(){
+              if ($.fn.dataTable && $.fn.dataTable.isDataTable('#bookTable')){
+                clearInterval(t); cb($('#bookTable').DataTable());
+              }
+            },50);
+          }
+
+          function renderStats(dt){
+            const nodes = dt.rows({ search:'applied' }).nodes().to$();
+            const status = { 'Müsait':0, 'Tükenmek Üzere':0, 'Tükenmiş':0 };
+            const catsMap = {};
+
+            nodes.each(function(){
+              const $tr=$(this);
+              const st = $tr.find('td').eq(0).text();
+              if (st.indexOf('Tükenmek Üzere')>-1) status['Tükenmek Üzere']++;
+              else if (st.indexOf('Tükenmiş')>-1)   status['Tükenmiş']++;
+              else if (st.indexOf('Müsait')>-1)     status['Müsait']++;
+
+              const cat = $tr.find('td').eq(4).text().trim();
+              if (cat) catsMap[cat]=(catsMap[cat]||0)+1;
+            });
+
+            // Donut
+            const el1=document.getElementById('libStatAvailability');
+            if (el1){
+              const data1={
+                labels:Object.keys(status),
+                datasets:[{ data:Object.values(status), backgroundColor:['#16a34a','#f59e0b','#ef4444'], borderWidth:0 }]
+
+              };
+              if(chAvail){ chAvail.data=data1; chAvail.update(); }
+              else{ chAvail=new Chart(el1,{type:'doughnut',data:data1,options:{plugins:{legend:{position:'bottom'}},cutout:'62%'}}); }
+            }
+
+            // Kategori (ilk 8)
+            const top = Object.entries(catsMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+            const labels = top.map(x=>x[0]), vals = top.map(x=>x[1]);
+            const el2=document.getElementById('libStatCategories');
+            if (el2){
+              const data2={ labels, datasets:[{ label:'Adet', data:vals, backgroundColor:BRAND.c700, borderRadius:6, maxBarThickness:32 }] };
+              const opts2={ plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ display:false } }, y:{ beginAtZero:true, grid:{ color:'rgba(0,0,0,.06)' } } } };
+              if(chCats){ chCats.data=data2; chCats.update(); } else { chCats=new Chart(el2,{type:'bar',data:data2,options:opts2}); }
+            }
+          }
+
+          // Filtre rozeti sayısını güncel tut (mevcut fonksiyona dokunmadan)
+          $(document).on('click','#customf-apply-filter,#customf-clear-filter',function(){
+            setTimeout(function(){ if (typeof updateFilterBadge==='function') updateFilterBadge(); },0);
+          });
+
+          // Çalıştır
+          withDT(function(dt){
+            renderStats(dt);
+            $('#bookTable').on('draw.dt', function(){ renderStats(dt); });
+          });
+        })();
+                function getDetailColIndex(){
+          return $('#bookTable thead th').filter(function(){
+            return $(this).text().trim() === 'Detay';
+          }).index();
+        }
+
+      
+    </script>
+    <script>
+               (function(){
+          const PREFIX = 'lib_toggle_';
+
+          function setIcon(el, isOn){
+            const on  = el.dataset.on  || '';
+            const off = el.dataset.off || '';
+            el.className = isOn ? on : off;
+          }
+
+          // ➜ YENİ: ikon sağa/sola taşıyan yardımcı
+          function applySwapFromState(el, isOn){
+            const link = el.closest('.sidebar-link');
+            if (link) link.classList.toggle('icon-right', isOn);
+          }
+
+          // Başlangıç: kayıtlı durumu yükle
+          document.querySelectorAll('.js-toggle-icon').forEach(el=>{
+            const key = el.dataset.key ? (PREFIX + el.dataset.key) : null;
+            const saved = key ? localStorage.getItem(key) : null;
+            const isOn = saved === 'on';
+            setIcon(el, isOn);
+            applySwapFromState(el, isOn); // ← YENİ: sayfa yüklenirken konumu uygula
+          });
+
+          // Tıklama
+          document.addEventListener('click', function(e){
+            const el = e.target.closest('.js-toggle-icon');
+            if(!el) return;
+
+            e.preventDefault(); // linke gitmesin (ikon tıklanınca)
+            e.stopPropagation();
+
+            const nowOn = !(el.className === (el.dataset.on || ''));
+            setIcon(el, nowOn);
+            applySwapFromState(el, nowOn); // ← YENİ: ikon konumunu güncelle
+
+            const key = el.dataset.key ? (PREFIX + el.dataset.key) : null;
+            if(key) localStorage.setItem(key, nowOn ? 'on' : 'off');
+
+            const cbName = el.dataset.callback;
+            const cb = cbName && window[cbName];
+            if(typeof cb === 'function') cb(nowOn, el);
+
+            const ev = new CustomEvent('toggle:changed', { detail: { on: nowOn, el }});
+            el.dispatchEvent(ev);
+          });
+        })();
+
+    </script>
+    <script>
+        (function moveBookIconRight(){
+          var $bookLink = $('a.sidebar-link').filter(function(){
+            var href = ($(this).attr('href')||'').toLowerCase();
+            var txt  = ($(this).text()||'').toLowerCase();
+            return href.indexOf('/book') >= 0 || txt.indexOf('kitap') >= 0;
+          }).first();
+          if(!$bookLink.length) return;
+
+          // Ikonu sağa alacak sınıf
+          $bookLink.addClass('icon-right');
+
+          // İkon yoksa ekle, varsa kitap ikonuna çevir
+          var $i = $bookLink.find('i').first();
+          if(!$i.length){
+            $bookLink.prepend('<i class="mdi mdi-book-open-page-variant" aria-hidden="true"></i>');
+          } else {
+            // sadece ikon tipini kitap yap (mdi kullanıyorsan)
+            $i.attr('class','mdi mdi-book-open-page-variant');
+            // (Font Awesome kullanıyorsan: $i.attr('class','fas fa-book-open'); )
+          }
+        })();
+    </script>
+
 }

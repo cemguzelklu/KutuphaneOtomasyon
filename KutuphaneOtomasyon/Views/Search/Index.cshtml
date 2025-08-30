@@ -2,6 +2,22 @@
     ViewData["Title"] = "Arama Sonuçları";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+@{
+    var q = ViewBag.Query as string;
+    var sug = ViewBag.SuggestedQuery as string;
+}
+@if (string.IsNullOrWhiteSpace(q) == false
+   && (ViewBag.Books as IEnumerable<object>)?.Any() != true
+   && (ViewBag.Members as IEnumerable<object>)?.Any() != true
+   && (ViewBag.Borrows as IEnumerable<object>)?.Any() != true
+   && string.IsNullOrWhiteSpace(sug) == false)
+{
+    <div class="alert alert-info">
+        Bunu mu demek istediniz?
+        <a class="alert-link"
+           href="@Url.Action("Index", "Search", new { query = sug })">@sug</a>
+    </div>
+}
 
 <h4 class="mb-4">🔎 "@ViewBag.Query" için Arama Sonuçları</h4>
 

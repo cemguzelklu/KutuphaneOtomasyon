@@ -1,0 +1,450 @@
+﻿@model List<KutuphaneOtomasyon.Models.AiLog>
+@using System.Linq
+@{
+    ViewData["Title"] = "AI Logs";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var total = Model?.Count ?? 0;
+    var successCount = Model?.Count(x => x.Success == true) ?? 0;
+    var failCount = total - successCount;
+
+    var latencies = (Model ?? new List<KutuphaneOtomasyon.Models.AiLog>())
+                        .Where(x => x.LatencyMs.HasValue)
+                        .Select(x => (double)x.LatencyMs.Value)
+                        .ToList();
+    var avgLatency = latencies.Any() ? Math.Round(latencies.Average(), 1) : 0.0;
+}
+
+<style>
+    /* ========= PALET (Kitap sayfasıyla aynı) ========= */
+    :root {
+        --lib-900: #1A2A80; /* ana */
+        --lib-700: #3B38A0; /* hover */
+        --lib-500: #7A85C1;
+        --lib-300: #B2B0E8;
+        --ok: #16a34a;
+        --ok-bg: rgba(22,163,74,.08);
+        --warn: #f59e0b;
+        --warn-bg: rgba(245,158,11,.10);
+        --bad: #ef4444;
+        --bad-bg: rgba(239,68,68,.10);
+    }
+
+    .ai-page {
+        max-width: 1320px;
+        margin: 0 auto;
+    }
+
+        .ai-page h4 {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: #111;
+            position: relative;
+            margin-bottom: .75rem;
+        }
+
+            .ai-page h4::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                bottom: -6px;
+                width: 64px;
+                height: 4px;
+                border-radius: 9999px;
+                background: linear-gradient(90deg,#16a34a,#f59e0b,#ef4444);
+            }
+
+            .ai-page h4 .pill {
+                font-size: .85rem;
+            }
+
+    /* KPI kartları (uyumlu gölge/hover) */
+    .ai-kpi {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+        .ai-kpi .kpi {
+            background: #fff;
+            border-radius: 14px;
+            padding: 12px 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,.06);
+            min-width: 180px;
+            transition: transform .18s ease, box-shadow .18s ease;
+            border: 1px solid var(--lib-300);
+        }
+
+            .ai-kpi .kpi:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 16px 40px rgba(2,6,23,.12);
+            }
+
+    .kpi .k {
+        font-size: .8rem;
+        color: #6c757d;
+    }
+
+    .kpi .v {
+        font-weight: 700;
+    }
+
+    /* Kart (kitap sayfası estetiği) */
+    .ai-card {
+        border: 0;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 16px rgba(27,31,35,.08), 0 18px 40px rgba(27,31,35,.10);
+        transition: transform .18s ease, box-shadow .18s ease;
+        position: relative;
+    }
+
+        .ai-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,.06), 0 12px 26px rgba(27,31,35,.10), 0 28px 60px rgba(27,31,35,.12);
+        }
+
+        .ai-card + .ai-card {
+            margin-top: 14px;
+        }
+
+    /* DataTable görünüm (kitap sayfasıyla aynı mimari) */
+    .dt-pretty {
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(255,255,255,.92);
+    }
+
+        .dt-pretty thead.bg-info th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--lib-900) !important;
+            color: #fff !important;
+            box-shadow: 0 1px 0 rgba(0,0,0,.06);
+        }
+
+        .dt-pretty td, .dt-pretty th {
+            border-color: #eef2f7 !important;
+        }
+
+        .dt-pretty tbody tr {
+            transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+
+            .dt-pretty tbody tr:hover {
+                background: #f8fbff !important;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 14px rgba(30,41,59,.06);
+            }
+
+    /* Satır hata vurgusu (yumuşak kırmızı) */
+    tr.log-fail td {
+        background: var(--bad-bg) !important;
+    }
+
+        tr.log-fail td:first-child {
+            box-shadow: -3px 0 0 var(--bad) inset;
+        }
+
+    /* ==== ROZET/PILL (tek boy – kitap sayfası ile uyumlu) ==== */
+    #logTable .badge {
+        border-radius: 9999px !important;
+        padding: 6px 12px !important;
+        font-weight: 700 !important;
+        border: 1.2px solid transparent !important;
+        line-height: 1 !important;
+        min-height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,.05) !important;
+    }
+    /* HTTP class’ları */
+    #logTable .badge-success {
+        color: var(--ok) !important;
+        background: linear-gradient(180deg, rgba(22,163,74,.12), rgba(22,163,74,.05)) !important;
+        border-color: rgba(22,163,74,.35) !important;
+        box-shadow: 0 6px 14px rgba(22,163,74,.10) !important;
+    }
+
+    #logTable .badge-warning {
+        color: var(--warn) !important;
+        background: linear-gradient(180deg, rgba(245,158,11,.12), rgba(245,158,11,.05)) !important;
+        border-color: rgba(245,158,11,.35) !important;
+        box-shadow: 0 6px 14px rgba(245,158,11,.10) !important;
+    }
+
+    #logTable .badge-danger {
+        color: var(--bad) !important;
+        background: linear-gradient(180deg, rgba(239,68,68,.12), rgba(239,68,68,.05)) !important;
+        border-color: rgba(239,68,68,.35) !important;
+        box-shadow: 0 6px 14px rgba(239,68,68,.10) !important;
+    }
+
+    #logTable .badge-secondary {
+        color: #334155 !important;
+        background: linear-gradient(180deg, rgba(148,163,184,.18), rgba(148,163,184,.08)) !important;
+        border-color: rgba(148,163,184,.35) !important;
+        box-shadow: 0 6px 14px rgba(148,163,184,.10) !important;
+    }
+
+    /* DataTables üst butonları – kitap sayfasındakiyle aynı, hover’da renk DEĞİŞMEZ */
+    .dataTables_wrapper .dt-buttons {
+        display: flex;
+        gap: 8px;
+        overflow: visible;
+    }
+
+        .dataTables_wrapper .dt-buttons .dt-button.btn-copy,
+        .dataTables_wrapper .dt-buttons .dt-button.btn-export {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 10px 14px !important;
+            font-weight: 600 !important;
+            line-height: 1 !important;
+            box-shadow: 0 8px 20px rgba(26,42,128,.25) !important;
+            transition: transform .12s ease, box-shadow .12s ease, filter .18s ease;
+        }
+
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy i,
+            .dataTables_wrapper .dt-buttons .dt-button.btn-export i {
+                margin-right: 6px;
+            }
+            /* hover/focus/active sabit renk */
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy:hover,
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy:focus,
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy:active,
+            .dataTables_wrapper .dt-buttons .dt-button.btn-export:hover,
+            .dataTables_wrapper .dt-buttons .dt-button.btn-export:focus,
+            .dataTables_wrapper .dt-buttons .dt-button.btn-export:active {
+                background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
+                color: #fff !important;
+                transform: none !important;
+                box-shadow: 0 8px 20px rgba(26,42,128,.25) !important;
+                filter: none !important;
+                outline: none !important;
+            }
+            /* parıltı efektini kapat */
+            .dataTables_wrapper .dt-buttons .dt-button.btn-copy::after,
+            .dataTables_wrapper .dt-buttons .dt-button.btn-export::after {
+                content: none !important;
+            }
+        /* genel hover güvenlik ağı */
+        .dataTables_wrapper .dt-buttons .dt-button:hover {
+            background: inherit !important;
+            color: inherit !important;
+        }
+
+    /* Sayfalama (kitap sayfasıyla aynı) */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border: 1px solid transparent !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        margin: 0 2px !important;
+        background: transparent !important;
+        color: inherit !important;
+    }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: rgba(78,115,223,.12) !important;
+            border-color: rgba(78,115,223,.25) !important;
+            color: #224abe !important;
+            box-shadow: 0 2px 8px rgba(78,115,223,.15);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: linear-gradient(135deg,var(--lib-900),var(--lib-700)) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+            box-shadow: 0 8px 18px rgba(26,42,128,.25) !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            background: transparent !important;
+            border-color: transparent !important;
+            color: #999 !important;
+            box-shadow: none !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+    /* Sol menü react ikonu (aynı) */
+    .sidebar-link.ai-react-right {
+        display: flex;
+        align-items: center;
+    }
+
+        .sidebar-link.ai-react-right i.mdi.mdi-test-tube {
+            order: 2;
+            margin-left: 8px;
+            margin-right: 0;
+            color: #61dafb; /* istersen #3B38A0 yap */
+            text-shadow: 0 0 8px rgba(97,218,251,.8), 0 0 16px rgba(97,218,251,.4);
+            transition: transform .35s cubic-bezier(.2,.7,.2,1);
+            animation: tubePulse 2.6s ease-in-out infinite;
+        }
+
+        .sidebar-link.ai-react-right .hide-menu {
+            order: 1;
+        }
+    @@keyframes tubePulse {
+        0%,100%
+
+    {
+        transform: translateY(0) scale(1);
+        filter: drop-shadow(0 0 0 rgba(97,218,251,.0));
+    }
+
+    50% {
+        transform: translateY(-1px) scale(1.06);
+        filter: drop-shadow(0 0 6px rgba(97,218,251,.6));
+    }
+
+    }
+    /* DataTables pagination: aktif (current) sayının yazısını her durumda beyaz yap */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:focus,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:active,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:focus-visible,
+#bookTable_wrapper  .dataTables_paginate .paginate_button.current,
+#bookTable_wrapper  .dataTables_paginate .paginate_button.current:hover,
+#logTable_wrapper   .dataTables_paginate .paginate_button.current,
+#logTable_wrapper   .dataTables_paginate .paginate_button.current:hover{
+  color:#fff !important;
+}
+
+/* Tıklama anında griye düşmesini engelle (bazı tarayıcılar :active’te renki kısıyor) */
+.dataTables_wrapper .dataTables_paginate .paginate_button:active{
+  color:#fff !important;
+}
+
+/* Eğer DataTables 'span' veya çocuk eleman üretirse, onların da rengi beyaz kalsın */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current *,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current > *{
+  color:#fff !important;
+}
+
+</style>
+
+<div class="ai-page">
+    <h4 class="mb-3">
+        🧪 AI Logs
+        <span class="pill badge badge-secondary ml-2">Toplam @total</span>
+    </h4>
+
+    <div class="ai-kpi">
+        <div class="kpi"><div class="k">Başarı</div><div class="v">@successCount / @total (@Math.Round(successCount * 100.0 / (total == 0 ? 1 : total), 1)%)</div></div>
+        <div class="kpi"><div class="k">Hata</div><div class="v">@failCount</div></div>
+        <div class="kpi"><div class="k">Ortalama Gecikme</div><div class="v">@avgLatency ms</div></div>
+    </div>
+
+    <div class="card ai-card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="logTable" class="table table-bordered table-hover table-striped dt-pretty">
+                    <thead class="bg-info">
+                        <tr>
+                            <th>Zaman (UTC)</th>
+                            <th>Aksiyon</th>
+                            <th>Üye</th>
+                            <th>HTTP</th>
+                            <th>Durum</th>
+                            <th>ms</th>
+                            <th>ErrType</th>
+                            <th>ErrCode</th>
+                            <th>Model</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var x in Model ?? Enumerable.Empty<KutuphaneOtomasyon.Models.AiLog>())
+                        {
+                            var httpVal = x.HttpStatus;
+                            var httpClass = httpVal >= 500 ? "badge badge-danger"
+                            : httpVal >= 400 ? "badge badge-warning"
+                            : (httpVal >= 200 && httpVal < 300) ? "badge badge-success"
+                            : "badge badge-secondary";
+
+                            var rowClass = x.Success == true ? "" : "log-fail";
+
+                            <tr class="@rowClass">
+                                <td data-order="@x.CreatedAtUtc.ToString("O")">@x.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@x.Action</td>
+                                <td class="text-right">@x.MemberId</td>
+                                <td class="text-center"><span class="@httpClass">@httpVal</span></td>
+                                <td class="text-center">
+                                    @if (x.Success == true)
+                                    {
+                                        <span class="badge badge-success">✔ Başarılı</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">✖ Hata</span>
+                                    }
+                                </td>
+                                <td class="text-right" data-order="@(x.LatencyMs ?? 0)">@((x.LatencyMs.HasValue ? x.LatencyMs.Value.ToString() : "-"))</td>
+                                <td>@(string.IsNullOrWhiteSpace(x.ErrorType) ? "-" : x.ErrorType)</td>
+                                <td>@(string.IsNullOrWhiteSpace(x.ErrorCode) ? "-" : x.ErrorCode)</td>
+                                <td>@(string.IsNullOrWhiteSpace(x.Model) ? "-" : x.Model)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+
+    <script>
+        (function(){
+          $('#logTable').DataTable({
+            responsive:true,
+            autoWidth:false,
+            order:[[0,'desc']],
+            pageLength:15,
+            lengthMenu:[[10,15,25,50,100,-1],[10,15,25,50,100,"Tümü"]],
+            language:{ url:"//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json" },
+            dom:'Bfrtip',
+            buttons:[
+              { extend:"copy", text:'<i class="fas fa-copy"></i> Kopyala', className:"btn-copy",   titleAttr:"Tabloyu kopyala" },
+              { extend:"csv",  text:'<i class="fas fa-file-download"></i> CSV', className:"btn-export", titleAttr:"CSV indir", title:"ai_logs" }
+            ]
+          });
+
+          // Sol menü: React ikonunu sağa al + efekt (mevcut davranış korunur)
+          (function reactIconRight(){
+            var $aiLink = $('a.sidebar-link').filter(function(){
+              var href = ($(this).attr('href')||'').toLowerCase();
+              var txt  = ($(this).text()||'').toLowerCase();
+              return href.indexOf('/admin/ai/log')>=0 || (txt.indexOf('log')>=0 && txt.indexOf('ai')>=0);
+            }).first();
+            if(!$aiLink.length) return;
+                    if(!$aiLink.find('i.mdi.mdi-test-tube').length){
+          $aiLink.prepend('<i class="mdi mdi-test-tube" aria-hidden="true"></i>');
+        }
+        $aiLink.addClass('ai-react-right');
+          })();
+        })();
+    </script>
+}

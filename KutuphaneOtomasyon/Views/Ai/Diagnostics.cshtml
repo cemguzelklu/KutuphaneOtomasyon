@@ -1,0 +1,592 @@
+﻿@model KutuphaneOtomasyon.ViewModels.Admin.AiDiagnosticsVm
+@{
+    ViewData["Title"] = "AI Tanılama";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    /* ——— Sayfa kabuğu ——— */
+    .ai-page {
+        max-width: 1320px;
+        margin: 0 auto;
+    }
+
+        .ai-page h4 .pill {
+            font-size: .85rem;
+        }
+
+    /* ——— KPI ——— */
+    .ai-kpi {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+        .ai-kpi .kpi {
+            background: #fff;
+            border-radius: 14px;
+            padding: 12px 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,.06);
+            min-width: 180px;
+        }
+
+    .kpi .k {
+        font-size: .8rem;
+        color: #6c757d;
+    }
+
+    .kpi .v {
+        font-weight: 700;
+    }
+
+    /* ——— Tabs ——— */
+    .nav-tabs {
+        border-bottom: none;
+    }
+
+        .nav-tabs .nav-link {
+            border: none;
+            font-weight: 700;
+            padding: 12px 18px;
+            border-radius: 10px;
+            color: #334155;
+        }
+
+            .nav-tabs .nav-link:hover {
+                background: #eef2ff;
+                cursor: pointer;
+            }
+
+            .nav-tabs .nav-link.active {
+                color: #1d4ed8 !important;
+                background: #e0e7ff;
+            }
+
+    /* ——— Kart ——— */
+    .ai-card {
+        border: 0;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(2,6,23,.08);
+    }
+
+        .ai-card + .ai-card {
+            margin-top: 14px;
+        }
+
+    /* ——— Prompt/Response (açık tema) ——— */
+    pre.ai-snippet {
+        background: #f8fafc;
+        color: #0f172a;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 14px;
+        font-size: .95rem;
+        max-height: 360px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    /* ——— Aksiyon butonları ——— */
+    .btn-cta, .copy-btn {
+        background: linear-gradient(135deg,#4e73df,#224abe);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        padding: 8px 12px;
+        box-shadow: 0 8px 20px rgba(78,115,223,.25);
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+        .btn-cta:hover, .copy-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(78,115,223,.35);
+        }
+
+        .btn-cta:active, .copy-btn:active {
+            transform: none;
+        }
+
+        .copy-btn i {
+            margin-right: 6px;
+        }
+
+    /* ——— Hızlı Test (Genel Durum) ——— */
+    .ai-hero {
+        border-radius: 16px;
+        background: linear-gradient(135deg,#eef2ff,#f8fafc);
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        box-shadow: 0 8px 24px rgba(2,6,23,.06);
+    }
+
+        .ai-hero .hero-text h5 {
+            margin: 0 0 6px 0;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .ai-hero .hero-text p {
+            margin: 0;
+            color: #475569;
+        }
+
+        .ai-hero .hero-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .ai-hero input[type="number"] {
+            min-width: 160px;
+        }
+
+    /* ——— Sonuç listesi ——— */
+    .result-item {
+        display: flex;
+        gap: 12px;
+        padding: 10px 0;
+    }
+
+    .rank-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+    }
+
+    .result-body .title {
+        font-weight: 800;
+    }
+
+    .result-body .author {
+        color: #64748b;
+        font-size: .92rem;
+    }
+
+    .reason {
+        display: none;
+        margin-top: 6px;
+        color: #334155;
+        font-size: .92rem;
+    }
+
+    .empty-state {
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 18px;
+        text-align: center;
+        color: #6c757d;
+        background: #f8fafc;
+    }
+
+    /* ——— Alt panel ——— */
+    .ai-results-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 16px;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+        border-radius: 0 0 16px 16px;
+    }
+
+        .ai-results-footer .meta {
+            color: #475569;
+            font-size: .92rem;
+        }
+
+        .ai-results-footer .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+    /* ——— Yükleme / progress ——— */
+    .top-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: #2563eb;
+        width: 0%;
+        z-index: 2000;
+        transition: width .2s ease;
+    }
+
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1050;
+        background: rgba(255,255,255,.65);
+        backdrop-filter: blur(2px);
+    }
+
+    .loading-card {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        background: #fff;
+        border-radius: 16px;
+        padding: 18px 22px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.15);
+        text-align: center;
+        min-width: 260px;
+    }
+
+    .spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid #e9ecef;
+        border-top-color: #2563eb;
+        border-radius: 50%;
+        animation: spin .9s linear infinite;
+        margin: 0 auto 10px;
+    }
+    @@keyframes spin {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* ——— Sol menü React ikonu (sağa kaydır + glow + yavaş dönüş) ——— */
+    .sidebar-link.ai-react-right {
+        display: flex;
+        align-items: center;
+    }
+
+        .sidebar-link.ai-react-right i.fab.fa-react {
+            order: 2;
+            margin-left: 8px;
+            margin-right: 0;
+            color: #61dafb;
+            text-shadow: 0 0 8px rgba(97,218,251,.8), 0 0 16px rgba(97,218,251,.4);
+            transition: transform .35s cubic-bezier(.2,.7,.2,1), margin .25s, color .25s;
+            animation: reactSpin 10s linear infinite;
+        }
+
+        .sidebar-link.ai-react-right .hide-menu {
+            order: 1;
+        }
+    @@keyframes reactSpin {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+</style>
+
+<div class="ai-page">
+    <h4 class="mb-3">
+        🤖 AI Tanılama
+        <span class="pill badge @(Model.Enabled ? "badge-success" : "badge-secondary") ml-2">
+            @(Model.Enabled ? "AI Açık" : "AI Kapalı")
+        </span>
+    </h4>
+
+    <div class="ai-kpi mb-3">
+        <div class="kpi"><div class="k">Sağlayıcı</div><div class="v">@Model.Provider</div></div>
+        @if (!string.IsNullOrWhiteSpace(Model.Model))
+        {
+            <div class="kpi"><div class="k">Model</div><div class="v">@Model.Model</div></div>
+        }
+        @if (Model.LastLatencyMs.HasValue)
+        {
+            <div class="kpi"><div class="k">Son Gecikme</div><div class="v">@Model.LastLatencyMs ms</div></div>
+        }
+    </div>
+
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tab-overview" role="tab">Genel Durum</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-logs" role="tab">İzleme (Prompt/Response)</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-test" role="tab">Öneri Testi</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- GENEL DURUM -->
+        <div class="tab-pane fade show active" id="tab-overview" role="tabpanel">
+            <div class="card ai-card mb-3">
+                <div class="card-body">
+                    <p class="mb-2">
+                        Öneri motoru ve sohbet entegrasyonunun anlık durumu burada. “Öneri Testi” ile bir üye üzerinde deneyip sonuçları aşağıda görebilirsin.
+                    </p>
+                    <ul class="mb-0">
+                        <li>Durum rozetleri ve gecikme ölçümü</li>
+                        <li>Son prompt/response gör ve kopyala</li>
+                        <li>AJAX’lı test + yükleme göstergesi</li>
+                    </ul>
+
+                    <!-- Hızlı Test -->
+                    <div class="ai-hero mt-3">
+                        <div class="hero-text">
+                            <h5>Hızlı Test</h5>
+                            <p>Üye Id gir, öneri motorunu anında dene. Sonuçlar “Öneri Testi” sekmesinde açılır.</p>
+                        </div>
+                        <div class="hero-actions">
+                            <input id="quickMemberId" type="number" class="form-control" placeholder="örn: 12" value="@(Model.TestMemberId?.ToString() ?? "")" />
+                            <button id="startQuickTest" class="btn-cta"><i class="fas fa-bolt mr-1"></i> Testi Başlat</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGS -->
+        <div class="tab-pane fade" id="tab-logs" role="tabpanel">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card ai-card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Prompt (son)</span>
+                            <button class="copy-btn" data-target="#promptSnippet"><i class="fas fa-copy"></i> Kopyala</button>
+                        </div>
+                        <div class="card-body">
+                            <pre id="promptSnippet" class="ai-snippet mb-0">@Model.LastPromptSnippet</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card ai-card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Response (son)</span>
+                            <button class="copy-btn" data-target="#responseSnippet"><i class="fas fa-copy"></i> Kopyala</button>
+                        </div>
+                        <div class="card-body">
+                            <pre id="responseSnippet" class="ai-snippet mb-0">@Model.LastResponseSnippet</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÖNERİ TESTİ -->
+        <div class="tab-pane fade" id="tab-test" role="tabpanel">
+            <div class="card ai-card">
+                <div class="card-body">
+                    <form id="aiTestForm" class="form-inline mb-3" method="get" action="@Url.Action("Diagnostics","Ai")">
+                        <div class="form-group mr-2 mb-2">
+                            <label class="mr-2">Üye Id:</label>
+                            <input type="number" class="form-control" name="memberId" value="@(Model.TestMemberId?.ToString() ?? "")" placeholder="örn: 12" />
+                        </div>
+                        <div class="form-group mr-2 mb-2">
+                            <label class="mr-2">Top N:</label>
+                            <input type="number" min="1" max="50" class="form-control" name="topN" value="10" />
+                        </div>
+                        <div class="form-group mr-2 mb-2">
+                            <div class="custom-control custom-checkbox mt-1">
+                                <input type="checkbox" class="custom-control-input" id="chkReasons" name="includeReasons" checked>
+                                <label class="custom-control-label" for="chkReasons">Gerekçe döndür</label>
+                            </div>
+                        </div>
+                        <button id="btnTest" class="btn-cta mb-2" type="submit"><i class="fas fa-magic mr-1"></i> Üye ile test et</button>
+                    </form>
+
+                    <div id="testArea">
+                        @if (Model.TestAiResults != null)
+                        {
+                            <div class="card ai-card mb-0">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Test Sonucu (AI sıralı)</span>
+                                    <small class="text-muted">@((Model.TestAiResults?.Count() ?? 0)) kayıt</small>
+                                </div>
+                                <div class="card-body">
+                                    @if (!Model.TestAiResults.Any())
+                                    {
+                                        <div class="empty-state">Bu üyeye ait öneri bulunamadı.</div>
+                                    }
+                                    else
+                                    {
+                                        var idx = 0;
+                                        foreach (var b in Model.TestAiResults)
+                                        {
+                                            idx++;
+                                            <div class="result-item">
+                                                <div class="rank-badge">@idx</div>
+                                                <div class="result-body">
+                                                    <div class="title">@b.Title</div>
+                                                    @if (!string.IsNullOrWhiteSpace(b.Author))
+                                                    {
+                                                        <div class="author">@b.Author</div>
+                                                    }
+                                                    @if (!string.IsNullOrWhiteSpace(b.Reason))
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-link p-0 toggle-reason">Gerekçeyi göster</button>
+                                                        <div class="reason">@b.Reason</div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            if (idx < Model.TestAiResults.Count())
+                                            {
+
+                                                <hr class="my-2" />
+                                            }
+                                        }
+                                    }
+                                </div>
+
+                                <!-- Alt panel -->
+                                <div class="ai-results-footer">
+                                    <div class="meta">
+                                        <strong>Üye:</strong> @(Model.TestMemberId?.ToString() ?? "-")
+                                        <span class="mx-2">•</span>
+                                        <strong>TopN:</strong> <span id="metaTopN">10</span>
+                                        <span class="mx-2">•</span>
+                                        <strong>Gerekçe:</strong> <span id="metaReason">Açık</span>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button id="btnToggleAll" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-angle-down mr-1"></i> Tüm Gerekçeleri Aç/Kapat
+                                        </button>
+                                        <button id="btnExportCsv" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-download mr-1"></i> CSV indir
+                                        </button>
+                                        <button id="btnRerun" class="btn-cta btn-sm">
+                                            <i class="fas fa-sync mr-1"></i> Yeniden Çalıştır
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                Henüz test çalıştırılmadı. Üye Id girip <b>Üye ile test et</b> butonuna bas.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Yükleme overlay + üst progress -->
+<div id="aiLoading" class="loading-overlay" aria-hidden="true">
+    <div class="loading-card">
+        <div class="spinner"></div>
+        <div>Öneriler hazırlanıyor…</div>
+    </div>
+</div>
+<div id="topProgress" class="top-progress"></div>
+
+@section Scripts {
+    <script>
+        (function () {
+          // — Copy —
+          $(document).on('click', '.copy-btn', function () {
+            var target = $(this).data('target');
+            var text = $(target).text();
+            if (!navigator.clipboard) {
+              var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+              try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
+            } else { navigator.clipboard.writeText(text); }
+            var $btn = $(this); $btn.blur().html('<i class="fas fa-check"></i> Kopyalandı');
+            setTimeout(function(){ $btn.html('<i class="fas fa-copy"></i> Kopyala'); }, 1200);
+          });
+
+          // — Quick test (Genel Durum > Hero) —
+          $('#startQuickTest').on('click', function(){
+            var mid = $('#quickMemberId').val();
+            $('a[href="#tab-test"]').tab('show');
+            $('#aiTestForm input[name="memberId"]').val(mid || '');
+            $('#aiTestForm').trigger('submit');
+          });
+
+          // — Reason toggle (tek tek) —
+          $(document).on('click', '.toggle-reason', function () {
+            var $btn = $(this), $reason = $btn.next('.reason');
+            $reason.slideToggle(130);
+            $btn.text($reason.is(':visible') ? 'Gerekçeyi gizle' : 'Gerekçeyi göster');
+          });
+
+          // — Toggle all reasons (alt panel) —
+          $(document).on('click', '#btnToggleAll', function(){
+            var anyHidden = $('.reason:hidden').length > 0;
+            $('.reason');
+            $('.toggle-reason').text(anyHidden ? 'Gerekçeyi gizle' : 'Gerekçeyi göster');
+          });
+
+          // — CSV export —
+          $(document).on('click', '#btnExportCsv', function(){
+            var rows = [['Sıra','Başlık','Yazar','Gerekçe']];
+            $('.result-item').each(function(i){
+              var title = $(this).find('.title').text().trim();
+              var author = $(this).find('.author').text().trim();
+              var reason = $(this).find('.reason').text().replace(/\s+/g,' ').trim();
+              rows.push([i+1, title, author, reason]);
+            });
+            var csv = rows.map(r => r.map(x => `"${(x||'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+            var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'ai_oneri_sonuclari.csv';
+            document.body.appendChild(a); a.click(); a.remove();
+          });
+
+          // — Rerun —
+          $(document).on('click', '#btnRerun', function(){ $('#aiTestForm').trigger('submit'); });
+
+          // — Meta sync —
+          function syncMeta(){ $('#metaTopN').text($('input[name="topN"]').val() || '10'); $('#metaReason').text($('#chkReasons').is(':checked') ? 'Açık' : 'Kapalı'); }
+          syncMeta();
+          $('#aiTestForm').on('input change', 'input, select, textarea, input[type="checkbox"]', syncMeta);
+
+          // — Loading UI —
+          var $overlay = $('#aiLoading'), $bar = $('#topProgress'); var progressInterval = null;
+          function startLoading(){ $overlay.fadeIn(80); $bar.css('width','0%').show(); var w=0; progressInterval=setInterval(function(){ if(w<70)w+=6; else if(w<85)w+=1; $bar.css('width', w+'%'); },180); }
+          function stopLoading(){ clearInterval(progressInterval); $bar.css('width','100%'); setTimeout(function(){ $bar.fadeOut(150,function(){ $bar.css('width','0%'); }); },150); $overlay.fadeOut(100); }
+
+          // — AJAX Test —
+          $('#aiTestForm').on('submit', function (e) {
+            e.preventDefault();
+            var $btn = $('#btnTest'); $btn.prop('disabled', true).append(' <span class="spinner-border spinner-border-sm"></span>');
+            startLoading();
+            var $form = $(this), url = $form.attr('action'), qs = $form.serialize();
+            $.get(url, qs)
+              .done(function (html) {
+                var $html = $('<div>').html(html), $new = $html.find('#testArea');
+                if ($new.length) { $('#testArea').replaceWith($new); }
+                else { window.location = url + (url.indexOf('?')>=0 ? '&' : '?') + qs; }
+              })
+              .fail(function () { $form.off('submit').trigger('submit'); })
+              .always(function () { stopLoading(); $btn.prop('disabled', false).find('.spinner-border').remove(); syncMeta(); });
+          });
+
+          // — Sol menü: React ikonunu aktif linkte SAĞA al + efekt —
+          (function reactIconRight(){
+            // Mevcut temada link sınıfı: "sidebar-link ...", içinde <i class="fab fa-react"> ve <span class="hide-menu">Yapay Zeka Öneri</span>
+            var $aiLink = $('a.sidebar-link').filter(function(){
+              var href = ($(this).attr('href')||'').toLowerCase();
+              var txt  = ($(this).text()||'').toLowerCase();
+              return href.indexOf('/admin/ai/diagnostics')>=0 || txt.indexOf('yapay zeka')>=0 || txt.indexOf('öneri')>=0 || txt.indexOf('ai')>=0;
+            }).first();
+
+            if(!$aiLink.length) return;
+
+            // İkon yoksa ekle
+            if(!$aiLink.find('i.fab.fa-react').length){
+              $aiLink.prepend('<i class="fab fa-react" aria-hidden="true"></i>');
+            }
+
+            // Bu sayfada link zaten .active olduğundan sağa taşıyıcı sınıfı ver
+            $aiLink.addClass('ai-react-right');
+          })();
+
+        })(); // IIFE end
+    </script>
+}

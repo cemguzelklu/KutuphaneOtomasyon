@@ -10,7 +10,15 @@
         public int TotalBorrowCount { get; set; }
         public int LateReturnCount { get; set; }
         public double OnTimeRate { get; set; } // 0..1
+        
+        // --- YENİ: Toggle ve iki ayrı liste ---
+        public bool AiEnabled { get; set; }            // Sistemde AI aktif mi?
+        public bool UseAi { get; set; } = true;        // Toggle sonucu (UI)
+        public DateTime? SuggestionsGeneratedAt { get; set; } // AI çalıştıysa zaman damgası
 
+        public List<AiSuggestionVm> ClassicSuggestions { get; set; } = new(); // kural-tabanlı
+        public List<AiSuggestionVm>? AiSuggestions { get; set; }              // AI re-rank
+        // --------------------------------------
         // Yapay zekâ/öneri ve risk
         public List<AiSuggestionVm> Suggestions { get; set; } = new();   // ilk yüklemede boş olabilir
         public RiskResultVm? Risk { get; set; }                          // ilk yüklemede null olabilir

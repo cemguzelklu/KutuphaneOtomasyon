@@ -14,7 +14,7 @@ namespace KutuphaneOtomasyon.Models
         public string Category { get; set; }
 
 
-        // ISBN ekleyelim (API'den gelecek)z
+        // ISBN ekleyelim (API'den gelecek)
         public string? ISBN { get; set; }
         public string? CleanISBN { get; set; } // Yeni eklenen alan
 

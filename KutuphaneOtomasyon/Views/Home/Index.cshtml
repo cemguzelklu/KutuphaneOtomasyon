@@ -1,143 +1,466 @@
-﻿@{
+﻿@using System.Linq
+@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    // — Güvenli listeler —
+    var bookList = (List<KutuphaneOtomasyon.Models.Book>)(ViewBag.BookList
+                    ?? ViewBag.RecentBooks
+                    ?? new List<KutuphaneOtomasyon.Models.Book>());
+
+    var recentBooks = ViewBag.RecentBooks as List<KutuphaneOtomasyon.Models.Book>
+                      ?? new List<KutuphaneOtomasyon.Models.Book>();
+
+    // — Tablolar doğrudan Controller’dan gelsin —
+    var topBooks = (IEnumerable<dynamic>)(ViewBag.TopBooks ?? new List<object>());
+    var topMembers = (IEnumerable<dynamic>)(ViewBag.TopMembers ?? new List<object>());
 }
 
-<div class="container-fluid mt-4">
+<style>
+    /* (stil bölümün aynen bırakıldı) */
+    :root {
+        --accent: #8b5cf6;
+        --accent-600: #7c3aed;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --card: #ffffff;
+        --soft: #f8fafc;
+        --thead: #0b1220;
+        --thead-text: #fff;
+        --row-hover: #f8fafc;
+    }
 
-    <!-- Toplam Kitap -->
-    <div class="card mb-3 shadow" data-bs-toggle="collapse" data-bs-target="#bookDetails" style="cursor:pointer;">
-        <div class="card-body bg-info text-white">
-            <h5 class="card-title mb-0">📚 Toplam Kitap: <strong>@ViewBag.TotalBooks</strong></h5>
-            <small class="text-white-50">Detaylar için tıklayın</small>
-        </div>
+    .container-fluid {
+        max-width: 1320px;
+    }
+
+    .page-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 16px 0 10px;
+    }
+
+        .page-head h4 {
+            margin: 0;
+            color: var(--ink);
+            font-weight: 800;
+        }
+
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 12px;
+    }
+
+    @@media (min-width:992px) {
+        .kpi-row {
+            grid-template-columns: repeat(4,1fr);
+        }
+    }
+
+    .kpi {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(2,6,23,.08);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        transition: transform .18s, box-shadow .18s;
+    }
+
+        .kpi:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 50px rgba(2,6,23,.14);
+        }
+
+        .kpi .ico {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: linear-gradient(135deg,var(--accent),var(--accent-600));
+            box-shadow: 0 8px 22px rgba(139,92,246,.35);
+        }
+
+        .kpi .t {
+            margin: 0;
+            color: var(--muted);
+            font-size: .85rem;
+        }
+
+        .kpi .n {
+            margin: 0;
+            color: var(--ink);
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+    .mid-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 14px;
+    }
+
+    @@media (min-width:992px) {
+        .mid-grid {
+            grid-template-columns: 2fr 1fr;
+        }
+    }
+
+    .cardish {
+        background: var(--card);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(2,6,23,.08);
+        padding: 16px;
+        transition: transform .18s, box-shadow .18s;
+    }
+
+        .cardish:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 50px rgba(2,6,23,.14);
+        }
+
+    .analysis-head h5 {
+        margin: 0;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .analysis-sub {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: .9rem;
+    }
+
+    .analysis-canvas {
+        width: 100%;
+        height: 340px;
+    }
+
+    .side-stats {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .side-item {
+        background: var(--soft);
+        border-radius: 12px;
+        padding: 14px;
+        text-align: center;
+    }
+
+        .side-item i {
+            color: var(--accent-600);
+            font-size: 18px;
+        }
+
+        .side-item .t {
+            color: var(--muted);
+            font-size: .85rem;
+            margin: 4px 0 0;
+        }
+
+        .side-item .n {
+            color: var(--ink);
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+    .recent-wrap {
+        margin-top: 14px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 4px 0 8px;
+    }
+
+        .section-title h5 {
+            margin: 0;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+    .hscroll {
+        display: flex;
+        gap: 12px;
+        overflow: auto;
+        padding-bottom: 8px;
+        scroll-snap-type: x mandatory;
+    }
+
+        .hscroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .hscroll::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 999px;
+        }
+
+    .book-card {
+        min-width: 220px;
+        max-width: 240px;
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: 0 8px 22px rgba(2,6,23,.08);
+        padding: 12px;
+        display: flex;
+        gap: 10px;
+        scroll-snap-align: start;
+    }
+
+    .book-cover {
+        width: 48px;
+        height: 64px;
+        border-radius: 8px;
+        background: linear-gradient(135deg,#e5e7eb,#cbd5e1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #475569;
+        font-weight: 800;
+    }
+
+    .book-meta .bt {
+        margin: 0;
+        font-weight: 700;
+        color: var(--ink);
+        font-size: .95rem;
+    }
+
+    .book-meta .ba {
+        margin: 2px 0 0;
+        font-size: .85rem;
+        color: var(--muted);
+    }
+
+    .book-meta .bc {
+        margin: 2px 0 0;
+        font-size: .8rem;
+        color: #334155;
+    }
+
+    .bottom-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 14px;
+    }
+
+    @@media (min-width:992px) {
+        .bottom-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .simple-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .simple-table thead th {
+            background: var(--thead);
+            color: var(--thead-text);
+            padding: 10px 12px;
+            position: sticky;
+            top: 0;
+        }
+
+        .simple-table td {
+            border-bottom: 1px solid #eef2f7;
+            padding: 10px 12px;
+        }
+
+        .simple-table tbody tr:hover {
+            background: var(--row-hover);
+        }
+
+    .rank {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(139,92,246,.15);
+        color: #4c1d95;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+    }
+
+    .row-flex {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .small-muted {
+        color: var(--muted);
+        font-size: .85rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="page-head"><h4>📊 Yönetim Paneli</h4></div>
+
+    <div class="kpi-row">
+        <div class="kpi"><div class="ico"><i class="fa fa-book"></i></div><div><p class="t">Toplam Kitap</p><p class="n">@ViewBag.TotalBooks</p></div></div>
+        <div class="kpi"><div class="ico"><i class="fa fa-users"></i></div><div><p class="t">Toplam Üye</p><p class="n">@ViewBag.TotalMembers</p></div></div>
+        <div class="kpi"><div class="ico"><i class="fa fa-book-reader"></i></div><div><p class="t">Ödünçte</p><p class="n">@ViewBag.BorrowedBooks</p></div></div>
+        <div class="kpi"><div class="ico"><i class="fa fa-clipboard-list"></i></div><div><p class="t">Toplam Ödünç</p><p class="n">@ViewBag.TotalBorrows</p></div></div>
     </div>
-    <div id="bookDetails" class="collapse mb-4">
-        <div class="card card-body">
-            <table class="table table-bordered">
-                <thead class="table-info">
-                    <tr>
-                        <th>Başlık</th>
-                        <th>Yazar</th>
-                        <th>Kategori</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var book in (List<KutuphaneOtomasyon.Models.Book>)ViewBag.BookList)
-                    {
-                        <tr>
-                            <td>@book.Title</td>
-                            <td>@book.Author</td>
-                            <td>@book.Category</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+
+    <div class="mid-grid">
+        <div class="cardish">
+            <div class="analysis-head">
+                <h5>Site Analizi</h5>
+                <div class="analysis-sub">Son 30 gün ödünç / iade trendi</div>
+            </div>
+            <div class="analysis-body">
+                <canvas id="siteAnalysisChart" class="analysis-canvas"></canvas>
+            </div>
+        </div>
+
+        <div class="side-stats">
+            <div class="side-item"><i class="fa fa-sun"></i><div class="n">@ViewBag.TodayBorrows</div><div class="t">Bugün Ödünç</div></div>
+            <div class="side-item"><i class="fa fa-undo"></i><div class="n">@ViewBag.TodayReturns</div><div class="t">Bugün İade</div></div>
+            <div class="side-item"><i class="fa fa-trophy"></i><div class="n">@((ViewBag.TopMember != null) ? (string)ViewBag.TopMember.Name : "-")</div><div class="t">En Çok Ödünç Alan</div></div>
+            <div class="side-item"><i class="fa fa-layer-group"></i><div class="n">@bookList.Count</div><div class="t">Listelenen Kitap</div></div>
         </div>
     </div>
 
-    <!-- Toplam Üye -->
-    <div class="card mb-3 shadow" data-bs-toggle="collapse" data-bs-target="#memberDetails" style="cursor:pointer;">
-        <div class="card-body bg-success text-white">
-            <h5 class="card-title mb-0">👤 Toplam Üye: <strong>@ViewBag.TotalMembers</strong></h5>
-            <small class="text-white-50">Detaylar için tıklayın</small>
-        </div>
-    </div>
-    <div id="memberDetails" class="collapse mb-4">
-        <div class="card card-body">
-            <table class="table table-bordered">
-                <thead class="table-success">
-                    <tr>
-                        <th>İsim</th>
-                        <th>Email</th>
-                        <th>Üye Tipi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var member in (List<KutuphaneOtomasyon.Models.Member>)ViewBag.MemberList)
-                    {
-                        <tr>
-                            <td>@member.Name</td>
-                            <td>@member.Email</td>
-                            <td>@member.MemberType</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Ödünç Kitaplar -->
-    <div class="card mb-3 shadow" data-bs-toggle="collapse" data-bs-target="#borrowDetails" style="cursor:pointer;">
-        <div class="card-body bg-warning text-dark">
-            <h5 class="card-title mb-0">📖 Ödünç Kitaplar: <strong>@ViewBag.BorrowedBooks</strong></h5>
-            <small class="text-dark-50">Detaylar için tıklayın</small>
-        </div>
-    </div>
-    <div id="borrowDetails" class="collapse mb-4">
-        <div class="card card-body">
-            <table class="table table-bordered">
-                <thead class="table-warning">
-                    <tr>
-                        <th>Üye</th>
-                        <th>Kitap</th>
-                        <th>Alış Tarihi</th>
-                        <th>İade Durumu</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var borrow in (List<KutuphaneOtomasyon.Models.Borrow>)ViewBag.BorrowList)
-                    {
-                        <tr>
-                            <td>@borrow.Member.Name</td>
-                            <td>@borrow.Book.Title</td>
-                            <td>@borrow.BorrowDate.ToShortDateString()</td>
-                            <td>
-                                @(borrow.ReturnDate == null ? "İade Edilmedi" : borrow.ReturnDate?.ToShortDateString())
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Toplam Ödünç İşlemi -->
-    <div class="card mb-3 shadow">
-        <div class="card-body bg-danger text-white">
-            <h5 class="card-title mb-0">📦 Toplam Ödünç İşlemi</h5>
-            <h3 class="mt-2">@ViewBag.TotalBorrows</h3>
-        </div>
-    </div>
-
-    <!-- Bugün Yapılan Ödünç İşlemleri -->
-    <div class="card mb-3 shadow">
-        <div class="card-body bg-primary text-white">
-            <h5 class="card-title mb-0">📅 Bugün Ödünç Alınan Kitap Sayısı</h5>
-            <h3 class="mt-2">@ViewBag.TodayBorrows</h3>
-        </div>
-    </div>
-
-    <!-- Bugün Yapılan İade İşlemleri -->
-    <div class="card mb-3 shadow">
-        <div class="card-body bg-secondary text-white">
-            <h5 class="card-title mb-0">✅ Bugün İade Edilen Kitap Sayısı</h5>
-            <h3 class="mt-2">@ViewBag.TodayReturns</h3>
-        </div>
-    </div>
-
-    <!-- En Çok Kitap Alan Üye -->
-    <div class="card mb-5 shadow">
-        <div class="card-body bg-dark text-white">
-            <h5 class="card-title mb-0">🏆 En Çok Kitap Ödünç Alan Üye</h5>
-            @if (ViewBag.TopMember != null)
+    <div class="cardish recent-wrap">
+        <div class="section-title"><h5>Son Eklenen Kitaplar</h5></div>
+        <div class="hscroll">
+            @if (recentBooks.Any())
             {
-                <p class="mt-2"><strong>@ViewBag.TopMember.Name</strong> - @ViewBag.TopMember.Count kitap</p>
+                foreach (var b in recentBooks)
+                {
+                    <div class="book-card">
+                        <div class="book-cover">@((b.Title ?? "?").Substring(0, 1).ToUpper())</div>
+                        <div class="book-meta">
+                            <p class="bt">@b.Title</p>
+                            <p class="ba">@b.Author</p>
+                            <p class="bc">@b.Category</p>
+                        </div>
+                    </div>
+                }
             }
             else
             {
-                <p class="mt-2">Veri bulunamadı</p>
+                <div class="book-card" style="justify-content:center; min-width: 100%;">
+                    <div class="book-meta"><p class="ba">Son eklenen kitap bulunamadı.</p></div>
+                </div>
             }
         </div>
     </div>
 
+    <div class="bottom-grid">
+        <div class="cardish">
+            <div class="section-title"><h5>🔥 En Popüler Kitaplar</h5></div>
+            <div class="table-responsive">
+                <table class="simple-table">
+                    <thead><tr><th>#</th><th>Kitap</th><th>Yazar</th><th>Kategori</th><th>Ödünç</th></tr></thead>
+                    <tbody>
+                        @{
+                            var r = 0;
+                            foreach (var t in topBooks.Take(5))  // <= burada sınırlandı
+                            {
+                                r++;
+                                <tr>
+                                    <td><div class="rank">@r</div></td>
+                                    <td>@t.Title</td>
+                                    <td class="small-muted">@t.Author</td>
+                                    <td class="small-muted">@t.Category</td>
+                                    <td><strong>@t.Count</strong></td>
+                                </tr>
+                            }
+                            if (!topBooks.Any())
+                            {
+                                <tr><td colspan="5" class="small-muted">Veri yok.</td></tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="cardish">
+            <div class="section-title"><h5>🏃 En Aktif Üyeler</h5></div>
+            <div class="table-responsive">
+                <table class="simple-table">
+                    <thead><tr><th>#</th><th>Üye</th><th>İşlem</th></tr></thead>
+                    <tbody>
+                        @{
+                            var m = 0;
+                            foreach (var t in topMembers.Take(5)) // <= burada sınırlandı
+                            {
+                                m++;
+                                <tr>
+                                    <td><div class="rank">@m</div></td>
+                                    <td>@t.Name</td>
+                                    <td><strong>@t.Count</strong> ödünç</td>
+                                </tr>
+                            }
+                            if (!topMembers.Any())
+                            {
+                                <tr><td colspan="3" class="small-muted">Veri yok.</td></tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function () {
+      const canvas = document.getElementById('siteAnalysisChart');
+      if (!canvas) return;
+
+      // Controller’dan gelen JSON (labels/borrows/returns)
+      const ax = @Html.Raw(ViewBag.AnalyticsJson ?? "{\"labels\":[],\"borrows\":[],\"returns\":[]}");
+      const labels  = ax.labels  || [];
+      const borrows = ax.borrows || [];
+      const returns = ax.returns || [];
+
+      const ctx = canvas.getContext('2d');
+      const g1 = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      g1.addColorStop(0, 'rgba(124,58,237,.28)');
+      g1.addColorStop(1, 'rgba(124,58,237,0)');
+
+      const g2 = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      g2.addColorStop(0, 'rgba(14,165,233,.26)');
+      g2.addColorStop(1, 'rgba(14,165,233,0)');
+
+      new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Ödünç', data: borrows, borderColor: '#7c3aed', backgroundColor: g1, tension: .35, fill: true, pointRadius: 2 },
+            { label: 'İade',  data: returns, borderColor: '#0ea5e9', backgroundColor: g2, tension: .35, fill: true, pointRadius: 2 }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } },
+          scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, grid: { color: 'rgba(2,6,23,.08)' }, ticks: { precision: 0 } }
+          }
+        }
+      });
+    })();
+</script>

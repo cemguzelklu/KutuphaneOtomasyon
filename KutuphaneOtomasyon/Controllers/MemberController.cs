@@ -63,7 +63,8 @@ namespace KutuphaneOtomasyon.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Members.Add(member);
+                if (member.JoinedAt == default) member.JoinedAt = DateTime.UtcNow;
+                _context.Add(member);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -125,7 +126,7 @@ namespace KutuphaneOtomasyon.Controllers
         }
 
         // === DETAY ===
-        public async Task<IActionResult> Details(int id, CancellationToken ct)
+        public async Task<IActionResult> Details(int id, bool useAi = true, CancellationToken ct = default)
         {
             var member = await _context.Members
                 .Include(m => m.Borrows).ThenInclude(b => b.Book)
@@ -171,27 +172,71 @@ namespace KutuphaneOtomasyon.Controllers
                 ? 1
                 : (double)(totalBorrowCount - lateReturnCount) / totalBorrowCount;
 
-            // --- Risk & Öneri (kural tabanlı) ---
+            // --- Risk (eski mantığın kalsın) ---
+            // --- Risk (hesaplandı) ---
             var riskResult = _riskAnalyzer.Calculate(id);
-            var suggestions = _recommendationService.RecommendForMember(id);
 
-            // --- AI ile zenginleştir (anahtar yoksa OpenAiAssistant zaten no-op/fallback yapar) ---
-            try
+            // --- Normalize: Score 0..100 + Level üret ---
+            if (riskResult != null)
             {
-                suggestions = await _ai.RerankAndExplainAsync(id, suggestions, ct);
-            }
-            catch { /* sessiz geç */ }
+                riskResult.Score = Math.Max(0, Math.Min(100, riskResult.Score));
+                if (string.IsNullOrWhiteSpace(riskResult.Level))
+                    riskResult.Level = riskResult.Score < 30 ? "Low"
+                                     : riskResult.Score < 70 ? "Medium"
+                                     : "High";
 
-            try
-            {
-                if (riskResult != null)
+                // (Opsiyonel) maddeleri kısalt/sırala
+                if (riskResult.Items?.Count > 10)
+                    riskResult.Items = riskResult.Items
+                        .OrderByDescending(x => x.Weight)
+                        .ThenByDescending(x => x.Status)
+                        .Take(10).ToList();
+
+                // --- AI özet (quota yoksa bile fallback hazır) ---
+                try
                 {
-                    var memberVm = new MemberVm { MemberId = member.MemberId, Name = member.Name };
-                    riskResult.Summary = await _ai.SummarizeRiskAsync(memberVm, riskResult, ct);
+                    var memberVmForAi = new MemberVm { MemberId = member.MemberId, Name = member.Name };
+                    var aiText = await _ai.SummarizeRiskAsync(memberVmForAi, riskResult, ct);
+
+                    if (!string.IsNullOrWhiteSpace(aiText))
+                        riskResult.Summary = aiText.Trim();
+
+                    if (string.IsNullOrWhiteSpace(riskResult.Summary))
+                        riskResult.Summary = $"Skor {riskResult.Score} ({riskResult.Level}). " +
+                                             $"{riskResult.OverdueCount} gecikmiş, {riskResult.DueSoonCount} yaklaşan iade.";
+                }
+                catch
+                {
+                    if (string.IsNullOrWhiteSpace(riskResult.Summary))
+                        riskResult.Summary = $"Skor {riskResult.Score} ({riskResult.Level}). " +
+                                             $"{riskResult.OverdueCount} gecikmiş, {riskResult.DueSoonCount} yaklaşan iade.";
                 }
             }
-            catch { /* sessiz geç */ }
 
+            // --- ÖNERİLER ---
+            // 1) Kural-tabanlı (klasik)
+            var classic = _recommendationService.RecommendForMember(id) ?? new List<AiSuggestionVm>();
+
+            // 2) AI (toggle ve provider açık ise)
+            List<AiSuggestionVm>? ai = null;
+            DateTime? generatedAt = null;
+            var aiEnabled = false;
+            try
+            {
+                aiEnabled = (_ai?.GetType().Name ?? "") != "NullAiAssistant"; // veya _ai.IsEnabled
+                if (useAi && aiEnabled && classic.Any())
+                {
+                    ai = await _ai.RerankAndExplainAsync(id, classic, ct);
+                    generatedAt = DateTime.Now;
+                }
+            }
+            catch
+            {
+                // AI hatası durumunda klasik'e düş
+                ai = null;
+            }
+
+            // 3) ViewModel
             var vm = new MemberDetailsVm
             {
                 Member = new MemberVm
@@ -205,11 +250,58 @@ namespace KutuphaneOtomasyon.Controllers
                 TotalBorrowCount = totalBorrowCount,
                 LateReturnCount = lateReturnCount,
                 OnTimeRate = onTimeRate,
+
                 Risk = riskResult,
-                Suggestions = suggestions
+
+                AiEnabled = aiEnabled,
+                UseAi = useAi,
+                SuggestionsGeneratedAt = generatedAt,
+                ClassicSuggestions = classic,
+                AiSuggestions = ai
             };
 
+            // Nihai gösterilecek liste (toggle + mevcutluğa göre)
+            vm.Suggestions = (vm.UseAi && vm.AiEnabled && (vm.AiSuggestions?.Any() ?? false))
+                ? vm.AiSuggestions!
+                : vm.ClassicSuggestions;
+
             return View(vm);
+        }
+        // MemberController sınıfının içine ekle
+        [HttpGet("/api/ai/member-suggestions")]
+        public async Task<IActionResult> QuickSuggestions(int memberId, int take = 6, CancellationToken ct = default)
+        {
+            // 1) Kural tabanlı öneri
+            var classic = _recommendationService.RecommendForMember(memberId) ?? new List<AiSuggestionVm>();
+
+            // 2) AI varsa re-rank
+            List<AiSuggestionVm> result = classic;
+            if (_ai.IsEnabled && classic.Any())
+            {
+                try
+                {
+                    var ai = await _ai.RerankAndExplainAsync(memberId, classic, ct);
+                    if (ai != null && ai.Any()) result = ai;
+                }
+                catch
+                {
+                    // hata olursa sessizce klasik'e dön
+                }
+            }
+
+            // 3) Sadece gereken alanları dön (hafif JSON)
+            var payload = result
+                .Take(Math.Max(1, take))
+                .Select(s => new {
+                    s.BookId,
+                    s.Title,
+                    s.Author,
+                    s.Reason,
+                    s.AvailableCopies,
+                    s.ThumbnailUrl
+                });
+
+            return Json(payload);
         }
 
     }

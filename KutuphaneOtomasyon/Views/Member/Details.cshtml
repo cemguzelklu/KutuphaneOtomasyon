@@ -36,7 +36,14 @@
             </ul>
         </div>
     }
-
+    @if (Model.Risk != null)
+    {
+        @await Html.PartialAsync("_RiskCard", Model.Risk)
+    }
+    else
+    {
+        <div class="alert alert-light">Risk bilgisi hesaplanamadı.</div>
+    }
     <!-- İstatistikler -->
     <div class="row mb-4">
         <div class="col-md-4">
@@ -119,25 +126,93 @@
         </tbody>
     </table>
 
-    <!-- Önerilen Kitaplar -->
-    @if (Model.Suggestions != null && Model.Suggestions.Any())
-    {
-        <h4>Önerilen Kitaplar</h4>
-        <div class="row">
-            @foreach (var s in Model.Suggestions)
+    @* --- ÖNERİLER (AI Toggle) --- *@
+    <div class="d-flex align-items-center mb-2">
+        <h5 class="mb-0">Öneriler</h5>
+
+        @if (Model.AiEnabled)
+        {
+            <label class="ml-3 mb-0" style="cursor:pointer;">
+                <input type="checkbox" id="aiToggle" @(Model.UseAi ? "checked" : "") />
+                <span class="ml-1">AI sıralı</span>
+            </label>
+            <small class="text-muted ml-2">
+                @(Model.UseAi ? "AI aktif" : "Klasik")
+                @if (Model.SuggestionsGeneratedAt.HasValue)
+                {
+                    <text> · güncelleme: @Model.SuggestionsGeneratedAt.Value.ToString("dd.MM.yyyy HH:mm")</text>
+                }
+            </small>
+        }
+        else
+        {
+            <span class="badge badge-secondary ml-2">AI kapalı</span>
+        }
+    </div>
+
+    <div class="card border-primary mb-3">
+        <div class="card-header">
+            @(Model.UseAi && Model.AiEnabled ? "AI Önerileri" : "Klasik Öneriler")
+            @if (Model.UseAi && Model.AiEnabled)
             {
-                <div class="col-md-3 mb-3">
-                    <div class="card h-100 shadow-sm">
-                        <img src="@s.ThumbnailUrl" class="card-img-top" alt="@s.Title" />
-                        <div class="card-body">
-                            <h6 class="card-title">@s.Title</h6>
-                            <p class="card-text"><small>@s.Author</small></p>
-                            <p class="text-muted"><small>@s.Reason</small></p>
-                            <span class="badge bg-info">Stok: @s.AvailableCopies</span>
-                        </div>
-                    </div>
-                </div>
+                <span class="badge badge-primary ml-2">AI sıraladı</span>
             }
         </div>
-    }
+        <div class="card-body">
+            @if (Model.Suggestions?.Any() == true)
+            {
+                foreach (var b in Model.Suggestions)
+                {
+                    <div class="py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="mr-2">
+                                <strong>@b.Title</strong>
+                                @if (!string.IsNullOrWhiteSpace(b.Author))
+                                {
+                                    <small class="text-muted"> @b.Author</small>
+                                }
+                                <div>
+                                    <small class="text-muted">Stok: @b.AvailableCopies</small>
+                                </div>
+                            </div>
+
+                            <div class="text-nowrap">
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        data-toggle="collapse"
+                                        data-target="#why-@b.BookId"
+                                        aria-expanded="false"
+                                        aria-controls="why-@b.BookId">
+                                    Neden?
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="why-@b.BookId" class="collapse mt-1">
+                            <small class="text-muted">
+                                @(!string.IsNullOrWhiteSpace(b.Reason) ? b.Reason : "Açıklama yok")
+                            </small>
+                        </div>
+                        <hr class="my-2" />
+                    </div>
+                }
+            }
+            else
+            {
+                <small class="text-muted">Öneri bulunamadı.</small>
+            }
+        </div>
+    </div>
 </div>
+@section Scripts {
+    <script>
+        (function(){
+          var t = document.getElementById('aiToggle');
+          if(!t) return;
+          t.addEventListener('change', function(e){
+            var url = new URL(window.location.href);
+            url.searchParams.set('useAi', e.target.checked ? 'true' : 'false');
+            window.location.href = url.toString();
+          });
+        })();
+    </script>
+}

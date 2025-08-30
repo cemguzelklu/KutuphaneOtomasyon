@@ -16,7 +16,7 @@ namespace KutuphaneOtomasyon.Controllers
             if (username == adminUsername && password == adminPassword)
             {
                 HttpContext.Session.SetString("IsAdmin", "true");
-                return RedirectToAction("Index","");
+                return RedirectToAction("Index","Home");
             }
             ViewBag.Error = "Kullanıcı adı veya şifre yanlış.";
             return View();

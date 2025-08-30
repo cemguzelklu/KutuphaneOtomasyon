@@ -40,7 +40,78 @@
         </form>
     </div>
 </div>
-
+<!-- Sağ panel -->
+<div class="card">
+    <div class="card-header">
+        Bu üyeye şunlar da gider
+        <small class="text-muted" id="ai-badge" style="display:none"> (AI)</small>
+    </div>
+    <div class="card-body" id="quick-suggest">
+        <div class="text-muted">Öneriler yükleniyor…</div>
+    </div>
+</div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function(){
+          // Üye Id’yi bir yerden al: modelden, hidden input'tan ya da querystring’ten.
+          // Örn: server tarafında yaz:
+          var memberId = @Model.MemberId; // yoksa: document.querySelector('[name="MemberId"]').value;
+
+          fetch(`/api/ai/member-suggestions?memberId=${memberId}&take=6`)
+            .then(r => r.json())
+            .then(list => {
+              const host = document.getElementById('quick-suggest');
+              host.innerHTML = '';
+              if(!list || !list.length){
+                host.innerHTML = '<div class="text-muted">Öneri bulunamadı.</div>';
+                return;
+              }
+
+              // AI rozetini basit heuristikle göster (Reason doluysa)
+              if(list.some(x => x.reason && x.reason.length > 0)){
+                document.getElementById('ai-badge').style.display = 'inline';
+              }
+
+              list.forEach(x => {
+                const item = document.createElement('div');
+                item.className = 'd-flex align-items-center mb-2';
+                item.innerHTML = `
+                  <img src="${x.thumbnailUrl ?? ''}" onerror="this.style.display='none';" class="mr-2" style="width:36px;height:54px;object-fit:cover;border-radius:4px;">
+                  <div class="flex-grow-1">
+                    <div><strong>${x.title}</strong> <small class="text-muted">${x.author ?? ''}</small></div>
+                    ${x.reason ? `<div><small class="text-muted">${x.reason}</small></div>` : ''}
+                    <div>
+                      <small class="${(x.availableCopies ?? 0) > 0 ? 'text-success' : 'text-danger'}">
+                        ${(x.availableCopies ?? 0) > 0 ? 'Stokta' : 'Stok yok'}
+                      </small>
+                    </div>
+                  </div>
+                  <button class="btn btn-sm btn-primary ml-2" type="button"
+                    onclick="addBookToLoan(${x.bookId}, '${(x.title ?? '').replace(/'/g, "\\'")}')">
+                    Ekle
+                  </button>`;
+                host.appendChild(item);
+              });
+            })
+            .catch(_ => {
+              document.getElementById('quick-suggest').innerHTML =
+                '<div class="text-muted">Öneriler yüklenemedi.</div>';
+            });
+        })();
+
+        // “Ekle” butonu tıklandığında formunu doldur:
+        function addBookToLoan(bookId, title){
+          // Projendeki Create formundaki alan adına göre düzenle:
+          // Örn: <input type="hidden" name="BookId" id="BookId">
+          const inp = document.getElementById('BookId') || document.querySelector('[name="BookId"]');
+          if(inp){ inp.value = bookId; }
+
+          // Kullanıcıya görsel geri bildirim:
+          const info = document.getElementById('selected-book-info');
+          if(info){ info.textContent = `Seçildi: ${title} (#${bookId})`; }
+
+          // Eğer arama/autocomplete’in varsa onu da tetikleyebilirsin (opsiyonel).
+        }
+    </script>
 }

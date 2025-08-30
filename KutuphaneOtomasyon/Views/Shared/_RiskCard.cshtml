@@ -1,0 +1,64 @@
+﻿@model KutuphaneOtomasyon.ViewModels.Members.RiskResultVm
+
+@{
+    var sc = Model.Score;
+    var barClass = sc < 30 ? "bg-success" : sc < 70 ? "bg-warning" : "bg-danger";
+    var levelBadge = (Model.Level ?? "").ToLowerInvariant() switch
+    {
+        "low" => "badge-success",
+        "medium" => "badge-warning",
+        "high" => "badge-danger",
+        _ => "badge-secondary"
+    };
+}
+
+<div class="card mb-3">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <div>
+            <strong>Üye Risk Durumu</strong>
+            <span class="badge @levelBadge ml-2">@Model.Level</span>
+        </div>
+        <small class="text-muted">Skor: <strong>@Model.Score</strong> / 100</small>
+    </div>
+
+    <div class="card-body">
+        <div class="progress mb-2" style="height:10px;">
+            <div class="progress-bar @barClass" role="progressbar" style="width:@($"{Model.Score}%")"></div>
+        </div>
+
+        <div class="mb-2 text-muted">
+            @if (!string.IsNullOrWhiteSpace(Model.Summary))
+            {
+                @Model.Summary
+            }
+            else
+            {
+                <text>Kısa özet mevcut değil.</text>
+            }
+        </div>
+
+        <div class="d-flex flex-wrap" style="gap:.5rem;">
+            <span class="badge badge-light text-dark">Gecikmiş: <strong>@Model.OverdueCount</strong></span>
+            <span class="badge badge-light text-dark">Yaklaşan: <strong>@Model.DueSoonCount</strong></span>
+        </div>
+
+        @if (Model.Items?.Any() == true)
+        {
+            <hr />
+            <div class="small text-muted mb-1">Kitap bazlı durumlar</div>
+            @foreach (var it in Model.Items)
+            {
+                var w = it.Weight;
+                var dot = w >= 20 ? "text-danger" : w >= 10 ? "text-warning" : "text-muted";
+                <div class="d-flex justify-content-between align-items-center py-1">
+                    <div>
+                        <i class="fa fa-circle @dot mr-1"></i>
+                        <strong>@it.Title</strong>
+                        <small class="text-muted ml-1">(@it.Status)</small>
+                    </div>
+                    <span class="badge badge-light">+@w</span>
+                </div>
+            }
+        }
+    </div>
+</div>

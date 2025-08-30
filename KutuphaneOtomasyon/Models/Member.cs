@@ -15,6 +15,12 @@ namespace KutuphaneOtomasyon.Models
         [Required]
         public MemberTypeEnum MemberType { get; set; }
 
+        [Display(Name = "Üyelik Tarihi")]
+        [DataType(DataType.Date)]
+        [Required]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;  // kod tarafı default
+
         [ValidateNever]
         public ICollection<Borrow> Borrows { get; set; }
 

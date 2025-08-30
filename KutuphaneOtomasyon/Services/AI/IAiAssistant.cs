@@ -9,5 +9,11 @@ namespace KutuphaneOtomasyon.Services.AI
 
         Task<string> SummarizeRiskAsync(
             MemberVm member, RiskResultVm risk, CancellationToken ct = default);
+
+        bool IsEnabled { get; } // provider/anahtar var mı?
+        Task<AiDiagInfo> DiagnosticsAsync(CancellationToken ct = default);
+
+        Task<string?> SuggestQueryRewriteAsync(string query, CancellationToken ct = default);
+
     }
 }
