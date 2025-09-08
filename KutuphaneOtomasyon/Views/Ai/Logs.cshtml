@@ -301,43 +301,41 @@
         .sidebar-link.ai-react-right .hide-menu {
             order: 1;
         }
+
     @@keyframes tubePulse {
-        0%,100%
+        0%, 100% {
+            transform: translateY(0) scale(1);
+            filter: drop-shadow(0 0 0 rgba(97,218,251,.0));
+        }
 
-    {
-        transform: translateY(0) scale(1);
-        filter: drop-shadow(0 0 0 rgba(97,218,251,.0));
-    }
-
-    50% {
-        transform: translateY(-1px) scale(1.06);
-        filter: drop-shadow(0 0 6px rgba(97,218,251,.6));
-    }
-
+        50% {
+            transform: translateY(-1px) scale(1.06);
+            filter: drop-shadow(0 0 6px rgba(97,218,251,.6));
+        }
     }
     /* DataTables pagination: aktif (current) sayının yazısını her durumda beyaz yap */
-.dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:focus,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:active,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:focus-visible,
-#bookTable_wrapper  .dataTables_paginate .paginate_button.current,
-#bookTable_wrapper  .dataTables_paginate .paginate_button.current:hover,
-#logTable_wrapper   .dataTables_paginate .paginate_button.current,
-#logTable_wrapper   .dataTables_paginate .paginate_button.current:hover{
-  color:#fff !important;
-}
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:focus,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:active,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:focus-visible,
+    #bookTable_wrapper .dataTables_paginate .paginate_button.current,
+    #bookTable_wrapper .dataTables_paginate .paginate_button.current:hover,
+    #logTable_wrapper .dataTables_paginate .paginate_button.current,
+    #logTable_wrapper .dataTables_paginate .paginate_button.current:hover {
+        color: #fff !important;
+    }
 
-/* Tıklama anında griye düşmesini engelle (bazı tarayıcılar :active’te renki kısıyor) */
-.dataTables_wrapper .dataTables_paginate .paginate_button:active{
-  color:#fff !important;
-}
+    /* Tıklama anında griye düşmesini engelle (bazı tarayıcılar :active’te renki kısıyor) */
+    .dataTables_wrapper .dataTables_paginate .paginate_button:active {
+        color: #fff !important;
+    }
 
-/* Eğer DataTables 'span' veya çocuk eleman üretirse, onların da rengi beyaz kalsın */
-.dataTables_wrapper .dataTables_paginate .paginate_button.current *,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current > *{
-  color:#fff !important;
-}
+    /* Eğer DataTables 'span' veya çocuk eleman üretirse, onların da rengi beyaz kalsın */
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current *,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current > * {
+        color: #fff !important;
+    }
 
 </style>
 

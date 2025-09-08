@@ -41,7 +41,7 @@ namespace KutuphaneOtomasyon.Controllers
             if (memberId.HasValue)
             {
                 var classic = _rec.RecommendForMember(memberId.Value) ?? new List<AiSuggestionVm>();
-                testResults = (_ai.IsEnabled && classic.Any())
+                testResults = _ai.IsEnabled && classic.Any()
                     ? await _ai.RerankAndExplainAsync(memberId.Value, classic, ct)
                     : classic;
             }
@@ -152,7 +152,7 @@ namespace KutuphaneOtomasyon.Controllers
                 {
                     count = total,
                     unique = uniqueTitles,
-                    last = (lastCreatedAt == default(DateTime))
+                    last = lastCreatedAt == default
                         ? null
                         : lastCreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
                 }

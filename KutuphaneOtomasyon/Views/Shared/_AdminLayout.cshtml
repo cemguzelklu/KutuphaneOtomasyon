@@ -305,6 +305,54 @@
             background: transparent !important;
         }
 
+        :root {
+            --topbar-h: 64px;
+        }
+        /* topbar yüksekliği; gerekiyorsa 56px yap */
+
+        @@media (max-width: 991.98px) {
+            /* İçerik sola kaymasın */
+            .page-wrapper
+
+        {
+            margin-left: 0 !important;
+        }
+
+        /* Sidebar’ı ekrandan dışarıda başlat */
+        .left-sidebar {
+            position: fixed !important;
+            top: var(--topbar-h);
+            bottom: 0;
+            left: 0;
+            width: var(--sidebar-open,240px) !important;
+            transform: translateX(-100%);
+            transition: transform .2s ease;
+            z-index: 1060; /* topbar üstünde */
+        }
+
+        /* .show-sidebar geldiğinde içeri kaydır */
+        #main-wrapper.show-sidebar .left-sidebar {
+            transform: translateX(0);
+        }
+
+        /* Arka plan karartma */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s ease;
+            z-index: 1055;
+        }
+
+        #main-wrapper.show-sidebar + .sidebar-backdrop,
+        #main-wrapper.show-sidebar .sidebar-backdrop {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        }
     </style>
 </head>
 
@@ -384,7 +432,11 @@
                                 <i class="mdi mdi-menu font-24"></i>
                             </a>
                         </li>
-
+                        <li class="nav-item d-md-none">
+                            <a class="nav-link" asp-controller="Book" asp-action="Index">
+                                <i class="mdi mdi-book-multiple"></i> Kitaplar
+                            </a>
+                        </li>
                         <!-- ============================================================== -->
                         <!-- create new -->
                         <!-- ============================================================== -->
@@ -529,6 +581,7 @@
         <!-- Left Sidebar - style you can find in sidebar.scss  -->
         <!-- ============================================================== -->
         <aside class="left-sidebar" data-sidebarbg="skin5">
+            <div class="sidebar-backdrop d-md-none"></div>
             <!-- Sidebar scroll-->
             <div class="scroll-sidebar">
                 <!-- Sidebar navigation-->
@@ -1341,6 +1394,37 @@
           });
         })();
     </script>
+    <script>
+        (function () {
+          var $wrapper = $('#main-wrapper');
+
+          // Üst çubuktaki hamburger (sadece telefon)
+          $(document).on('click', '.nav-toggler', function (e) {
+            e.preventDefault();
+            $wrapper.toggleClass('show-sidebar');
+          });
+
+          // Var olan “mini-sidebar” butonu (desktop davranışı kalsın)
+          $(document).on('click', '.sidebartoggler', function (e) {
+            // Matrix Admin zaten mini-sidebar sınıfını yönetiyor; dokunmuyoruz
+            // İstersen alt satırı açıp overlay’i kapatabilirsin:
+            // $wrapper.removeClass('show-sidebar');
+          });
+
+          // Karartma perdesine tıklandığında kapat
+          $(document).on('click', '.sidebar-backdrop', function () {
+            $wrapper.removeClass('show-sidebar');
+          });
+
+          // Menüden bir linke tıklayınca da kapat (mobil UX)
+          $(document).on('click', '.left-sidebar .sidebar-link', function () {
+            if (window.matchMedia('(max-width: 991.98px)').matches) {
+              $wrapper.removeClass('show-sidebar');
+            }
+          });
+        })();
+    </script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 

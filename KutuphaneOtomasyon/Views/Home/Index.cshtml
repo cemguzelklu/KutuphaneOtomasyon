@@ -307,6 +307,25 @@
         color: var(--muted);
         font-size: .85rem;
     }
+    /* Side-stat kartlarını biraz daha ayır ve zebra efekti ver */
+    .side-stats {
+        gap: 16px;
+    }
+    /* boşluğu artır */
+    .side-item {
+        border: 1px solid #e9eef5; /* hafif çerçeve */
+        box-shadow: 0 4px 14px rgba(2,6,23,.06); /* ince gölge */
+    }
+
+        /* Zebra: tek/çift sıraya farklı arka plan */
+        .side-item:nth-child(odd) {
+            background: #fff;
+        }
+        /* sayfa rengi etkisi */
+        .side-item:nth-child(even) {
+            background: var(--soft);
+        }
+    /* mevcut yumuşak ton */
 </style>
 
 <div class="container-fluid">

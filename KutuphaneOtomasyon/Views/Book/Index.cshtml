@@ -1234,7 +1234,7 @@
                         {
                             <tr>
                                 <td>
-                                    @if (book.AvailableCopies > 1)
+                                @if (book.AvailableCopies > 1)
                                     {
                                         <span class="badge bg-success text-white">Müsait</span>
                                     }
@@ -1383,7 +1383,7 @@
                         }
                     }
                 ],
-                dom: "<'lib-topbar d-flex align-items-center justify-content-between flex-wrap gap-2'Bf>rtip"
+                dom: "Bfrtip"
             });
             cacheColumnDataAndTypes("bookTable");
 
@@ -1952,10 +1952,19 @@
 
           console.log("[DEBUG] Column Types:", columnTypesCache);
           console.log("[DEBUG] parsedDatesCache Sample:", parsedDatesCache.slice(0, 5));
-        { const api=$('#bookTable').DataTable(); console.table(Array.from({length:5},(_,r)=>{const o={row:r}; api.columns().header().toArray().forEach((h,i)=>{ if(columnTypesCache[i]==='number') o[$(h).text().trim()]=numericCache[r]?.[i]??null;}); return o;})); }
-
+                (() => {
+          const api = $('#bookTable').DataTable();
+          const rows = Array.from({length: 5}, (_, r) => {
+            const o = { row: r };
+            api.columns().header().toArray().forEach((h, i) => {
+              if (columnTypesCache[i] === 'number')
+                o[$(h).text().trim()] = numericCache[r]?.[i] ?? null;
+            });
+            return o;
+          });
+          console.table(rows);
+        })();
         }
-
          function escapeRegExp(s){
                      return (s||'').toString().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
                  }
@@ -2583,28 +2592,21 @@
           function startHtml5Qrcode() {
           $('#isbnReader').empty();
 
-          html5Scanner = new Html5QrcodeScanner("isbnReader", {
-            fps: 15,
-            // Görüntü genişliğinin %95’i, yüksekliğin ~%45’i kadar tarama penceresi
-            qrbox: function(viewportWidth, viewportHeight){
-              return { width: Math.floor(viewportWidth*0.95), height: Math.floor(viewportHeight*0.45) };
-            },
-            rememberLastUsedCamera: true,
-            supportedScanTypes: [
-              Html5QrcodeScanType.SCAN_TYPE_CAMERA,
-              Html5QrcodeScanType.SCAN_TYPE_FILE
-            ],
-            formatsToSupport: [ Html5QrcodeSupportedFormats.EAN_13 ],
-            experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-            showTorchButtonIfSupported: true,
-            showZoomSliderIfSupported: true,
-            videoConstraints: {
-              facingMode: { ideal: "environment" },
-              width: { ideal: 1920 },
-              focusMode: "continuous",
-              advanced: [{ focusMode: "continuous" }]
-            }
-          }, false);
+                html5Scanner = new Html5QrcodeScanner("isbnReader", {
+          fps: 12,
+          qrbox: (vw, vh) => ({ width: Math.floor(vw*0.92), height: Math.min(160, Math.floor(vh*0.22)) }),
+          aspectRatio: 2.2, // 1D için geniş kutu
+          rememberLastUsedCamera: true,
+          formatsToSupport: [ Html5QrcodeSupportedFormats.EAN_13 ],
+          experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+          showTorchButtonIfSupported: true,
+          showZoomSliderIfSupported: true,
+          videoConstraints: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 }, // 1920 bazı cihazlarda düşüyor; 1280 daha stabil
+            focusMode: "continuous"
+          }
+        }, /*verbose*/ false);
 
           html5Scanner.render(
             function onSuccess(text) {
@@ -2731,37 +2733,60 @@
           } catch(_) {}
         }
 
-        // Dosyadan barkod oku (tek seferlik)
-        async function decodeIsbnFromFile(file){
+             async function decodeIsbnFromFile(file){
           if(!file) return;
-          try { await stopScanEngine(); } catch(_) {}
 
-          const reader = new FileReader();
-          reader.onload = function(e){
-            const src = e.target.result;
-            Quagga.decodeSingle({
-              src,
-              inputStream: { size: 1920, singleChannel: false },
-              locator: { patchSize: 'large', halfSample: false },
-              decoder: { readers: ['ean_reader'] },
-              locate: true
-            }, function(res){
-              const code = res?.codeResult?.code;
-              const isbn = normalizeIsbn13(code);
-              if (isbn) {
-                handleDecodedIsbn(isbn);
-              } else {
-                Swal.fire({
-                  icon: 'warning',
-                  title: 'Bulunamadı',
-                  text: 'Görselde EAN-13 barkod tespit edilemedi. Barkodu daha net/kırpılmış yüklemeyi deneyin.',
-                   zIndex: 50000
-                });
-              }
+          // 1) BarcodeDetector (çoğu modern cihazda çok iyi)
+          if ('BarcodeDetector' in window) {
+            try {
+              const bitmap = await createImageBitmap(file);
+              const bd = new BarcodeDetector({ formats: ['ean_13'] });
+              const hits = await bd.detect(bitmap);
+              const raw = hits.find(h => h.format?.toLowerCase().includes('ean'))?.rawValue;
+              const isbn = normalizeIsbn13(raw);
+              if (isbn) { handleDecodedIsbn(isbn); return; }
+            } catch(_) { /* devam */ }
+          }
+
+          // 2) Quagga - 0/90/180/270 derece dene
+          const img = await new Promise(r => { const i=new Image(); i.onload=()=>r(i); i.src = URL.createObjectURL(file); });
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d', { willReadFrequently:true });
+
+          for (const rot of [0,90,180,270]) {
+            const rad = rot*Math.PI/180;
+            const w = img.width, h = img.height;
+            if (rot % 180 === 0) { canvas.width=w; canvas.height=h; }
+            else { canvas.width=h; canvas.height=w; }
+
+            // döndür ve çiz
+            ctx.setTransform(1,0,0,1,0,0);
+            ctx.translate(canvas.width/2, canvas.height/2);
+            ctx.rotate(rad);
+            ctx.drawImage(img, -w/2, -h/2);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+            const ok = await new Promise(res => {
+              Quagga.decodeSingle({
+                src: dataUrl,
+                inputStream: { size: 1280, singleChannel: false },
+                locator: { patchSize: 'medium', halfSample: false },
+                locate: true,
+                decoder: { readers: ['ean_reader'] }
+              }, (r) => {
+                const code = r?.codeResult?.code;
+                const isbn = normalizeIsbn13(code);
+                res(isbn || null);
+              });
             });
-          };
-          reader.readAsDataURL(file);
+
+            if (ok) { handleDecodedIsbn(ok); return; }
+          }
+
+          Swal.fire({ icon:'warning', title:'Okunamadı', text:'Barkodu biraz daha yakından, parlama olmadan ve kenarlarda beyaz boşluk bırakarak çekip tekrar deneyin.' , zIndex:50000 });
         }
+
 
         // Kalıcı butonun change olayı
         $(document).on('change', '#isbnFile', function(e){

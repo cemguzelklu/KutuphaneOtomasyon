@@ -22,21 +22,21 @@ namespace KutuphaneOtomasyon.Controllers
 
             var books = await _context.Books
                 .Where(b =>
-                    (b.Title != null && b.Title.Contains(query)) ||
-                    (b.Author != null && b.Author.Contains(query)) ||
-                    (b.Category != null && b.Category.Contains(query)))
+                    b.Title != null && b.Title.Contains(query) ||
+                    b.Author != null && b.Author.Contains(query) ||
+                    b.Category != null && b.Category.Contains(query))
                 .ToListAsync(ct);
 
             var members = await _context.Members
                 .Where(m =>
-                    (m.Name != null && m.Name.Contains(query)) ||
-                    (m.Email != null && m.Email.Contains(query)))
+                    m.Name != null && m.Name.Contains(query) ||
+                    m.Email != null && m.Email.Contains(query))
                 .ToListAsync(ct);
 
             var borrows = await _context.Borrows
                 .Where(b =>
-                    (b.Book != null && b.Book.Title != null && b.Book.Title.Contains(query)) ||
-                    (b.Member != null && b.Member.Name != null && b.Member.Name.Contains(query)))
+                    b.Book != null && b.Book.Title != null && b.Book.Title.Contains(query) ||
+                    b.Member != null && b.Member.Name != null && b.Member.Name.Contains(query))
                 .Include(b => b.Book)
                 .Include(b => b.Member)
                 .ToListAsync(ct);
@@ -101,7 +101,7 @@ namespace KutuphaneOtomasyon.Controllers
             for (int i = 1; i <= n; i++)
                 for (int j = 1; j <= m; j++)
                 {
-                    int cost = (a[i - 1] == b[j - 1]) ? 0 : 1;
+                    int cost = a[i - 1] == b[j - 1] ? 0 : 1;
                     d[i, j] = Math.Min(
                                 Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
                                 d[i - 1, j - 1] + cost);
@@ -119,11 +119,11 @@ namespace KutuphaneOtomasyon.Controllers
                               // Kitap/Üye/Ödünç tarafında hızlı bir LIKE testi (performans için sınırla)
             bool asciiHits =
                 await _context.Books.AnyAsync(b =>
-                      (b.Title != null && NormalizeTr(b.Title).Contains(ascii)) ||
-                      (b.Author != null && NormalizeTr(b.Author).Contains(ascii)), ct)
+                      b.Title != null && NormalizeTr(b.Title).Contains(ascii) ||
+                      b.Author != null && NormalizeTr(b.Author).Contains(ascii), ct)
                 || await _context.Members.AnyAsync(m =>
-                      (m.Name != null && NormalizeTr(m.Name).Contains(ascii)) ||
-                      (m.Email != null && NormalizeTr(m.Email).Contains(ascii)), ct);
+                      m.Name != null && NormalizeTr(m.Name).Contains(ascii) ||
+                      m.Email != null && NormalizeTr(m.Email).Contains(ascii), ct);
 
             if (asciiHits && !string.Equals(ascii, NormalizeTr(query), StringComparison.Ordinal))
                 return query; // Kullanıcı girdisi zaten TR; görünür öneri olarak aynı metni göstermek yerine:

@@ -54,7 +54,7 @@ namespace KutuphaneOtomasyon.Controllers
 
             var returnsAgg = await _context.Borrows
                 .Where(b => b.ReturnDate.HasValue && b.ReturnDate.Value >= startDate)
-                .GroupBy(b => new { Year = b.ReturnDate!.Value.Year, Month = b.ReturnDate!.Value.Month, Day = b.ReturnDate!.Value.Day })
+                .GroupBy(b => new { b.ReturnDate!.Value.Year, b.ReturnDate!.Value.Month, b.ReturnDate!.Value.Day })
                 .Select(g => new { Day = new DateTime(g.Key.Year, g.Key.Month, g.Key.Day), Count = g.Count() })
                 .ToListAsync();
 
@@ -65,7 +65,7 @@ namespace KutuphaneOtomasyon.Controllers
 
             ViewBag.AnalyticsJson = JsonSerializer.Serialize(new
             {
-                labels = labels,
+                labels,
                 borrows = borrowsSeries,
                 returns = returnsSeries
             });
